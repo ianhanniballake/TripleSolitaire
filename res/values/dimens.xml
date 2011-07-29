@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="between_card_dim">10dp</dimen>
+    <dimen name="card_width_dim">65dp</dimen>
+    <dimen name="card_height_dim">101dp</dimen>
+    
+</resources>

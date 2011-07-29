@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:padding="5dp"
+	android:background="#660000">
+	<ImageView
+		android:id="@+id/stock"
+		android:layout_width="@dimen/card_width_dim"
+        android:layout_height="@dimen/card_height_dim"
+		android:layout_margin="@dimen/between_card_dim"
+		android:layout_alignParentTop="true"
+		android:layout_alignParentLeft="true"
+		android:src="@drawable/clubs1" />
+	<ImageView
+		android:id="@+id/waste"
+		android:layout_width="@dimen/card_width_dim"
+		android:layout_height="@dimen/card_height_dim"
+        android:layout_margin="@dimen/between_card_dim"
+		android:layout_alignParentTop="true"
+		android:layout_toRightOf="@id/stock"
+		android:src="@drawable/spades13" />
+    <ImageView
+        android:id="@+id/foundation12"
+        android:layout_width="@dimen/card_width_dim"
+        android:layout_height="@dimen/card_height_dim"
+        android:layout_margin="@dimen/between_card_dim"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:src="@drawable/clubs1" />
+    <ImageView
+        android:id="@+id/foundation11"
+        android:layout_width="@dimen/card_width_dim"
+        android:layout_height="@dimen/card_height_dim"
+        android:layout_margin="@dimen/between_card_dim"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@id/foundation12"
+        android:src="@drawable/clubs1" />
+    <ImageView
+        android:id="@+id/foundation10"
+        android:layout_width="@dimen/card_width_dim"
+        android:layout_height="@dimen/card_height_dim"
+        android:layout_margin="@dimen/between_card_dim"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@id/foundation11"
+        android:src="@drawable/clubs1" />
+    <ImageView
+        android:id="@+id/foundation9"
+        android:layout_width="@dimen/card_width_dim"
+        android:layout_height="@dimen/card_height_dim"
+        android:layout_margin="@dimen/between_card_dim"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@id/foundation10"
+        android:src="@drawable/clubs1" />
+    <ImageView
+        android:id="@+id/foundation8"
+        android:layout_width="@dimen/card_width_dim"
+        android:layout_height="@dimen/card_height_dim"
+        android:layout_margin="@dimen/between_card_dim"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@id/foundation9"
+        android:src="@drawable/clubs1" />
+    <ImageView
+        android:id="@+id/foundation7"
+        android:layout_width="@dimen/card_width_dim"
+        android:layout_height="@dimen/card_height_dim"
+        android:layout_margin="@dimen/between_card_dim"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@id/foundation8"
+        android:src="@drawable/clubs1" />
+	<ImageView
+		android:id="@+id/foundation6"
+		android:layout_width="@dimen/card_width_dim"
+		android:layout_height="@dimen/card_height_dim"
+		android:layout_margin="@dimen/between_card_dim"
+		android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@id/foundation7"
+		android:src="@drawable/clubs1" />
+    <ImageView
+        android:id="@+id/foundation5"
+        android:layout_width="@dimen/card_width_dim"
+        android:layout_height="@dimen/card_height_dim"
+        android:layout_margin="@dimen/between_card_dim"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@id/foundation6"
+        android:src="@drawable/clubs1" />
+    <ImageView
+        android:id="@+id/foundation4"
+        android:layout_width="@dimen/card_width_dim"
+        android:layout_height="@dimen/card_height_dim"
+        android:layout_margin="@dimen/between_card_dim"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@id/foundation5"
+        android:src="@drawable/clubs1" />
+    <ImageView
+        android:id="@+id/foundation3"
+        android:layout_width="@dimen/card_width_dim"
+        android:layout_height="@dimen/card_height_dim"
+        android:layout_margin="@dimen/between_card_dim"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@id/foundation4"
+        android:src="@drawable/clubs1" />
+    <ImageView
+        android:id="@+id/foundation2"
+        android:layout_width="@dimen/card_width_dim"
+        android:layout_height="@dimen/card_height_dim"
+        android:layout_margin="@dimen/between_card_dim"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@id/foundation3"
+        android:src="@drawable/clubs1" />
+    <ImageView
+        android:id="@+id/foundation1"
+        android:layout_width="@dimen/card_width_dim"
+        android:layout_height="@dimen/card_height_dim"
+        android:layout_margin="@dimen/between_card_dim"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@id/foundation2"
+        android:src="@drawable/clubs1" />
+    <ImageView
+        android:id="@+id/lane13"
+        android:layout_width="@dimen/card_width_dim"
+        android:layout_height="@dimen/card_height_dim"
+        android:layout_margin="@dimen/between_card_dim"
+        android:layout_below="@id/foundation12"
+        android:layout_alignParentRight="true"
+        android:src="@drawable/clubs1" />
+    <ImageView
+        android:id="@+id/lane12"
+        android:layout_width="@dimen/card_width_dim"
+        android:layout_height="@dimen/card_height_dim"
+        android:layout_margin="@dimen/between_card_dim"
+        android:layout_below="@id/foundation11"
+        android:layout_toLeftOf="@id/lane13"
+        android:src="@drawable/clubs1" />
+    <ImageView
+        android:id="@+id/lane11"
+        android:layout_width="@dimen/card_width_dim"
+        android:layout_height="@dimen/card_height_dim"
+        android:layout_margin="@dimen/between_card_dim"
+        android:layout_below="@id/foundation10"
+        android:layout_toLeftOf="@id/lane12"
+        android:src="@drawable/clubs1" />
+    <ImageView
+        android:id="@+id/lane10"
+        android:layout_width="@dimen/card_width_dim"
+        android:layout_height="@dimen/card_height_dim"
+        android:layout_margin="@dimen/between_card_dim"
+        android:layout_below="@id/foundation9"
+        android:layout_toLeftOf="@id/lane11"
+        android:src="@drawable/clubs1" />
+    <ImageView
+        android:id="@+id/lane9"
+        android:layout_width="@dimen/card_width_dim"
+        android:layout_height="@dimen/card_height_dim"
+        android:layout_margin="@dimen/between_card_dim"
+        android:layout_below="@id/foundation8"
+        android:layout_toLeftOf="@id/lane10"
+        android:src="@drawable/clubs1" />
+    <ImageView
+        android:id="@+id/lane8"
+        android:layout_width="@dimen/card_width_dim"
+        android:layout_height="@dimen/card_height_dim"
+        android:layout_margin="@dimen/between_card_dim"
+        android:layout_below="@id/foundation7"
+        android:layout_toLeftOf="@id/lane9"
+        android:src="@drawable/clubs1" />
+    <ImageView
+        android:id="@+id/lane7"
+        android:layout_width="@dimen/card_width_dim"
+        android:layout_height="@dimen/card_height_dim"
+        android:layout_margin="@dimen/between_card_dim"
+        android:layout_below="@id/foundation6"
+        android:layout_toLeftOf="@id/lane8"
+        android:src="@drawable/clubs1" />
+    <ImageView
+        android:id="@+id/lane6"
+        android:layout_width="@dimen/card_width_dim"
+        android:layout_height="@dimen/card_height_dim"
+        android:layout_margin="@dimen/between_card_dim"
+        android:layout_below="@id/foundation5"
+        android:layout_toLeftOf="@id/lane7"
+        android:src="@drawable/clubs1" />
+    <ImageView
+        android:id="@+id/lane5"
+        android:layout_width="@dimen/card_width_dim"
+        android:layout_height="@dimen/card_height_dim"
+        android:layout_margin="@dimen/between_card_dim"
+        android:layout_below="@id/foundation4"
+        android:layout_toLeftOf="@id/lane6"
+        android:src="@drawable/clubs1" />
+    <ImageView
+        android:id="@+id/lane4"
+        android:layout_width="@dimen/card_width_dim"
+        android:layout_height="@dimen/card_height_dim"
+        android:layout_margin="@dimen/between_card_dim"
+        android:layout_below="@id/foundation3"
+        android:layout_toLeftOf="@id/lane5"
+        android:src="@drawable/clubs1" />
+    <ImageView
+        android:id="@+id/lane3"
+        android:layout_width="@dimen/card_width_dim"
+        android:layout_height="@dimen/card_height_dim"
+        android:layout_margin="@dimen/between_card_dim"
+        android:layout_below="@id/foundation2"
+        android:layout_toLeftOf="@id/lane4"
+        android:src="@drawable/clubs1" />
+    <ImageView
+        android:id="@+id/lane2"
+        android:layout_width="@dimen/card_width_dim"
+        android:layout_height="@dimen/card_height_dim"
+        android:layout_margin="@dimen/between_card_dim"
+        android:layout_below="@id/foundation1"
+        android:layout_toLeftOf="@id/lane3"
+        android:src="@drawable/clubs1" />
+    <ImageView
+        android:id="@+id/lane1"
+        android:layout_width="@dimen/card_width_dim"
+        android:layout_height="@dimen/card_height_dim"
+        android:layout_margin="@dimen/between_card_dim"
+        android:layout_below="@id/waste"
+        android:layout_toLeftOf="@id/lane2"
+        android:src="@drawable/clubs1" />
+</RelativeLayout>
