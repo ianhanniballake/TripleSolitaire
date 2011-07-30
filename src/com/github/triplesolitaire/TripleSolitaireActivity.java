@@ -92,7 +92,6 @@ public class TripleSolitaireActivity extends Activity
 			}
 			else if (event.getAction() == DragEvent.ACTION_DROP)
 				Log.d(TAG, -1 * foundationIndex + ": Drop of "
-						+ (isMyFoundation ? "mine: " : "not mine: ")
 						+ event.getClipData().getItemAt(0).getText());
 			else if (event.getAction() == DragEvent.ACTION_DRAG_ENDED)
 				if (isMyFoundation)
@@ -413,7 +412,6 @@ public class TripleSolitaireActivity extends Activity
 			stock.push(fullDeck.get(currentIndex++));
 		waste = new ArrayList<String>();
 		foundation = new String[12];
-		foundation[2] = fullDeck.get(currentIndex++);
 		lane = new LaneData[13];
 		for (int h = 0; h < 13; h++)
 		{
@@ -422,6 +420,7 @@ public class TripleSolitaireActivity extends Activity
 				lane[h].getStack().push(fullDeck.get(currentIndex++));
 			lane[h].getCascade().add(fullDeck.get(currentIndex++));
 		}
+		lane[12].getCascade().add(fullDeck.get(currentIndex++));
 		restoreUI();
 	}
 

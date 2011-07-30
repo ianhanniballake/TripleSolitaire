@@ -29,8 +29,15 @@ public class Lane extends RelativeLayout implements OnDragListener
 			if (event.getAction() != MotionEvent.ACTION_DOWN)
 				return false;
 			Log.d(TAG, laneId + ": Starting drag at " + cascadeIndex);
+			final StringBuilder cascadeData = new StringBuilder(
+					cascade.get(cascadeIndex));
+			for (int h = cascadeIndex + 1; h < cascade.size(); h++)
+			{
+				cascadeData.append(";");
+				cascadeData.append(cascade.get(h));
+			}
 			final ClipData dragData = ClipData.newPlainText(
-					cascade.get(cascadeIndex), cascade.get(cascadeIndex));
+					cascade.get(cascadeIndex), cascadeData);
 			v.startDrag(dragData, new View.DragShadowBuilder(v), laneId, 0);
 			return true;
 		}
@@ -187,7 +194,6 @@ public class Lane extends RelativeLayout implements OnDragListener
 		}
 		else if (event.getAction() == DragEvent.ACTION_DROP)
 			Log.d(TAG, laneId + ": Drop of "
-					+ (isMyCascade ? "mine: " : "not mine: ")
 					+ event.getClipData().getItemAt(0).getText());
 		else if (event.getAction() == DragEvent.ACTION_DRAG_ENDED)
 			if (isMyCascade)
