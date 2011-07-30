@@ -55,6 +55,7 @@ public class TripleSolitaireActivity extends Activity
 					"lane" + (curLane + 1), "id", getPackageName());
 			final Lane laneLayout = (Lane) findViewById(laneId);
 			laneLayout.setOnCardFlipListener(new OnCardFlipListener(curLane));
+			laneLayout.setLaneId(curLane);
 		}
 		if (savedInstanceState == null)
 			startGame();
