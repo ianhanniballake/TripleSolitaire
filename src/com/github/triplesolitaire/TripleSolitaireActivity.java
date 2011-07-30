@@ -95,8 +95,18 @@ public class TripleSolitaireActivity extends Activity
 				return acceptDrop;
 			}
 			else if (event.getAction() == DragEvent.ACTION_DROP)
-				Log.d(TAG, -1 * foundationIndex + ": Drop of "
-						+ event.getClipData().getItemAt(0).getText());
+			{
+				final String card = event.getClipData().getItemAt(0).getText()
+						.toString();
+				Log.d(TAG, -1 * foundationIndex + ": Drop of " + card);
+				foundation[foundationIndex - 1] = card;
+				if ((Integer) event.getLocalState() == 0)
+				{
+					waste.remove(0);
+					updateWasteUI();
+				}
+				updateFoundationUI();
+			}
 			else if (event.getAction() == DragEvent.ACTION_DRAG_ENDED)
 				if (isMyFoundation)
 					Log.d(TAG, -1 * foundationIndex + ": Drag ended of mine: "
