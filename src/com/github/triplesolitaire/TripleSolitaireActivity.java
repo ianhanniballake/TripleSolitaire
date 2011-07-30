@@ -51,14 +51,6 @@ public class TripleSolitaireActivity extends Activity
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		for (int curLane = 0; curLane < 13; curLane++)
-		{
-			final int laneId = getResources().getIdentifier(
-					"lane" + (curLane + 1), "id", getPackageName());
-			final Lane laneLayout = (Lane) findViewById(laneId);
-			laneLayout.setOnCardFlipListener(new OnCardFlipListener(curLane));
-			laneLayout.setLaneId(curLane);
-		}
 		final ImageView stockView = (ImageView) findViewById(R.id.stock);
 		stockView.setOnClickListener(new OnClickListener()
 		{
@@ -79,6 +71,14 @@ public class TripleSolitaireActivity extends Activity
 				updateWasteUI();
 			}
 		});
+		for (int curLane = 0; curLane < 13; curLane++)
+		{
+			final int laneId = getResources().getIdentifier(
+					"lane" + (curLane + 1), "id", getPackageName());
+			final Lane laneLayout = (Lane) findViewById(laneId);
+			laneLayout.setOnCardFlipListener(new OnCardFlipListener(curLane));
+			laneLayout.setLaneId(curLane);
+		}
 		if (savedInstanceState == null)
 			startGame();
 	}
