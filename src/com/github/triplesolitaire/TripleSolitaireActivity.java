@@ -54,7 +54,11 @@ public class TripleSolitaireActivity extends Activity
 				final String newCard)
 		{
 			if (foundationCard == null)
+				// Must be an ace if there are no cards on this foundation
 				return newCard.endsWith("s1");
+			if (newCard.startsWith("MULTI"))
+				// Foundations don't accept multiple cards
+				return false;
 			final String existingFoundationCard = foundation[foundationIndex - 1];
 			int firstNumber;
 			for (firstNumber = 0; firstNumber < existingFoundationCard.length(); firstNumber++)
@@ -408,7 +412,7 @@ public class TripleSolitaireActivity extends Activity
 		Collections.shuffle(fullDeck, random);
 		int currentIndex = 0;
 		stock = new Stack<String>();
-		for (int h = 0; h < 64; h++)
+		for (int h = 0; h < 65; h++)
 			stock.push(fullDeck.get(currentIndex++));
 		waste = new ArrayList<String>();
 		foundation = new String[12];
@@ -420,7 +424,6 @@ public class TripleSolitaireActivity extends Activity
 				lane[h].getStack().push(fullDeck.get(currentIndex++));
 			lane[h].getCascade().add(fullDeck.get(currentIndex++));
 		}
-		lane[12].getCascade().add(fullDeck.get(currentIndex++));
 		restoreUI();
 	}
 

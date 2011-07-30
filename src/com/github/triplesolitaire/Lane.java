@@ -31,13 +31,15 @@ public class Lane extends RelativeLayout implements OnDragListener
 			Log.d(TAG, laneId + ": Starting drag at " + cascadeIndex);
 			final StringBuilder cascadeData = new StringBuilder(
 					cascade.get(cascadeIndex));
+			String multiCardPrefix = "";
 			for (int h = cascadeIndex + 1; h < cascade.size(); h++)
 			{
 				cascadeData.append(";");
 				cascadeData.append(cascade.get(h));
+				multiCardPrefix = "MULTI";
 			}
-			final ClipData dragData = ClipData.newPlainText(
-					cascade.get(cascadeIndex), cascadeData);
+			final ClipData dragData = ClipData.newPlainText(multiCardPrefix
+					+ cascade.get(cascadeIndex), cascadeData);
 			v.startDrag(dragData, new View.DragShadowBuilder(v), laneId, 0);
 			return true;
 		}
@@ -183,8 +185,11 @@ public class Lane extends RelativeLayout implements OnDragListener
 				Log.d(TAG, laneId + ": Drag started of mine: " + event);
 				return false;
 			}
-			final String card = event.getClipDescription().getLabel()
-					.toString();
+			String card = event.getClipDescription().getLabel().toString();
+			// Take off MULTI prefix - we accept all cascades based on the top
+			// card alone
+			if (card.startsWith("MULTI"))
+				card = card.substring(5);
 			final String cascadeCard = cascade.get(cascade.size() - 1);
 			final boolean acceptDrop = acceptDrop(cascadeCard, card);
 			if (acceptDrop)
