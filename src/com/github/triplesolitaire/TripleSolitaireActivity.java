@@ -6,10 +6,13 @@ import java.util.Random;
 import java.util.Stack;
 
 import android.app.Activity;
+import android.content.ClipData;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.widget.ImageView;
 
 public class TripleSolitaireActivity extends Activity
@@ -33,6 +36,31 @@ public class TripleSolitaireActivity extends Activity
 					"lane" + (laneIndex + 1), "id", getPackageName());
 			final Lane laneLayout = (Lane) findViewById(laneId);
 			laneLayout.flipOverTopStack(card);
+		}
+	}
+
+	private class OnFoundationTouchListener implements OnTouchListener
+	{
+		private final int foundationIndex;
+
+		public OnFoundationTouchListener(final int foundationIndex)
+		{
+			this.foundationIndex = foundationIndex;
+		}
+
+		@Override
+		public boolean onTouch(final View v, final MotionEvent event)
+		{
+			if (event.getAction() != MotionEvent.ACTION_DOWN
+					|| foundation[foundationIndex - 1] == null)
+				return false;
+			Log.d(TAG, foundationIndex + ": Starting drag at foundation");
+			final ClipData dragData = ClipData.newPlainText(
+					foundation[foundationIndex - 1],
+					foundation[foundationIndex - 1]);
+			v.startDrag(dragData, new View.DragShadowBuilder(v), -1
+					* foundationIndex, 0);
+			return true;
 		}
 	}
 
@@ -71,13 +99,37 @@ public class TripleSolitaireActivity extends Activity
 				updateWasteUI();
 			}
 		});
+		final ImageView waste3View = (ImageView) findViewById(R.id.waste3);
+		waste3View.setOnTouchListener(new OnTouchListener()
+		{
+			@Override
+			public boolean onTouch(final View v, final MotionEvent event)
+			{
+				if (event.getAction() != MotionEvent.ACTION_DOWN
+						|| waste.isEmpty())
+					return false;
+				Log.d(TAG, "W: Starting drag at waste");
+				final ClipData dragData = ClipData.newPlainText(waste.get(0),
+						waste.get(0));
+				v.startDrag(dragData, new View.DragShadowBuilder(v), 0, 0);
+				return true;
+			}
+		});
+		for (int curFoundation = 0; curFoundation < 12; curFoundation++)
+		{
+			final int foundationId = getResources().getIdentifier(
+					"foundation" + (curFoundation + 1), "id", getPackageName());
+			final ImageView foundationLayout = (ImageView) findViewById(foundationId);
+			foundationLayout.setOnTouchListener(new OnFoundationTouchListener(
+					curFoundation + 1));
+		}
 		for (int curLane = 0; curLane < 13; curLane++)
 		{
 			final int laneId = getResources().getIdentifier(
 					"lane" + (curLane + 1), "id", getPackageName());
 			final Lane laneLayout = (Lane) findViewById(laneId);
 			laneLayout.setOnCardFlipListener(new OnCardFlipListener(curLane));
-			laneLayout.setLaneId(curLane);
+			laneLayout.setLaneId(curLane + 1);
 		}
 		if (savedInstanceState == null)
 			startGame();
@@ -292,11 +344,9 @@ public class TripleSolitaireActivity extends Activity
 		Collections.shuffle(fullDeck, random);
 		int currentIndex = 0;
 		stock = new Stack<String>();
-		for (int h = 0; h < 62; h++)
+		for (int h = 0; h < 65; h++)
 			stock.push(fullDeck.get(currentIndex++));
 		waste = new ArrayList<String>();
-		for (int h = 0; h < 3; h++)
-			waste.add(fullDeck.get(currentIndex++));
 		foundation = new String[12];
 		lane = new LaneData[13];
 		for (int h = 0; h < 13; h++)
