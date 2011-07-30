@@ -3,6 +3,6 @@
     <dimen name="between_card_dim">10dp</dimen>
     <dimen name="card_width_dim">65dp</dimen>
     <dimen name="card_height_dim">101dp</dimen>
-    <dimen name="card_horz_overlap_dim">16dp</dimen>
+    <dimen name="card_horz_overlap_dim">12dp</dimen>
     <dimen name="card_vert_overlap_dim">19dp</dimen>
 </resources>

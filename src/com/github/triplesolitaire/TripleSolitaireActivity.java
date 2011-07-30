@@ -59,6 +59,26 @@ public class TripleSolitaireActivity extends Activity
 			laneLayout.setOnCardFlipListener(new OnCardFlipListener(curLane));
 			laneLayout.setLaneId(curLane);
 		}
+		final ImageView stockView = (ImageView) findViewById(R.id.stock);
+		stockView.setOnClickListener(new OnClickListener()
+		{
+			@Override
+			public void onClick(final View v)
+			{
+				if (stock.isEmpty() && waste.isEmpty())
+					return;
+				if (stock.isEmpty())
+				{
+					stock.addAll(waste);
+					waste.clear();
+				}
+				else
+					for (int h = 0; h < 3 && !stock.isEmpty(); h++)
+						waste.add(0, stock.pop());
+				updateStockUI();
+				updateWasteUI();
+			}
+		});
 		if (savedInstanceState == null)
 			startGame();
 	}
@@ -102,52 +122,10 @@ public class TripleSolitaireActivity extends Activity
 
 	public void restoreUI()
 	{
-		// Restore stock UI
-		final ImageView stockView = (ImageView) findViewById(R.id.stock);
-		if (stock.isEmpty())
-			stockView.setBackgroundResource(R.drawable.lane);
-		else
-			stockView.setBackgroundResource(R.drawable.back);
-		// Restore waste UI
-		final ImageView waste1 = (ImageView) findViewById(R.id.waste1);
-		if (waste.size() > 2)
-			waste1.setBackgroundResource(getResources().getIdentifier(
-					waste.get(2), "drawable", getPackageName()));
-		else
-			waste1.setBackgroundResource(0);
-		final ImageView waste2 = (ImageView) findViewById(R.id.waste2);
-		if (waste.size() > 1)
-			waste2.setBackgroundResource(getResources().getIdentifier(
-					waste.get(1), "drawable", getPackageName()));
-		else
-			waste2.setBackgroundResource(0);
-		final ImageView waste3 = (ImageView) findViewById(R.id.waste3);
-		if (waste.size() > 0)
-			waste3.setBackgroundResource(getResources().getIdentifier(
-					waste.get(0), "drawable", getPackageName()));
-		else
-			waste3.setBackgroundResource(0);
-		// Restore foundation UI
-		for (int h = 0; h < 12; h++)
-		{
-			final int foundationViewId = getResources().getIdentifier(
-					"foundation" + (h + 1), "id", getPackageName());
-			final ImageView foundationView = (ImageView) findViewById(foundationViewId);
-			if (foundation[h] == null)
-				foundationView.setBackgroundResource(R.drawable.foundation);
-			else
-				foundationView.setBackgroundResource(getResources()
-						.getIdentifier(foundation[h], "drawable",
-								getPackageName()));
-		}
-		// Restore lane UI
-		for (int curLane = 0; curLane < 13; curLane++)
-		{
-			final int laneId = getResources().getIdentifier(
-					"lane" + (curLane + 1), "id", getPackageName());
-			final Lane laneLayout = (Lane) findViewById(laneId);
-			laneLayout.restoreUI(lane[curLane]);
-		}
+		updateStockUI();
+		updateWasteUI();
+		updateFoundationUI();
+		updateLaneUI();
 	}
 
 	private void startGame()
@@ -329,5 +307,63 @@ public class TripleSolitaireActivity extends Activity
 			lane[h].getCascade().add(fullDeck.get(currentIndex++));
 		}
 		restoreUI();
+	}
+
+	public void updateFoundationUI()
+	{
+		for (int h = 0; h < 12; h++)
+		{
+			final int foundationViewId = getResources().getIdentifier(
+					"foundation" + (h + 1), "id", getPackageName());
+			final ImageView foundationView = (ImageView) findViewById(foundationViewId);
+			if (foundation[h] == null)
+				foundationView.setBackgroundResource(R.drawable.foundation);
+			else
+				foundationView.setBackgroundResource(getResources()
+						.getIdentifier(foundation[h], "drawable",
+								getPackageName()));
+		}
+	}
+
+	public void updateLaneUI()
+	{
+		for (int curLane = 0; curLane < 13; curLane++)
+		{
+			final int laneId = getResources().getIdentifier(
+					"lane" + (curLane + 1), "id", getPackageName());
+			final Lane laneLayout = (Lane) findViewById(laneId);
+			laneLayout.restoreUI(lane[curLane]);
+		}
+	}
+
+	public void updateStockUI()
+	{
+		final ImageView stockView = (ImageView) findViewById(R.id.stock);
+		if (stock.isEmpty())
+			stockView.setBackgroundResource(R.drawable.lane);
+		else
+			stockView.setBackgroundResource(R.drawable.back);
+	}
+
+	public void updateWasteUI()
+	{
+		final ImageView waste1 = (ImageView) findViewById(R.id.waste1);
+		if (waste.size() > 2)
+			waste1.setBackgroundResource(getResources().getIdentifier(
+					waste.get(2), "drawable", getPackageName()));
+		else
+			waste1.setBackgroundResource(0);
+		final ImageView waste2 = (ImageView) findViewById(R.id.waste2);
+		if (waste.size() > 1)
+			waste2.setBackgroundResource(getResources().getIdentifier(
+					waste.get(1), "drawable", getPackageName()));
+		else
+			waste2.setBackgroundResource(0);
+		final ImageView waste3 = (ImageView) findViewById(R.id.waste3);
+		if (waste.size() > 0)
+			waste3.setBackgroundResource(getResources().getIdentifier(
+					waste.get(0), "drawable", getPackageName()));
+		else
+			waste3.setBackgroundResource(0);
 	}
 }
