@@ -30,7 +30,7 @@ public class TripleSolitaireActivity extends Activity
 			final int laneId = getResources().getIdentifier(
 					"lane" + (laneIndex + 1), "id", getPackageName());
 			final Lane laneLayout = (Lane) findViewById(laneId);
-			laneLayout.restoreUI(lane[laneIndex]);
+			laneLayout.flipOverTopStack(card);
 		}
 	}
 
