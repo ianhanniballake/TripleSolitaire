@@ -9,9 +9,11 @@ import android.app.Activity;
 import android.content.ClipData;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.DragEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnDragListener;
 import android.view.View.OnTouchListener;
 import android.widget.ImageView;
 
@@ -36,6 +38,60 @@ public class TripleSolitaireActivity extends Activity
 					"lane" + (laneIndex + 1), "id", getPackageName());
 			final Lane laneLayout = (Lane) findViewById(laneId);
 			laneLayout.flipOverTopStack(card);
+		}
+	}
+
+	private class OnFoundationDragListener implements OnDragListener
+	{
+		private final int foundationIndex;
+
+		public OnFoundationDragListener(final int foundationIndex)
+		{
+			this.foundationIndex = foundationIndex;
+		}
+
+		@Override
+		public boolean onDrag(final View v, final DragEvent event)
+		{
+			final boolean isMyFoundation = -1 * foundationIndex == (Integer) event
+					.getLocalState();
+			if (event.getAction() == DragEvent.ACTION_DRAG_STARTED)
+			{
+				final String card = event.getClipDescription().getLabel()
+						.toString();
+				Log.d(TAG, -1 * foundationIndex + ": Drag started of "
+						+ (isMyFoundation ? "mine: " : "not mine: ") + event);
+				if (isMyFoundation)
+					return false;
+				else if (foundation[foundationIndex - 1] == null)
+					return card.endsWith("s1");
+				else
+				{
+					int firstNumber;
+					for (firstNumber = 0; firstNumber < card.length(); firstNumber++)
+						if (Character.isDigit(card.charAt(firstNumber)))
+							break;
+					final String currentSuit = card.substring(0, firstNumber);
+					final int currentNum = Integer.parseInt(card
+							.substring(firstNumber));
+					return card.equals(currentSuit + (currentNum + 1));
+				}
+			}
+			else if (event.getAction() == DragEvent.ACTION_DROP)
+			{
+				Log.d(TAG, -1 * foundationIndex + ": Drop of "
+						+ (isMyFoundation ? "mine: " : "not mine: ")
+						+ event.getClipData().getItemAt(0).getText());
+				return true;
+			}
+			else if (event.getAction() == DragEvent.ACTION_DRAG_ENDED)
+			{
+				if (isMyFoundation)
+					Log.d(TAG, -1 * foundationIndex + ": Drag ended of mine: "
+							+ event.getResult());
+				return true;
+			}
+			return false;
 		}
 	}
 
@@ -121,6 +177,8 @@ public class TripleSolitaireActivity extends Activity
 					"foundation" + (curFoundation + 1), "id", getPackageName());
 			final ImageView foundationLayout = (ImageView) findViewById(foundationId);
 			foundationLayout.setOnTouchListener(new OnFoundationTouchListener(
+					curFoundation + 1));
+			foundationLayout.setOnDragListener(new OnFoundationDragListener(
 					curFoundation + 1));
 		}
 		for (int curLane = 0; curLane < 13; curLane++)

@@ -141,10 +141,9 @@ public class Lane extends RelativeLayout implements OnDragListener
 		}
 		else if (event.getAction() == DragEvent.ACTION_DRAG_ENDED)
 		{
-			Log.d(TAG,
-					laneId + ": Drag ended of "
-							+ (isMyCascade ? "mine: " : "not mine: ")
-							+ event.getResult());
+			if (isMyCascade)
+				Log.d(TAG,
+						laneId + ": Drag ended of mine: " + event.getResult());
 			return true;
 		}
 		return false;
