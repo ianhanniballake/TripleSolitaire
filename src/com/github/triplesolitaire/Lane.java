@@ -180,12 +180,13 @@ public class Lane extends RelativeLayout implements OnDragListener
 		final boolean isMyCascade = laneId == (Integer) event.getLocalState();
 		if (event.getAction() == DragEvent.ACTION_DRAG_STARTED)
 		{
+			String card = event.getClipDescription().getLabel().toString();
 			if (isMyCascade)
 			{
-				Log.d(TAG, laneId + ": Drag started of mine: " + event);
+				Log.d(TAG, laneId + ": Drag started of mine of " + card + ": "
+						+ event);
 				return false;
 			}
-			String card = event.getClipDescription().getLabel().toString();
 			// Take off MULTI prefix - we accept all cascades based on the top
 			// card alone
 			if (card.startsWith("MULTI"))
@@ -200,10 +201,13 @@ public class Lane extends RelativeLayout implements OnDragListener
 		else if (event.getAction() == DragEvent.ACTION_DROP)
 			Log.d(TAG, laneId + ": Drop of "
 					+ event.getClipData().getItemAt(0).getText());
-		else if (event.getAction() == DragEvent.ACTION_DRAG_ENDED)
-			if (isMyCascade)
-				Log.d(TAG,
-						laneId + ": Drag ended of mine: " + event.getResult());
+		else if (event.getAction() == DragEvent.ACTION_DRAG_ENDED
+				&& isMyCascade)
+		{
+			Log.d(TAG, laneId + ": Drag ended of mine: " + event.getResult());
+			if (event.getResult())
+				removeCardsFromCascade(1);
+		}
 		return true;
 	}
 
@@ -212,10 +216,16 @@ public class Lane extends RelativeLayout implements OnDragListener
 		if (cascade.size() <= numCards)
 		{
 			removeViews(stackSize + 1, cascade.size());
+			cascade.clear();
+			final Card topStack = (Card) findViewById(stackSize);
+			topStack.setOnClickListener(onCardFlipListener);
 			return;
 		}
 		for (int h = 0; h < numCards; h++)
+		{
 			removeViewAt(getChildCount() - 1);
+			cascade.remove(0);
+		}
 	}
 
 	public void restoreUI(final LaneData laneData)

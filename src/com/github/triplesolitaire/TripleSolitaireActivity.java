@@ -79,13 +79,14 @@ public class TripleSolitaireActivity extends Activity
 					.getLocalState();
 			if (event.getAction() == DragEvent.ACTION_DRAG_STARTED)
 			{
+				final String foundationCard = foundation[foundationIndex - 1];
 				if (isMyFoundation)
 				{
 					Log.d(TAG, -1 * foundationIndex
-							+ ": Drag started of mine: " + event);
+							+ ": Drag started of mine of " + foundationCard
+							+ ": " + event);
 					return false;
 				}
-				final String foundationCard = foundation[foundationIndex - 1];
 				final String card = event.getClipDescription().getLabel()
 						.toString();
 				final boolean acceptDrop = acceptDrop(foundationCard, card);
