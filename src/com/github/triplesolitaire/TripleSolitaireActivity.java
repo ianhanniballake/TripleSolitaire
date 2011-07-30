@@ -50,6 +50,24 @@ public class TripleSolitaireActivity extends Activity
 			this.foundationIndex = foundationIndex;
 		}
 
+		private boolean acceptDrop(final String foundationCard,
+				final String newCard)
+		{
+			if (foundationCard == null)
+				return newCard.endsWith("s1");
+			final String existingFoundationCard = foundation[foundationIndex - 1];
+			int firstNumber;
+			for (firstNumber = 0; firstNumber < existingFoundationCard.length(); firstNumber++)
+				if (Character.isDigit(existingFoundationCard
+						.charAt(firstNumber)))
+					break;
+			final String currentSuit = existingFoundationCard.substring(0,
+					firstNumber);
+			final int currentNum = Integer.parseInt(existingFoundationCard
+					.substring(firstNumber));
+			return newCard.equals(currentSuit + (currentNum + 1));
+		}
+
 		@Override
 		public boolean onDrag(final View v, final DragEvent event)
 		{
@@ -57,41 +75,30 @@ public class TripleSolitaireActivity extends Activity
 					.getLocalState();
 			if (event.getAction() == DragEvent.ACTION_DRAG_STARTED)
 			{
+				if (isMyFoundation)
+				{
+					Log.d(TAG, -1 * foundationIndex
+							+ ": Drag started of mine: " + event);
+					return false;
+				}
+				final String foundationCard = foundation[foundationIndex - 1];
 				final String card = event.getClipDescription().getLabel()
 						.toString();
-				Log.d(TAG, -1 * foundationIndex + ": Drag started of "
-						+ (isMyFoundation ? "mine: " : "not mine: ") + event);
-				if (isMyFoundation)
-					return false;
-				else if (foundation[foundationIndex - 1] == null)
-					return card.endsWith("s1");
-				else
-				{
-					int firstNumber;
-					for (firstNumber = 0; firstNumber < card.length(); firstNumber++)
-						if (Character.isDigit(card.charAt(firstNumber)))
-							break;
-					final String currentSuit = card.substring(0, firstNumber);
-					final int currentNum = Integer.parseInt(card
-							.substring(firstNumber));
-					return card.equals(currentSuit + (currentNum + 1));
-				}
+				final boolean acceptDrop = acceptDrop(foundationCard, card);
+				if (acceptDrop)
+					Log.d(TAG, -1 * foundationIndex + ": Acceptable drag of "
+							+ card + " onto " + foundationCard);
+				return acceptDrop;
 			}
 			else if (event.getAction() == DragEvent.ACTION_DROP)
-			{
 				Log.d(TAG, -1 * foundationIndex + ": Drop of "
 						+ (isMyFoundation ? "mine: " : "not mine: ")
 						+ event.getClipData().getItemAt(0).getText());
-				return true;
-			}
 			else if (event.getAction() == DragEvent.ACTION_DRAG_ENDED)
-			{
 				if (isMyFoundation)
 					Log.d(TAG, -1 * foundationIndex + ": Drag ended of mine: "
 							+ event.getResult());
-				return true;
-			}
-			return false;
+			return true;
 		}
 	}
 
@@ -402,10 +409,11 @@ public class TripleSolitaireActivity extends Activity
 		Collections.shuffle(fullDeck, random);
 		int currentIndex = 0;
 		stock = new Stack<String>();
-		for (int h = 0; h < 65; h++)
+		for (int h = 0; h < 64; h++)
 			stock.push(fullDeck.get(currentIndex++));
 		waste = new ArrayList<String>();
 		foundation = new String[12];
+		foundation[2] = fullDeck.get(currentIndex++);
 		lane = new LaneData[13];
 		for (int h = 0; h < 13; h++)
 		{

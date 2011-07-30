@@ -54,6 +54,51 @@ public class Lane extends RelativeLayout implements OnDragListener
 		addView(laneBase);
 	}
 
+	private boolean acceptDrop(final String cascadeCard, final String newCard)
+	{
+		int firstNumber;
+		for (firstNumber = 0; firstNumber < cascadeCard.length(); firstNumber++)
+			if (Character.isDigit(cascadeCard.charAt(firstNumber)))
+				break;
+		final String currentSuit = cascadeCard.substring(0, firstNumber);
+		final int currentNum = Integer.parseInt(cascadeCard
+				.substring(firstNumber));
+		for (firstNumber = 0; firstNumber < newCard.length(); firstNumber++)
+			if (Character.isDigit(newCard.charAt(firstNumber)))
+				break;
+		final String newCardSuit = newCard.substring(0, firstNumber);
+		final int newCardNum = Integer.parseInt(newCard.substring(firstNumber));
+		if (newCardNum != currentNum - 1)
+			return false;
+		if (currentSuit.equals("clubs") && newCardSuit.equals("diamonds"))
+			return true;
+		else if (currentSuit.equals("clubs") && newCardSuit.equals("hearts"))
+			return true;
+		else if (currentSuit.equals("clubs") && newCardSuit.equals("spades"))
+			return false;
+		else if (currentSuit.equals("diamonds") && newCardSuit.equals("clubs"))
+			return true;
+		else if (currentSuit.equals("diamonds") && newCardSuit.equals("hearts"))
+			return false;
+		else if (currentSuit.equals("diamonds") && newCardSuit.equals("spades"))
+			return true;
+		else if (currentSuit.equals("hearts") && newCardSuit.equals("clubs"))
+			return true;
+		else if (currentSuit.equals("hearts") && newCardSuit.equals("diamonds"))
+			return false;
+		else if (currentSuit.equals("hearts") && newCardSuit.equals("spades"))
+			return true;
+		else if (currentSuit.equals("spades") && newCardSuit.equals("clubs"))
+			return false;
+		else if (currentSuit.equals("spades") && newCardSuit.equals("diamonds"))
+			return true;
+		else if (currentSuit.equals("spades") && newCardSuit.equals("hearts"))
+			return true;
+		else
+			// same suit
+			return false;
+	}
+
 	public void addCascade(final ArrayList<String> cascadeToAdd)
 	{
 		final int card_vert_overlap_dim = getResources().getDimensionPixelSize(
@@ -126,27 +171,29 @@ public class Lane extends RelativeLayout implements OnDragListener
 		final boolean isMyCascade = laneId == (Integer) event.getLocalState();
 		if (event.getAction() == DragEvent.ACTION_DRAG_STARTED)
 		{
-			Log.d(TAG, laneId + ": Drag started of "
-					+ (isMyCascade ? "mine: " : "not mine: ") + event);
 			if (isMyCascade)
+			{
+				Log.d(TAG, laneId + ": Drag started of mine: " + event);
 				return false;
-			return true;
+			}
+			final String card = event.getClipDescription().getLabel()
+					.toString();
+			final String cascadeCard = cascade.get(cascade.size() - 1);
+			final boolean acceptDrop = acceptDrop(cascadeCard, card);
+			if (acceptDrop)
+				Log.d(TAG, laneId + ": Acceptable drag of " + card + " onto "
+						+ cascadeCard);
+			return acceptDrop;
 		}
 		else if (event.getAction() == DragEvent.ACTION_DROP)
-		{
 			Log.d(TAG, laneId + ": Drop of "
 					+ (isMyCascade ? "mine: " : "not mine: ")
 					+ event.getClipData().getItemAt(0).getText());
-			return true;
-		}
 		else if (event.getAction() == DragEvent.ACTION_DRAG_ENDED)
-		{
 			if (isMyCascade)
 				Log.d(TAG,
 						laneId + ": Drag ended of mine: " + event.getResult());
-			return true;
-		}
-		return false;
+		return true;
 	}
 
 	public void removeCardsFromCascade(final int numCards)
