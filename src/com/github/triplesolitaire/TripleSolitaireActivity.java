@@ -2,7 +2,10 @@ package com.github.triplesolitaire;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ClipData;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.DragEvent;
@@ -16,6 +19,7 @@ import android.view.View.OnDragListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 public class TripleSolitaireActivity extends Activity
 {
@@ -119,6 +123,7 @@ public class TripleSolitaireActivity extends Activity
 		}
 	}
 
+	public static final int DIALOG_WINNING_ID = 0;
 	/**
 	 * Logging tag
 	 */
@@ -222,6 +227,52 @@ public class TripleSolitaireActivity extends Activity
 	}
 
 	@Override
+	protected Dialog onCreateDialog(final int dialogId)
+	{
+		switch (dialogId)
+		{
+			case DIALOG_WINNING_ID:
+				final TextView timeView = (TextView) progressBar
+						.findViewById(R.id.time);
+				final CharSequence time = timeView.getText();
+				final TextView moveCountView = (TextView) progressBar
+						.findViewById(R.id.move_count);
+				final CharSequence moveCount = moveCountView.getText();
+				final String message = "You won in " + time + " and "
+						+ moveCount + " moves!";
+				final AlertDialog.Builder builder = new AlertDialog.Builder(
+						this);
+				builder.setMessage(message)
+						.setCancelable(false)
+						.setPositiveButton("New Game",
+								new DialogInterface.OnClickListener()
+								{
+									@Override
+									public void onClick(
+											final DialogInterface dialog,
+											final int id)
+									{
+										dialog.cancel();
+										gameState.newGame();
+									}
+								})
+						.setNegativeButton("Exit",
+								new DialogInterface.OnClickListener()
+								{
+									@Override
+									public void onClick(
+											final DialogInterface dialog,
+											final int id)
+									{
+										TripleSolitaireActivity.this.finish();
+									}
+								});
+				return builder.create();
+		}
+		return null;
+	}
+
+	@Override
 	public boolean onCreateOptionsMenu(final Menu menu)
 	{
 		getMenuInflater().inflate(R.menu.menu, menu);
@@ -283,6 +334,13 @@ public class TripleSolitaireActivity extends Activity
 		}
 	}
 
+	public void updateMoveCount(final int moveCount)
+	{
+		final TextView moveCountView = (TextView) progressBar
+				.findViewById(R.id.move_count);
+		moveCountView.setText(Integer.toString(moveCount));
+	}
+
 	public void updateStockUI()
 	{
 		final ImageView stockView = (ImageView) findViewById(R.id.stock);
@@ -290,6 +348,21 @@ public class TripleSolitaireActivity extends Activity
 			stockView.setBackgroundResource(R.drawable.lane);
 		else
 			stockView.setBackgroundResource(R.drawable.back);
+	}
+
+	public void updateTime(final int timeInSeconds)
+	{
+		final int minutes = timeInSeconds / 60;
+		final int seconds = timeInSeconds % 60;
+		final TextView timeView = (TextView) progressBar
+				.findViewById(R.id.time);
+		final StringBuilder sb = new StringBuilder();
+		sb.append(minutes);
+		sb.append(':');
+		if (seconds < 10)
+			sb.append(0);
+		sb.append(seconds);
+		timeView.setText(sb);
 	}
 
 	public void updateWasteUI()

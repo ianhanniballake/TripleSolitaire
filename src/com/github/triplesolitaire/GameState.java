@@ -14,7 +14,9 @@ public class GameState
 	private final TripleSolitaireActivity activity;
 	private String[] foundation;
 	private LaneData[] lane;
+	private int moveCount = 0;
 	private Stack<String> stock;
+	private int timeInSeconds = 0;
 	private LinkedList<String> waste;
 
 	public GameState(final TripleSolitaireActivity activity)
@@ -123,6 +125,14 @@ public class GameState
 		return cascadeData.toString();
 	}
 
+	public void checkForWin()
+	{
+		for (int foundationIndex = 0; foundationIndex < 12; foundationIndex++)
+			if (!foundation[foundationIndex].endsWith("s13"))
+				return;
+		activity.showDialog(TripleSolitaireActivity.DIALOG_WINNING_ID);
+	}
+
 	public void clickStock()
 	{
 		if (stock.isEmpty() && waste.isEmpty())
@@ -161,6 +171,7 @@ public class GameState
 		foundation[foundationIndex] = lane[from].getCascade().removeLast();
 		activity.updateFoundationUI(foundationIndex);
 		activity.getLane(from).decrementCascadeSize(1);
+		checkForWin();
 	}
 
 	public void dropFromFoundationToCascade(final int laneIndex,
@@ -201,6 +212,7 @@ public class GameState
 		foundation[foundationIndex] = waste.removeFirst();
 		activity.updateFoundationUI(foundationIndex);
 		activity.updateWasteUI();
+		checkForWin();
 	}
 
 	public void flipCard(final int laneIndex)
@@ -444,6 +456,10 @@ public class GameState
 			laneLayout.setStackSize(lane[laneIndex].getStack().size());
 			laneLayout.addCascade(lane[laneIndex].getCascade());
 		}
+		timeInSeconds = 0;
+		activity.updateTime(timeInSeconds);
+		moveCount = 0;
+		activity.updateMoveCount(moveCount);
 	}
 
 	public String nextInSuit(final String card)
