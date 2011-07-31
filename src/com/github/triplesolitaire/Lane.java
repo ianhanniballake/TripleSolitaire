@@ -77,7 +77,7 @@ public class Lane extends RelativeLayout implements OnDragListener
 					android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
 			lp.addRule(RelativeLayout.ALIGN_TOP, cascadeId - 1);
 			lp.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-			if (stackSize + cascadeSize > 0)
+			if (stackSize + cascadeSize + h != 0)
 				lp.setMargins(0, card_vert_overlap_dim, 0, 0);
 			cascadeCard.setOnTouchListener(new OnStartDragListener(h
 					+ cascadeSize));
