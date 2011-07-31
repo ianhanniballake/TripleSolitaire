@@ -492,6 +492,10 @@ public class GameState
 		final Random random = new Random();
 		gameId = random.nextLong();
 		random.setSeed(gameId);
+		timeInSeconds = 0;
+		activity.updateTime(timeInSeconds);
+		moveCount = 0;
+		activity.updateMoveCount(moveCount);
 		Collections.shuffle(fullDeck, random);
 		int currentIndex = 0;
 		stock = new Stack<String>();
@@ -514,10 +518,6 @@ public class GameState
 			laneLayout.setStackSize(lane[laneIndex].getStack().size());
 			laneLayout.addCascade(lane[laneIndex].getCascade());
 		}
-		timeInSeconds = 0;
-		activity.updateTime(timeInSeconds);
-		moveCount = 0;
-		activity.updateMoveCount(moveCount);
 		Log.d(TAG, "Game Started: " + gameId);
 	}
 
@@ -528,6 +528,12 @@ public class GameState
 
 	public void onRestoreInstanceState(final Bundle savedInstanceState)
 	{
+		// Restore the current game information
+		gameId = savedInstanceState.getLong("gameId");
+		timeInSeconds = savedInstanceState.getInt("timeInSeconds");
+		activity.updateTime(timeInSeconds);
+		moveCount = savedInstanceState.getInt("moveCount");
+		activity.updateMoveCount(moveCount);
 		// Restore the stack
 		final ArrayList<String> arrayCardStock = savedInstanceState
 				.getStringArrayList("stock");
@@ -559,6 +565,9 @@ public class GameState
 
 	public void onSaveInstanceState(final Bundle outState)
 	{
+		outState.put("gameId", gameId);
+		outState.put("timeInSeconds", timeInSeconds);
+		outState.put("moveCount", moveCount);
 		outState.putStringArrayList("stock", new ArrayList<String>(stock));
 		outState.putStringArrayList("waste", new ArrayList<String>(waste));
 		outState.putStringArray("foundation", foundation);
