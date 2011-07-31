@@ -219,6 +219,7 @@ public class Lane extends RelativeLayout implements OnDragListener
 	{
 		// Remove the existing views
 		removeViews(1, getChildCount() - 1);
+		cascadeSize = 0;
 		if (stackSize == 0 && newStackSize > 0)
 		{
 			final Card laneBase = (Card) findViewById(0);
