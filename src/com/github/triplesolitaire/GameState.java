@@ -136,7 +136,7 @@ public class GameState
 		while (st.hasMoreTokens())
 			cascadeToAdd.add(st.nextToken());
 		for (int cascadeIndex = 0; cascadeIndex < cascadeToAdd.size(); cascadeIndex++)
-			lane[from].getCascade().removeFirst();
+			lane[from].getCascade().removeLast();
 		final Lane fromLaneLayout = activity.getLane(from);
 		fromLaneLayout.decrementCascadeSize(cascadeToAdd.size());
 		lane[laneIndex].getCascade().addAll(cascadeToAdd);
