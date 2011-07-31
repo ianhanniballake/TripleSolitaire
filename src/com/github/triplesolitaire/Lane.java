@@ -135,6 +135,7 @@ public class Lane extends RelativeLayout implements OnDragListener,
 		else
 		{
 			final Card topCascade = (Card) findViewById(stackSize + cascadeSize);
+			topCascade.setOnDragListener(this);
 			topCascade.setOnLongClickListener(this);
 		}
 	}
