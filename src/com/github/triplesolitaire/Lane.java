@@ -1,6 +1,6 @@
 package com.github.triplesolitaire;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import android.content.ClipData;
 import android.content.Context;
@@ -60,7 +60,7 @@ public class Lane extends RelativeLayout implements OnDragListener,
 		addView(laneBase);
 	}
 
-	public void addCascade(final ArrayList<String> cascadeToAdd)
+	public void addCascade(final List<String> cascadeToAdd)
 	{
 		final int card_vert_overlap_dim = getResources().getDimensionPixelSize(
 				R.dimen.card_vert_overlap_dim);
@@ -122,7 +122,12 @@ public class Lane extends RelativeLayout implements OnDragListener,
 			removeViewAt(getChildCount() - 1);
 			cascadeSize -= 1;
 		}
-		if (cascadeSize == 0)
+		if (stackSize + cascadeSize == 0)
+		{
+			final Card laneBase = (Card) findViewById(0);
+			laneBase.setOnDragListener(this);
+		}
+		else if (cascadeSize == 0)
 		{
 			final Card topStack = (Card) findViewById(stackSize);
 			topStack.setOnClickListener(onCardFlipListener);

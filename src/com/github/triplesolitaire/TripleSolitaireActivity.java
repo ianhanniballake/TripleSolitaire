@@ -224,7 +224,13 @@ public class TripleSolitaireActivity extends Activity
 			stockView.setBackgroundResource(R.drawable.back);
 	}
 
-	public void updateWasteUI(final int wasteIndex)
+	public void updateWasteUI()
+	{
+		for (int wasteIndex = 0; wasteIndex < 3; wasteIndex++)
+			updateWasteUI(wasteIndex);
+	}
+
+	private void updateWasteUI(final int wasteIndex)
 	{
 		final String wasteCard = gameState.getWasteCard(wasteIndex);
 		final ImageView waste = (ImageView) findViewById(getResources()
