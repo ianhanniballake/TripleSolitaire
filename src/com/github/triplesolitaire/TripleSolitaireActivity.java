@@ -1,10 +1,12 @@
 package com.github.triplesolitaire;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.ClipData;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.DragEvent;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -12,6 +14,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnDragListener;
 import android.view.View.OnTouchListener;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
 
 public class TripleSolitaireActivity extends Activity
@@ -121,6 +124,7 @@ public class TripleSolitaireActivity extends Activity
 	 */
 	private static final String TAG = "TripleSolitaireActivity";
 	private final GameState gameState = new GameState(this);
+	private View progressBar;
 
 	public Lane getLane(final int laneIndex)
 	{
@@ -134,6 +138,16 @@ public class TripleSolitaireActivity extends Activity
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+		// Set up the progress bar area
+		progressBar = getLayoutInflater().inflate(R.layout.progress_bar, null);
+		final ActionBar bar = getActionBar();
+		bar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM,
+				ActionBar.DISPLAY_SHOW_CUSTOM);
+		final ActionBar.LayoutParams layoutParams = new ActionBar.LayoutParams(
+				LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+		layoutParams.gravity = Gravity.LEFT;
+		bar.setCustomView(progressBar, layoutParams);
+		// Set up game listeners
 		final ImageView stockView = (ImageView) findViewById(R.id.stock);
 		stockView.setOnClickListener(new OnClickListener()
 		{
