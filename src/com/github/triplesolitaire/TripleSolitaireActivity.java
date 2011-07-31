@@ -288,7 +288,6 @@ public class TripleSolitaireActivity extends Activity
 											final int id)
 									{
 										dialog.cancel();
-										gameState.newGame();
 									}
 								});
 				return builder.create();
@@ -311,6 +310,9 @@ public class TripleSolitaireActivity extends Activity
 		{
 			case R.id.new_game:
 				startGame();
+				return true;
+			case R.id.game_id:
+				showDialog(DIALOG_ID_SHOW_GAME_ID);
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
