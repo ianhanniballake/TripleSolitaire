@@ -20,7 +20,7 @@
 		android:layout_alignParentTop="true"
 		android:layout_toRightOf="@id/stock">
 		<ImageView
-			android:id="@+id/waste1"
+			android:id="@+id/waste3"
 			android:layout_width="@dimen/card_width_dim"
 			android:layout_height="@dimen/card_height_dim"
 			android:layout_alignParentTop="true"
@@ -31,9 +31,9 @@
 			android:layout_height="@dimen/card_height_dim"
 			android:layout_marginLeft="@dimen/card_horz_overlap_dim"
 			android:layout_alignParentTop="true"
-			android:layout_alignLeft="@id/waste1" />
+			android:layout_alignLeft="@id/waste3" />
 		<ImageView
-			android:id="@+id/waste3"
+			android:id="@+id/waste1"
 			android:layout_width="@dimen/card_width_dim"
 			android:layout_height="@dimen/card_height_dim"
 			android:layout_marginLeft="@dimen/card_horz_overlap_dim"

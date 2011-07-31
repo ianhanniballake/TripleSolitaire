@@ -29,17 +29,11 @@ public class Lane extends RelativeLayout implements OnDragListener
 			if (event.getAction() != MotionEvent.ACTION_DOWN)
 				return false;
 			Log.d(TAG, laneId + ": Starting drag at " + cascadeIndex);
-			final StringBuilder cascadeData = new StringBuilder(
-					cascade.get(cascadeIndex));
-			String multiCardPrefix = "";
-			for (int h = cascadeIndex + 1; h < cascade.size(); h++)
-			{
-				cascadeData.append(";");
-				cascadeData.append(cascade.get(h));
-				multiCardPrefix = "MULTI";
-			}
-			final ClipData dragData = ClipData.newPlainText(multiCardPrefix
-					+ cascade.get(cascadeIndex), cascadeData);
+			final String cascadeData = gameState.buildCascadeString(laneId - 1,
+					cascadeIndex + 1);
+			final ClipData dragData = ClipData.newPlainText(
+					(cascadeIndex > 0 ? "MULTI" : "") + cascadeData,
+					cascadeData);
 			v.startDrag(dragData, new View.DragShadowBuilder(v), laneId, 0);
 			return true;
 		}
@@ -49,10 +43,11 @@ public class Lane extends RelativeLayout implements OnDragListener
 	 * Logging tag
 	 */
 	private static final String TAG = "TripleSolitaireActivity";
-	private final ArrayList<String> cascade = new ArrayList<String>();
+	private int cascadeSize;
+	private GameState gameState;
 	private int laneId;
 	private OnClickListener onCardFlipListener;
-	private int stackSize = 0;
+	private int stackSize;
 
 	public Lane(final Context context, final AttributeSet attrs)
 	{
@@ -63,51 +58,6 @@ public class Lane extends RelativeLayout implements OnDragListener
 		addView(laneBase);
 	}
 
-	private boolean acceptDrop(final String cascadeCard, final String newCard)
-	{
-		int firstNumber;
-		for (firstNumber = 0; firstNumber < cascadeCard.length(); firstNumber++)
-			if (Character.isDigit(cascadeCard.charAt(firstNumber)))
-				break;
-		final String currentSuit = cascadeCard.substring(0, firstNumber);
-		final int currentNum = Integer.parseInt(cascadeCard
-				.substring(firstNumber));
-		for (firstNumber = 0; firstNumber < newCard.length(); firstNumber++)
-			if (Character.isDigit(newCard.charAt(firstNumber)))
-				break;
-		final String newCardSuit = newCard.substring(0, firstNumber);
-		final int newCardNum = Integer.parseInt(newCard.substring(firstNumber));
-		if (newCardNum != currentNum - 1)
-			return false;
-		if (currentSuit.equals("clubs") && newCardSuit.equals("diamonds"))
-			return true;
-		else if (currentSuit.equals("clubs") && newCardSuit.equals("hearts"))
-			return true;
-		else if (currentSuit.equals("clubs") && newCardSuit.equals("spades"))
-			return false;
-		else if (currentSuit.equals("diamonds") && newCardSuit.equals("clubs"))
-			return true;
-		else if (currentSuit.equals("diamonds") && newCardSuit.equals("hearts"))
-			return false;
-		else if (currentSuit.equals("diamonds") && newCardSuit.equals("spades"))
-			return true;
-		else if (currentSuit.equals("hearts") && newCardSuit.equals("clubs"))
-			return true;
-		else if (currentSuit.equals("hearts") && newCardSuit.equals("diamonds"))
-			return false;
-		else if (currentSuit.equals("hearts") && newCardSuit.equals("spades"))
-			return true;
-		else if (currentSuit.equals("spades") && newCardSuit.equals("clubs"))
-			return false;
-		else if (currentSuit.equals("spades") && newCardSuit.equals("diamonds"))
-			return true;
-		else if (currentSuit.equals("spades") && newCardSuit.equals("hearts"))
-			return true;
-		else
-			// same suit
-			return false;
-	}
-
 	public void addCascade(final ArrayList<String> cascadeToAdd)
 	{
 		final int card_vert_overlap_dim = getResources().getDimensionPixelSize(
@@ -115,7 +65,7 @@ public class Lane extends RelativeLayout implements OnDragListener
 		// Create the cascade
 		for (int h = 0; h < cascadeToAdd.size(); h++)
 		{
-			final int cascadeId = h + cascade.size() + stackSize + 1;
+			final int cascadeId = h + cascadeSize + stackSize + 1;
 			final Card cascadeCard = new Card(getContext(), getResources()
 					.getIdentifier(cascadeToAdd.get(h), "drawable",
 							getContext().getPackageName()));
@@ -128,10 +78,10 @@ public class Lane extends RelativeLayout implements OnDragListener
 			if (stackSize > 0)
 				lp.setMargins(0, card_vert_overlap_dim, 0, 0);
 			cascadeCard.setOnTouchListener(new OnStartDragListener(h
-					+ cascade.size()));
+					+ cascadeSize));
 			addView(cascadeCard, lp);
 		}
-		if (cascade.isEmpty() && !cascadeToAdd.isEmpty())
+		if (cascadeSize == 0 && !cascadeToAdd.isEmpty())
 			if (stackSize > 0)
 			{
 				// Remove the onCardFlipListener from the top card on the stack
@@ -147,10 +97,10 @@ public class Lane extends RelativeLayout implements OnDragListener
 				final Card laneBase = (Card) findViewById(0);
 				laneBase.setOnDragListener(null);
 			}
-		if (!cascade.isEmpty())
+		if (cascadeSize > 0)
 		{
 			final Card oldTopCascade = (Card) findViewById(stackSize
-					+ cascade.size());
+					+ cascadeSize);
 			oldTopCascade.setOnDragListener(null);
 		}
 		if (!cascadeToAdd.isEmpty())
@@ -158,7 +108,21 @@ public class Lane extends RelativeLayout implements OnDragListener
 			final Card newTopCascade = (Card) findViewById(getChildCount() - 1);
 			newTopCascade.setOnDragListener(this);
 		}
-		cascade.addAll(cascadeToAdd);
+		cascadeSize += cascadeToAdd.size();
+	}
+
+	public void decrementCascadeSize(final int removeCount)
+	{
+		for (int h = 0; h < removeCount; h++)
+		{
+			removeViewAt(getChildCount() - 1);
+			cascadeSize -= 1;
+		}
+		if (cascadeSize == 0)
+		{
+			final Card topStack = (Card) findViewById(stackSize);
+			topStack.setOnClickListener(onCardFlipListener);
+		}
 	}
 
 	public void flipOverTopStack(final String card)
@@ -170,8 +134,8 @@ public class Lane extends RelativeLayout implements OnDragListener
 		toFlip.setOnClickListener(null);
 		toFlip.setOnDragListener(this);
 		toFlip.setOnTouchListener(new OnStartDragListener(0));
-		stackSize = stackSize - 1;
-		cascade.add(card);
+		stackSize -= 1;
+		cascadeSize += 1;
 	}
 
 	@Override
@@ -190,12 +154,13 @@ public class Lane extends RelativeLayout implements OnDragListener
 			// Take off MULTI prefix - we accept all cascades based on the top
 			// card alone
 			if (card.startsWith("MULTI"))
-				card = card.substring(5);
-			final String cascadeCard = cascade.get(cascade.size() - 1);
-			final boolean acceptDrop = acceptDrop(cascadeCard, card);
+				card = card.substring(5, card.indexOf(';'));
+			final boolean acceptDrop = cascadeSize == 0 ? gameState
+					.acceptLaneDrop(card) : gameState.acceptCascadeDrop(
+					laneId - 1, card);
 			if (acceptDrop)
 				Log.d(TAG, laneId + ": Acceptable drag of " + card + " onto "
-						+ cascadeCard);
+						+ gameState.getCascadeTop(laneId - 1));
 			return acceptDrop;
 		}
 		else if (event.getAction() == DragEvent.ACTION_DROP)
@@ -203,35 +168,13 @@ public class Lane extends RelativeLayout implements OnDragListener
 					+ event.getClipData().getItemAt(0).getText());
 		else if (event.getAction() == DragEvent.ACTION_DRAG_ENDED
 				&& isMyCascade)
-		{
 			Log.d(TAG, laneId + ": Drag ended of mine: " + event.getResult());
-			if (event.getResult())
-				removeCardsFromCascade(1);
-		}
 		return true;
 	}
 
-	public void removeCardsFromCascade(final int numCards)
+	public void setGameState(final GameState gameState)
 	{
-		if (cascade.size() <= numCards)
-		{
-			removeViews(stackSize + 1, cascade.size());
-			cascade.clear();
-			final Card topStack = (Card) findViewById(stackSize);
-			topStack.setOnClickListener(onCardFlipListener);
-			return;
-		}
-		for (int h = 0; h < numCards; h++)
-		{
-			removeViewAt(getChildCount() - 1);
-			cascade.remove(0);
-		}
-	}
-
-	public void restoreUI(final LaneData laneData)
-	{
-		setStackSize(laneData.getStack().size());
-		addCascade(laneData.getCascade());
+		this.gameState = gameState;
 	}
 
 	public void setLaneId(final int laneId)
@@ -268,11 +211,9 @@ public class Lane extends RelativeLayout implements OnDragListener
 			lp.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
 			if (stackId != 1)
 				lp.setMargins(0, card_vert_overlap_dim, 0, 0);
-			if (cascade.isEmpty() && stackId == stackSize)
+			if (cascadeSize == 0 && stackId == stackSize)
 				stackCard.setOnClickListener(onCardFlipListener);
 			addView(stackCard, stackId, lp);
 		}
-		// Recreate the cascade
-		addCascade(cascade);
 	}
 }
