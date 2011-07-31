@@ -565,9 +565,9 @@ public class GameState
 
 	public void onSaveInstanceState(final Bundle outState)
 	{
-		outState.put("gameId", gameId);
-		outState.put("timeInSeconds", timeInSeconds);
-		outState.put("moveCount", moveCount);
+		outState.putLong("gameId", gameId);
+		outState.putInt("timeInSeconds", timeInSeconds);
+		outState.putInt("moveCount", moveCount);
 		outState.putStringArrayList("stock", new ArrayList<String>(stock));
 		outState.putStringArrayList("waste", new ArrayList<String>(waste));
 		outState.putStringArray("foundation", foundation);
