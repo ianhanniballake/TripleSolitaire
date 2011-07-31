@@ -85,6 +85,17 @@ public class GameState
 		return topNewCard.endsWith("s13");
 	}
 
+	public void attemptAutoMoveFromCascadeToFoundation(final int laneIndex)
+	{
+		final String card = lane[laneIndex].getCascade().get(0);
+		for (int foundationIndex = 0; foundationIndex < 12; foundationIndex++)
+			if (acceptFoundationDrop(foundationIndex, card))
+			{
+				dropFromCascadeToFoundation(foundationIndex, laneIndex);
+				return;
+			}
+	}
+
 	public String buildCascadeString(final int laneIndex,
 			final int numCardsToInclude)
 	{

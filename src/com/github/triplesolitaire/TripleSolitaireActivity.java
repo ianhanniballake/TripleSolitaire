@@ -102,7 +102,7 @@ public class TripleSolitaireActivity extends Activity
 		{
 			final String foundationCard = gameState
 					.getFoundationCard(foundationIndex - 1);
-			if (event.getAction() != MotionEvent.ACTION_DOWN
+			if (event.getAction() != MotionEvent.ACTION_MOVE
 					|| foundationCard == null)
 				return false;
 			Log.d(TAG, -1 * foundationIndex + ": Starting drag at foundation");

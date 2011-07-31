@@ -10,9 +10,11 @@ import android.view.DragEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnDragListener;
+import android.view.View.OnLongClickListener;
 import android.widget.RelativeLayout;
 
-public class Lane extends RelativeLayout implements OnDragListener
+public class Lane extends RelativeLayout implements OnDragListener,
+		OnLongClickListener
 {
 	private class OnStartDragListener implements OnTouchListener
 	{
@@ -26,7 +28,7 @@ public class Lane extends RelativeLayout implements OnDragListener
 		@Override
 		public boolean onTouch(final View v, final MotionEvent event)
 		{
-			if (event.getAction() != MotionEvent.ACTION_DOWN)
+			if (event.getAction() != MotionEvent.ACTION_MOVE)
 				return false;
 			Log.d(TAG, laneId + ": Starting drag at " + cascadeIndex);
 			final String cascadeData = gameState.buildCascadeString(laneId - 1,
@@ -102,11 +104,13 @@ public class Lane extends RelativeLayout implements OnDragListener
 			final Card oldTopCascade = (Card) findViewById(stackSize
 					+ cascadeSize);
 			oldTopCascade.setOnDragListener(null);
+			oldTopCascade.setOnLongClickListener(null);
 		}
 		if (!cascadeToAdd.isEmpty())
 		{
 			final Card newTopCascade = (Card) findViewById(getChildCount() - 1);
 			newTopCascade.setOnDragListener(this);
+			newTopCascade.setOnLongClickListener(this);
 		}
 		cascadeSize += cascadeToAdd.size();
 	}
@@ -123,6 +127,11 @@ public class Lane extends RelativeLayout implements OnDragListener
 			final Card topStack = (Card) findViewById(stackSize);
 			topStack.setOnClickListener(onCardFlipListener);
 		}
+		else
+		{
+			final Card topCascade = (Card) findViewById(stackSize + cascadeSize);
+			topCascade.setOnLongClickListener(this);
+		}
 	}
 
 	public void flipOverTopStack(final String card)
@@ -133,6 +142,7 @@ public class Lane extends RelativeLayout implements OnDragListener
 		toFlip.invalidate();
 		toFlip.setOnClickListener(null);
 		toFlip.setOnDragListener(this);
+		toFlip.setOnLongClickListener(this);
 		toFlip.setOnTouchListener(new OnStartDragListener(0));
 		stackSize -= 1;
 		cascadeSize += 1;
@@ -180,6 +190,13 @@ public class Lane extends RelativeLayout implements OnDragListener
 		else if (event.getAction() == DragEvent.ACTION_DRAG_ENDED
 				&& isMyCascade)
 			Log.d(TAG, laneId + ": Drag ended of mine: " + event.getResult());
+		return true;
+	}
+
+	@Override
+	public boolean onLongClick(final View v)
+	{
+		gameState.attemptAutoMoveFromCascadeToFoundation(laneId - 1);
 		return true;
 	}
 
