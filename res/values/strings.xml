@@ -4,4 +4,10 @@
     <string name="time">Time:</string>
     <string name="move_count">Move Count:</string>
     <string name="new_game">New Game</string>
+    <string name="win_dialog_1">You won in </string>
+    <string name="win_dialog_2"> and </string>
+    <string name="win_dialog_3"> moves!</string>
+    <string name="exit">Exit</string>
+    <string name="show_game_id">Show Game ID</string>
+    <string name="game_id_label">Game Id: </string>
 </resources>

@@ -4,4 +4,7 @@
 	<item
 		android:id="@+id/new_game"
 		android:title="@string/new_game" />
+	<item
+		android:id="@+id/game_id"
+		android:title="@string/show_game_id" />
 </menu>

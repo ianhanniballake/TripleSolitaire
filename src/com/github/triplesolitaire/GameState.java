@@ -13,6 +13,7 @@ public class GameState
 {
 	private final TripleSolitaireActivity activity;
 	private String[] foundation;
+	private long gameId = 0;
 	private LaneData[] lane;
 	private int moveCount = 0;
 	private Stack<String> stock;
@@ -130,7 +131,7 @@ public class GameState
 		for (int foundationIndex = 0; foundationIndex < 12; foundationIndex++)
 			if (!foundation[foundationIndex].endsWith("s13"))
 				return;
-		activity.showDialog(TripleSolitaireActivity.DIALOG_WINNING_ID);
+		activity.showDialog(TripleSolitaireActivity.DIALOG_ID_WINNING);
 	}
 
 	public void clickStock()
@@ -232,6 +233,11 @@ public class GameState
 	public String getFoundationCard(final int foundationIndex)
 	{
 		return foundation[foundationIndex];
+	}
+
+	public long getGameId()
+	{
+		return gameId;
 	}
 
 	public int getNumber(final String card)
@@ -433,7 +439,9 @@ public class GameState
 		fullDeck.add("spades11");
 		fullDeck.add("spades12");
 		fullDeck.add("spades13");
-		final Random random = new Random(0);
+		final Random random = new Random();
+		gameId = random.nextLong();
+		random.setSeed(gameId);
 		Collections.shuffle(fullDeck, random);
 		int currentIndex = 0;
 		stock = new Stack<String>();

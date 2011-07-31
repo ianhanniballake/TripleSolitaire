@@ -123,7 +123,8 @@ public class TripleSolitaireActivity extends Activity
 		}
 	}
 
-	public static final int DIALOG_WINNING_ID = 0;
+	public static final int DIALOG_ID_SHOW_GAME_ID = 1;
+	public static final int DIALOG_ID_WINNING = 0;
 	/**
 	 * Logging tag
 	 */
@@ -229,22 +230,26 @@ public class TripleSolitaireActivity extends Activity
 	@Override
 	protected Dialog onCreateDialog(final int dialogId)
 	{
+		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		switch (dialogId)
 		{
-			case DIALOG_WINNING_ID:
+			case DIALOG_ID_WINNING:
 				final TextView timeView = (TextView) progressBar
 						.findViewById(R.id.time);
 				final CharSequence time = timeView.getText();
 				final TextView moveCountView = (TextView) progressBar
 						.findViewById(R.id.move_count);
 				final CharSequence moveCount = moveCountView.getText();
-				final String message = "You won in " + time + " and "
-						+ moveCount + " moves!";
-				final AlertDialog.Builder builder = new AlertDialog.Builder(
-						this);
+				final String message = getResources().getString(
+						R.string.win_dialog_1)
+						+ time
+						+ getResources().getString(R.string.win_dialog_1)
+						+ moveCount
+						+ getResources().getString(R.string.win_dialog_1);
 				builder.setMessage(message)
 						.setCancelable(false)
-						.setPositiveButton("New Game",
+						.setPositiveButton(
+								getResources().getString(R.string.new_game),
 								new DialogInterface.OnClickListener()
 								{
 									@Override
@@ -256,7 +261,8 @@ public class TripleSolitaireActivity extends Activity
 										gameState.newGame();
 									}
 								})
-						.setNegativeButton("Exit",
+						.setNegativeButton(
+								getResources().getString(R.string.exit),
 								new DialogInterface.OnClickListener()
 								{
 									@Override
@@ -265,6 +271,24 @@ public class TripleSolitaireActivity extends Activity
 											final int id)
 									{
 										TripleSolitaireActivity.this.finish();
+									}
+								});
+				return builder.create();
+			case DIALOG_ID_SHOW_GAME_ID:
+				builder.setMessage(
+						getResources().getString(R.string.game_id_label)
+								+ gameState.getGameId())
+						.setCancelable(false)
+						.setPositiveButton("OK",
+								new DialogInterface.OnClickListener()
+								{
+									@Override
+									public void onClick(
+											final DialogInterface dialog,
+											final int id)
+									{
+										dialog.cancel();
+										gameState.newGame();
 									}
 								});
 				return builder.create();
@@ -332,6 +356,13 @@ public class TripleSolitaireActivity extends Activity
 			foundationView.setOnTouchListener(new OnFoundationTouchListener(
 					foundationIndex + 1));
 		}
+	}
+
+	public void updateGameId(final long gameId)
+	{
+		final TextView gameIdView = (TextView) progressBar
+				.findViewById(R.id.game_id);
+		gameIdView.setText(Long.toString(gameId));
 	}
 
 	public void updateMoveCount(final int moveCount)

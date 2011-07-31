@@ -7,7 +7,7 @@
 	<TextView
 		android:layout_width="wrap_content"
 		android:layout_height="fill_parent"
-		android:layout_marginLeft="20dp"
+        android:layout_marginLeft="20dp"
 		style="@android:style/TextAppearance.StatusBar.Title"
 		android:text="@string/time" />
 	<TextView
@@ -15,12 +15,11 @@
 		android:layout_width="wrap_content"
 		android:layout_height="fill_parent"
 		android:layout_marginLeft="5dp"
-		android:layout_marginRight="20dp"
-        style="@android:style/TextAppearance.StatusBar.Title"
-		android:text="0:00" />
+        style="@android:style/TextAppearance.StatusBar.Title" />
 	<TextView
 		android:layout_width="wrap_content"
 		android:layout_height="fill_parent"
+        android:layout_marginLeft="20dp"
         style="@android:style/TextAppearance.StatusBar.Title"
 		android:text="@string/move_count" />
 	<TextView
@@ -28,7 +27,5 @@
 		android:layout_width="wrap_content"
 		android:layout_height="fill_parent"
         android:layout_marginLeft="5dp"
-        android:layout_marginRight="20dp"
-        style="@android:style/TextAppearance.StatusBar.Title"
-		android:text="0" />
+        style="@android:style/TextAppearance.StatusBar.Title" />
 </LinearLayout>
