@@ -181,6 +181,7 @@ public class GameState
 				waste.addFirst(stock.pop());
 		activity.updateStockUI();
 		activity.updateWasteUI();
+		activity.updateMoveCount(++moveCount);
 	}
 
 	public void dropFromCascadeToCascade(final int laneIndex, final int from,
