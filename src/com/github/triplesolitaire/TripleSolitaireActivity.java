@@ -232,10 +232,14 @@ public class TripleSolitaireActivity extends Activity
 				final CharSequence moveCount = moveCountView.getText();
 				final String message = getResources().getString(
 						R.string.win_dialog_1)
+						+ " "
 						+ time
-						+ getResources().getString(R.string.win_dialog_1)
+						+ " "
+						+ getResources().getString(R.string.win_dialog_2)
+						+ " "
 						+ moveCount
-						+ getResources().getString(R.string.win_dialog_1);
+						+ " "
+						+ getResources().getString(R.string.win_dialog_3);
 				builder.setMessage(message)
 						.setCancelable(false)
 						.setPositiveButton(
@@ -266,7 +270,7 @@ public class TripleSolitaireActivity extends Activity
 				return builder.create();
 			case DIALOG_ID_SHOW_GAME_ID:
 				builder.setMessage(
-						getResources().getString(R.string.game_id_label)
+						getResources().getString(R.string.game_id_label) + " "
 								+ gameState.getGameId())
 						.setCancelable(false)
 						.setPositiveButton("OK",
