@@ -203,7 +203,7 @@ public class GameState
 	{
 		if (lane[laneIndex].getCascade().isEmpty())
 			return null;
-		return lane[laneIndex].getCascade().getFirst();
+		return lane[laneIndex].getCascade().getLast();
 	}
 
 	public String getFoundationCard(final int foundationIndex)
