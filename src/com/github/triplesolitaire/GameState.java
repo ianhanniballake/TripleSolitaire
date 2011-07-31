@@ -97,6 +97,17 @@ public class GameState
 			}
 	}
 
+	public void attemptAutoMoveFromWasteToFoundation()
+	{
+		final String card = waste.getFirst();
+		for (int foundationIndex = 0; foundationIndex < 12; foundationIndex++)
+			if (acceptFoundationDrop(foundationIndex, card))
+			{
+				dropFromWasteToFoundation(foundationIndex);
+				return;
+			}
+	}
+
 	public String buildCascadeString(final int laneIndex,
 			final int numCardsToInclude)
 	{

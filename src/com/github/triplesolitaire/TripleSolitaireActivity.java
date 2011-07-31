@@ -102,7 +102,7 @@ public class TripleSolitaireActivity extends Activity
 		{
 			final String foundationCard = gameState
 					.getFoundationCard(foundationIndex - 1);
-			if (event.getAction() != MotionEvent.ACTION_MOVE
+			if (event.getAction() != MotionEvent.ACTION_DOWN
 					|| foundationCard == null)
 				return false;
 			Log.d(TAG, -1 * foundationIndex + ": Starting drag at foundation");
@@ -156,6 +156,30 @@ public class TripleSolitaireActivity extends Activity
 						gameState.getWasteTop(), gameState.getWasteTop());
 				v.startDrag(dragData, new View.DragShadowBuilder(v), 0, 0);
 				return true;
+			}
+		});
+		wasteTopView.setOnDragListener(new OnDragListener()
+		{
+			@Override
+			public boolean onDrag(final View v, final DragEvent event)
+			{
+				final boolean fromMe = (Integer) event.getLocalState() == 0;
+				if (!fromMe)
+					return false;
+				if (event.getAction() == DragEvent.ACTION_DRAG_STARTED)
+				{
+					final String card = event.getClipDescription().getLabel()
+							.toString();
+					Log.d(TAG, "W: Drag started of mine of " + card + ": "
+							+ event);
+				}
+				else if (event.getAction() == DragEvent.ACTION_DRAG_ENDED)
+				{
+					Log.d(TAG, "W: Drag ended of mine: " + event.getResult());
+					if (!event.getResult())
+						gameState.attemptAutoMoveFromWasteToFoundation();
+				}
+				return false;
 			}
 		});
 		for (int curFoundation = 0; curFoundation < 12; curFoundation++)
@@ -218,7 +242,7 @@ public class TripleSolitaireActivity extends Activity
 			foundationView.setBackgroundResource(getResources().getIdentifier(
 					foundationCard, "drawable", getPackageName()));
 			foundationView.setOnTouchListener(new OnFoundationTouchListener(
-					foundationIndex));
+					foundationIndex + 1));
 		}
 	}
 
