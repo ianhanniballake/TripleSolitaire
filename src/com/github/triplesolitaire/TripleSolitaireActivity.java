@@ -335,8 +335,8 @@ public class TripleSolitaireActivity extends Activity
 
 	private void startGame()
 	{
-		Log.d(TAG, "Starting new game...");
 		gameState.newGame();
+		Log.d(TAG, "Game Started : " + gameState.getGameId());
 	}
 
 	public void updateFoundationUI(final int foundationIndex)
