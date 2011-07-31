@@ -34,6 +34,7 @@ public class Lane extends RelativeLayout implements OnDragListener
 					(cascadeIndex + 1 != cascadeSize ? "MULTI" : "")
 							+ cascadeData, cascadeData);
 			currentDragIndex = cascadeIndex;
+			cascadeSizeOnStartDrag = cascadeSize;
 			v.startDrag(dragData, new View.DragShadowBuilder(v), laneId, 0);
 			return true;
 		}
@@ -44,6 +45,7 @@ public class Lane extends RelativeLayout implements OnDragListener
 	 */
 	private static final String TAG = "TripleSolitaireActivity";
 	private int cascadeSize;
+	private int cascadeSizeOnStartDrag = 0;
 	private int currentDragIndex = -1;
 	private GameState gameState;
 	private int laneId;
@@ -187,7 +189,8 @@ public class Lane extends RelativeLayout implements OnDragListener
 		{
 			Log.d(TAG, "Drag " + laneId + ": Ended with "
 					+ (event.getResult() ? "success" : "failure"));
-			if (!event.getResult() && currentDragIndex + 1 == cascadeSize)
+			if (!event.getResult() && cascadeSizeOnStartDrag == cascadeSize
+					&& currentDragIndex + 1 == cascadeSize)
 				gameState.attemptAutoMoveFromCascadeToFoundation(laneId - 1);
 			currentDragIndex = -1;
 		}

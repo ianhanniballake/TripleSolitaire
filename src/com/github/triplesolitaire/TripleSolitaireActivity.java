@@ -170,6 +170,8 @@ public class TripleSolitaireActivity extends Activity
 		});
 		wasteTopView.setOnDragListener(new OnDragListener()
 		{
+			private String card;
+
 			@Override
 			public boolean onDrag(final View v, final DragEvent event)
 			{
@@ -178,15 +180,15 @@ public class TripleSolitaireActivity extends Activity
 					return false;
 				if (event.getAction() == DragEvent.ACTION_DRAG_STARTED)
 				{
-					final String card = event.getClipDescription().getLabel()
-							.toString();
+					card = event.getClipDescription().getLabel().toString();
 					Log.d(TAG, "Drag W: Started of " + card);
 				}
 				else if (event.getAction() == DragEvent.ACTION_DRAG_ENDED)
 				{
 					Log.d(TAG, "Drag W: Ended with "
 							+ (event.getResult() ? "success" : "failure"));
-					if (!event.getResult())
+					if (!event.getResult()
+							&& card.equals(gameState.getWasteTop()))
 						gameState.attemptAutoMoveFromWasteToFoundation();
 				}
 				return false;
