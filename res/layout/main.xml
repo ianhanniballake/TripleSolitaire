@@ -4,7 +4,7 @@
 	android:layout_width="fill_parent"
 	android:layout_height="fill_parent"
 	android:padding="5dp"
-	android:background="#660000">
+	android:background="@color/background">
 	<ImageView
 		android:id="@+id/stock"
 		android:layout_width="@dimen/card_width_dim"
