@@ -12,6 +12,19 @@ import android.util.Log;
 
 public class GameState
 {
+	private class GameTimerIncrement implements Runnable
+	{
+		@Override
+		public void run()
+		{
+			timeInSeconds++;
+			activity.updateTime(timeInSeconds);
+			if (gameInProgress)
+				activity.findViewById(R.id.base).postDelayed(
+						new GameTimerIncrement(), 1000);
+		}
+	}
+
 	/**
 	 * Logging tag
 	 */
@@ -19,6 +32,7 @@ public class GameState
 	private final TripleSolitaireActivity activity;
 	private String[] foundation;
 	private long gameId = 0;
+	private boolean gameInProgress = false;
 	private LaneData[] lane;
 	private int moveCount = 0;
 	private Stack<String> stock;
@@ -163,6 +177,7 @@ public class GameState
 			if (!foundation[foundationIndex].endsWith("s13"))
 				return;
 		Log.d(TAG, "Game win detected");
+		gameInProgress = false;
 		activity.showDialog(TripleSolitaireActivity.DIALOG_ID_WINNING);
 	}
 
@@ -181,7 +196,7 @@ public class GameState
 				waste.addFirst(stock.pop());
 		activity.updateStockUI();
 		activity.updateWasteUI();
-		activity.updateMoveCount(++moveCount);
+		incrementMoveCount();
 	}
 
 	public void dropFromCascadeToCascade(final int laneIndex, final int from,
@@ -200,7 +215,7 @@ public class GameState
 		lane[laneIndex].getCascade().addAll(cascadeToAdd);
 		final Lane laneLayout = activity.getLane(laneIndex);
 		laneLayout.addCascade(cascadeToAdd);
-		activity.updateMoveCount(++moveCount);
+		incrementMoveCount();
 	}
 
 	public void dropFromCascadeToFoundation(final int foundationIndex,
@@ -212,7 +227,7 @@ public class GameState
 		foundation[foundationIndex] = cascadeCard;
 		activity.updateFoundationUI(foundationIndex);
 		activity.getLane(from).decrementCascadeSize(1);
-		activity.updateMoveCount(++moveCount);
+		incrementMoveCount();
 		checkForWin();
 	}
 
@@ -229,6 +244,7 @@ public class GameState
 		final ArrayList<String> cascadeToAdd = new ArrayList<String>();
 		cascadeToAdd.add(foundationCard);
 		laneLayout.addCascade(cascadeToAdd);
+		incrementMoveCount();
 	}
 
 	public void dropFromFoundationToFoundation(final int foundationIndex,
@@ -241,6 +257,7 @@ public class GameState
 		foundation[from] = prevInSuit(foundationCard);
 		activity.updateFoundationUI(foundationIndex);
 		activity.updateFoundationUI(from);
+		incrementMoveCount();
 	}
 
 	public void dropFromWasteToCascade(final int laneIndex)
@@ -253,6 +270,7 @@ public class GameState
 		final ArrayList<String> cascadeToAdd = new ArrayList<String>();
 		cascadeToAdd.add(card);
 		laneLayout.addCascade(cascadeToAdd);
+		incrementMoveCount();
 	}
 
 	public void dropFromWasteToFoundation(final int foundationIndex)
@@ -262,6 +280,7 @@ public class GameState
 		foundation[foundationIndex] = card;
 		activity.updateFoundationUI(foundationIndex);
 		activity.updateWasteUI();
+		incrementMoveCount();
 		checkForWin();
 	}
 
@@ -318,6 +337,17 @@ public class GameState
 	public String getWasteTop()
 	{
 		return waste.get(0);
+	}
+
+	private void incrementMoveCount()
+	{
+		activity.updateMoveCount(++moveCount);
+		if (moveCount == 1)
+		{
+			gameInProgress = true;
+			activity.findViewById(R.id.base).postDelayed(
+					new GameTimerIncrement(), 1000);
+		}
 	}
 
 	public boolean isStockEmpty()
