@@ -24,7 +24,8 @@ public class GameState
 	public boolean acceptCascadeDrop(final int laneIndex,
 			final String topNewCard)
 	{
-		final String cascadeCard = lane[laneIndex].getCascade().get(0);
+		final ArrayList<String> cascade = lane[laneIndex].getCascade();
+		final String cascadeCard = cascade.get(cascade.size() - 1);
 		final String cascadeSuit = getSuit(cascadeCard);
 		final int cascadeNum = getNumber(cascadeCard);
 		final String topNewCardSuit = getSuit(topNewCard);
@@ -99,9 +100,11 @@ public class GameState
 	public String buildCascadeString(final int laneIndex,
 			final int numCardsToInclude)
 	{
-		final StringBuilder cascadeData = new StringBuilder(lane[laneIndex]
-				.getCascade().get(0));
-		for (int cascadeIndex = 1; cascadeIndex < numCardsToInclude; cascadeIndex++)
+		final ArrayList<String> cascade = lane[laneIndex].getCascade();
+		final StringBuilder cascadeData = new StringBuilder(cascade.get(cascade
+				.size() - numCardsToInclude));
+		for (int cascadeIndex = cascade.size() - numCardsToInclude + 1; cascadeIndex < cascade
+				.size(); cascadeIndex++)
 		{
 			cascadeData.append(";");
 			cascadeData.append(lane[laneIndex].getCascade().get(cascadeIndex));
@@ -137,7 +140,7 @@ public class GameState
 			lane[from].getCascade().remove(0);
 		final Lane fromLaneLayout = activity.getLane(from);
 		fromLaneLayout.decrementCascadeSize(cascadeToAdd.size());
-		lane[laneIndex].getCascade().addAll(0, cascadeToAdd);
+		lane[laneIndex].getCascade().addAll(cascadeToAdd);
 		final Lane laneLayout = activity.getLane(laneIndex);
 		laneLayout.addCascade(cascadeToAdd);
 	}
@@ -145,7 +148,8 @@ public class GameState
 	public void dropFromCascadeToFoundation(final int foundationIndex,
 			final int from)
 	{
-		foundation[foundationIndex] = lane[from].getCascade().remove(0);
+		final ArrayList<String> cascade = lane[from].getCascade();
+		foundation[foundationIndex] = cascade.remove(cascade.size() - 1);
 		activity.updateFoundationUI(foundationIndex);
 		activity.getLane(from).decrementCascadeSize(1);
 	}
@@ -156,7 +160,7 @@ public class GameState
 		final String foundationCard = foundation[foundationIndex];
 		foundation[foundationIndex] = prevInSuit(foundationCard);
 		activity.updateFoundationUI(foundationIndex);
-		lane[laneIndex].getCascade().add(0, foundationCard);
+		lane[laneIndex].getCascade().add(foundationCard);
 		final Lane laneLayout = activity.getLane(laneIndex);
 		final ArrayList<String> cascadeToAdd = new ArrayList<String>();
 		cascadeToAdd.add(foundationCard);
@@ -177,7 +181,7 @@ public class GameState
 		final String card = waste.remove(0);
 		for (int wasteIndex = 0; wasteIndex < 3; wasteIndex++)
 			activity.updateWasteUI(wasteIndex);
-		lane[laneIndex].getCascade().add(0, card);
+		lane[laneIndex].getCascade().add(card);
 		final Lane laneLayout = activity.getLane(laneIndex);
 		final ArrayList<String> cascadeToAdd = new ArrayList<String>();
 		cascadeToAdd.add(card);
@@ -421,7 +425,6 @@ public class GameState
 		for (int wasteIndex = 0; wasteIndex < 3; wasteIndex++)
 			activity.updateWasteUI(wasteIndex);
 		foundation = new String[12];
-		foundation[2] = "spades2";
 		for (int foundationIndex = 0; foundationIndex < 12; foundationIndex++)
 			activity.updateFoundationUI(foundationIndex);
 		lane = new LaneData[13];

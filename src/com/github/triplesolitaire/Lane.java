@@ -32,10 +32,10 @@ public class Lane extends RelativeLayout implements OnDragListener,
 				return false;
 			Log.d(TAG, laneId + ": Starting drag at " + cascadeIndex);
 			final String cascadeData = gameState.buildCascadeString(laneId - 1,
-					cascadeIndex + 1);
+					cascadeSize - cascadeIndex);
 			final ClipData dragData = ClipData.newPlainText(
-					(cascadeIndex > 0 ? "MULTI" : "") + cascadeData,
-					cascadeData);
+					(cascadeIndex + 1 != cascadeSize ? "MULTI" : "")
+							+ cascadeData, cascadeData);
 			v.startDrag(dragData, new View.DragShadowBuilder(v), laneId, 0);
 			return true;
 		}
@@ -77,7 +77,7 @@ public class Lane extends RelativeLayout implements OnDragListener,
 					android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
 			lp.addRule(RelativeLayout.ALIGN_TOP, cascadeId - 1);
 			lp.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-			if (stackSize > 0)
+			if (stackSize + cascadeSize > 0)
 				lp.setMargins(0, card_vert_overlap_dim, 0, 0);
 			cascadeCard.setOnTouchListener(new OnStartDragListener(h
 					+ cascadeSize));

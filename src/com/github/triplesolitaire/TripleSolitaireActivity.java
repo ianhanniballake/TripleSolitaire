@@ -26,7 +26,7 @@ public class TripleSolitaireActivity extends Activity
 		@Override
 		public void onClick(final View v)
 		{
-			Log.d(TAG, "Clicked " + laneIndex);
+			Log.d(TAG, "Clicked " + (laneIndex + 1));
 			gameState.flipCard(laneIndex);
 		}
 	}
@@ -138,6 +138,7 @@ public class TripleSolitaireActivity extends Activity
 			@Override
 			public void onClick(final View v)
 			{
+				Log.d(TAG, "Clicked stock");
 				gameState.clickStock();
 			}
 		});
