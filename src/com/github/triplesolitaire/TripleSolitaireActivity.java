@@ -209,10 +209,17 @@ public class TripleSolitaireActivity extends Activity
 				"foundation" + (foundationIndex + 1), "id", getPackageName());
 		final ImageView foundationView = (ImageView) findViewById(foundationViewId);
 		if (foundationCard == null)
+		{
 			foundationView.setBackgroundResource(R.drawable.foundation);
+			foundationView.setOnTouchListener(null);
+		}
 		else
+		{
 			foundationView.setBackgroundResource(getResources().getIdentifier(
 					foundationCard, "drawable", getPackageName()));
+			foundationView.setOnTouchListener(new OnFoundationTouchListener(
+					foundationIndex));
+		}
 	}
 
 	public void updateStockUI()
