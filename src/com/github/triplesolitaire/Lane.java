@@ -28,7 +28,6 @@ public class Lane extends RelativeLayout implements OnDragListener
 		{
 			if (event.getAction() != MotionEvent.ACTION_DOWN)
 				return false;
-			Log.d(TAG, laneId + ": Starting drag at " + cascadeIndex);
 			final String cascadeData = gameState.buildCascadeString(laneId - 1,
 					cascadeSize - cascadeIndex);
 			final ClipData dragData = ClipData.newPlainText(
@@ -159,27 +158,21 @@ public class Lane extends RelativeLayout implements OnDragListener
 			String card = event.getClipDescription().getLabel().toString();
 			if (isMyCascade)
 			{
-				Log.d(TAG, laneId + ": Drag started of mine of " + card + ": "
-						+ event);
+				Log.d(TAG, "Drag " + laneId + ": Started of  " + card);
 				return false;
 			}
 			// Take off MULTI prefix - we accept all cascades based on the top
 			// card alone
 			if (card.startsWith("MULTI"))
 				card = card.substring(5, card.indexOf(';'));
-			final boolean acceptDrop = cascadeSize == 0 ? gameState
-					.acceptLaneDrop(card) : gameState.acceptCascadeDrop(
-					laneId - 1, card);
-			if (acceptDrop)
-				Log.d(TAG, laneId + ": Acceptable drag of " + card + " onto "
-						+ gameState.getCascadeTop(laneId - 1));
-			return acceptDrop;
+			return cascadeSize == 0 ? gameState
+					.acceptLaneDrop(laneId - 1, card) : gameState
+					.acceptCascadeDrop(laneId - 1, card);
 		}
 		else if (event.getAction() == DragEvent.ACTION_DROP)
 		{
 			final String card = event.getClipData().getItemAt(0).getText()
 					.toString();
-			Log.d(TAG, laneId + ": Drop of " + card);
 			final int from = (Integer) event.getLocalState();
 			if (from == 0)
 				gameState.dropFromWasteToCascade(laneId - 1);
@@ -192,7 +185,8 @@ public class Lane extends RelativeLayout implements OnDragListener
 		else if (event.getAction() == DragEvent.ACTION_DRAG_ENDED
 				&& isMyCascade)
 		{
-			Log.d(TAG, laneId + ": Drag ended of mine: " + event.getResult());
+			Log.d(TAG, "Drag " + laneId + ": Ended with "
+					+ (event.getResult() ? "success" : "failure"));
 			if (!event.getResult() && currentDragIndex + 1 == cascadeSize)
 				gameState.attemptAutoMoveFromCascadeToFoundation(laneId - 1);
 			currentDragIndex = -1;

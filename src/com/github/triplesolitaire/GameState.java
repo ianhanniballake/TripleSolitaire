@@ -38,42 +38,48 @@ public class GameState
 		final int cascadeNum = getNumber(cascadeCard);
 		final String topNewCardSuit = getSuit(topNewCard);
 		final int topNewCardNum = getNumber(topNewCard);
+		boolean acceptDrop = false;
 		if (topNewCardNum != cascadeNum - 1)
-			return false;
-		if (cascadeSuit.equals("clubs") && topNewCardSuit.equals("diamonds"))
-			return true;
+			acceptDrop = false;
+		else if (cascadeSuit.equals("clubs")
+				&& topNewCardSuit.equals("diamonds"))
+			acceptDrop = true;
 		else if (cascadeSuit.equals("clubs") && topNewCardSuit.equals("hearts"))
-			return true;
+			acceptDrop = true;
 		else if (cascadeSuit.equals("clubs") && topNewCardSuit.equals("spades"))
-			return false;
+			acceptDrop = false;
 		else if (cascadeSuit.equals("diamonds")
 				&& topNewCardSuit.equals("clubs"))
-			return true;
+			acceptDrop = true;
 		else if (cascadeSuit.equals("diamonds")
 				&& topNewCardSuit.equals("hearts"))
-			return false;
+			acceptDrop = false;
 		else if (cascadeSuit.equals("diamonds")
 				&& topNewCardSuit.equals("spades"))
-			return true;
+			acceptDrop = true;
 		else if (cascadeSuit.equals("hearts") && topNewCardSuit.equals("clubs"))
-			return true;
+			acceptDrop = true;
 		else if (cascadeSuit.equals("hearts")
 				&& topNewCardSuit.equals("diamonds"))
-			return false;
+			acceptDrop = false;
 		else if (cascadeSuit.equals("hearts")
 				&& topNewCardSuit.equals("spades"))
-			return true;
+			acceptDrop = true;
 		else if (cascadeSuit.equals("spades") && topNewCardSuit.equals("clubs"))
-			return false;
+			acceptDrop = false;
 		else if (cascadeSuit.equals("spades")
 				&& topNewCardSuit.equals("diamonds"))
-			return true;
+			acceptDrop = true;
 		else if (cascadeSuit.equals("spades")
 				&& topNewCardSuit.equals("hearts"))
-			return true;
+			acceptDrop = true;
 		else
 			// same suit
-			return false;
+			acceptDrop = false;
+		if (acceptDrop)
+			Log.d(TAG, "Drag -> " + (laneIndex + 1) + ": Acceptable drag of "
+					+ topNewCard + " onto " + cascadeCard);
+		return acceptDrop;
 	}
 
 	public boolean acceptFoundationDrop(final int foundationIndex,
@@ -83,26 +89,40 @@ public class GameState
 			// Foundations don't accept multiple cards
 			return false;
 		final String existingFoundationCard = foundation[foundationIndex];
+		boolean acceptDrop = false;
 		if (existingFoundationCard == null)
-			// Must be an ace if there are no cards on this foundation
-			return newCard.endsWith("s1");
-		return newCard.equals(nextInSuit(existingFoundationCard));
+			acceptDrop = newCard.endsWith("s1");
+		else
+			acceptDrop = newCard.equals(nextInSuit(existingFoundationCard));
+		if (acceptDrop)
+		{
+			final String foundationDisplayCard = existingFoundationCard == null ? "empty foundation"
+					: existingFoundationCard;
+			Log.d(TAG, "Drag -> " + -1 * (foundationIndex + 1)
+					+ ": Acceptable drag of " + newCard + " onto "
+					+ foundationDisplayCard);
+		}
+		return acceptDrop;
 	}
 
-	public boolean acceptLaneDrop(final String topNewCard)
+	public boolean acceptLaneDrop(final int laneIndex, final String topNewCard)
 	{
-		return topNewCard.endsWith("s13");
+		final boolean acceptDrop = topNewCard.endsWith("s13");
+		if (acceptDrop)
+			Log.d(TAG, "Drag -> " + (laneIndex + 1) + ": Acceptable drag of "
+					+ topNewCard + " onto empty lane");
+		return acceptDrop;
 	}
 
 	public void attemptAutoMoveFromCascadeToFoundation(final int laneIndex)
 	{
 		final String card = lane[laneIndex].getCascade().getLast();
-		Log.d(TAG, laneIndex + 1 + ": Attempt auto move of " + card);
+		Log.d(TAG, "Auto Move Attempt " + (laneIndex + 1) + ": " + card);
 		for (int foundationIndex = 0; foundationIndex < 12; foundationIndex++)
 			if (acceptFoundationDrop(foundationIndex, card))
 			{
-				Log.d(TAG, -1 * (foundationIndex + 1) + ": Found auto move of "
-						+ card + " from cascade " + (laneIndex + 1));
+				Log.d(TAG, "Auto Move " + (laneIndex + 1) + " -> " + -1
+						* (foundationIndex + 1) + ": " + card);
 				dropFromCascadeToFoundation(foundationIndex, laneIndex);
 				return;
 			}
@@ -111,12 +131,12 @@ public class GameState
 	public void attemptAutoMoveFromWasteToFoundation()
 	{
 		final String card = waste.getFirst();
-		Log.d(TAG, "W: Attempt auto move of " + card);
+		Log.d(TAG, "Auto Move Attempt W: " + card);
 		for (int foundationIndex = 0; foundationIndex < 12; foundationIndex++)
 			if (acceptFoundationDrop(foundationIndex, card))
 			{
-				Log.d(TAG, -1 * (foundationIndex + 1) + ": Found auto move of "
-						+ card + " from waste");
+				Log.d(TAG, "Auto Move W -> " + -1 * (foundationIndex + 1)
+						+ ": " + card);
 				dropFromWasteToFoundation(foundationIndex);
 				return;
 			}
@@ -137,11 +157,12 @@ public class GameState
 		return cascadeData.toString();
 	}
 
-	public void checkForWin()
+	private void checkForWin()
 	{
 		for (int foundationIndex = 0; foundationIndex < 12; foundationIndex++)
 			if (!foundation[foundationIndex].endsWith("s13"))
 				return;
+		Log.d(TAG, "Game win detected");
 		activity.showDialog(TripleSolitaireActivity.DIALOG_ID_WINNING);
 	}
 
@@ -149,6 +170,7 @@ public class GameState
 	{
 		if (stock.isEmpty() && waste.isEmpty())
 			return;
+		Log.d(TAG, "Clicked Stock");
 		if (stock.isEmpty())
 		{
 			stock.addAll(waste);
@@ -164,6 +186,8 @@ public class GameState
 	public void dropFromCascadeToCascade(final int laneIndex, final int from,
 			final String card)
 	{
+		Log.d(TAG, "Drop " + (from + 1) + " -> " + (laneIndex + 1) + ": "
+				+ card);
 		final ArrayList<String> cascadeToAdd = new ArrayList<String>();
 		final StringTokenizer st = new StringTokenizer(card, ";");
 		while (st.hasMoreTokens())
@@ -175,14 +199,19 @@ public class GameState
 		lane[laneIndex].getCascade().addAll(cascadeToAdd);
 		final Lane laneLayout = activity.getLane(laneIndex);
 		laneLayout.addCascade(cascadeToAdd);
+		activity.updateMoveCount(++moveCount);
 	}
 
 	public void dropFromCascadeToFoundation(final int foundationIndex,
 			final int from)
 	{
-		foundation[foundationIndex] = lane[from].getCascade().removeLast();
+		final String cascadeCard = lane[from].getCascade().removeLast();
+		Log.d(TAG, "Drop " + (from + 1) + " -> " + -1 * (foundationIndex + 1)
+				+ ": " + cascadeCard);
+		foundation[foundationIndex] = cascadeCard;
 		activity.updateFoundationUI(foundationIndex);
 		activity.getLane(from).decrementCascadeSize(1);
+		activity.updateMoveCount(++moveCount);
 		checkForWin();
 	}
 
@@ -190,6 +219,8 @@ public class GameState
 			final int foundationIndex)
 	{
 		final String foundationCard = foundation[foundationIndex];
+		Log.d(TAG, "Drop " + -1 * (foundationIndex + 1) + " -> "
+				+ (laneIndex + 1) + ": " + foundationCard);
 		foundation[foundationIndex] = prevInSuit(foundationCard);
 		activity.updateFoundationUI(foundationIndex);
 		lane[laneIndex].getCascade().add(foundationCard);
@@ -202,8 +233,11 @@ public class GameState
 	public void dropFromFoundationToFoundation(final int foundationIndex,
 			final int from)
 	{
-		foundation[foundationIndex] = foundation[from];
-		foundation[from] = prevInSuit(foundation[from]);
+		final String foundationCard = foundation[from];
+		Log.d(TAG, "Drop " + -1 * (from + 1) + " -> " + -1
+				* (foundationIndex + 1) + ": " + foundationCard);
+		foundation[foundationIndex] = foundationCard;
+		foundation[from] = prevInSuit(foundationCard);
 		activity.updateFoundationUI(foundationIndex);
 		activity.updateFoundationUI(from);
 	}
@@ -211,6 +245,7 @@ public class GameState
 	public void dropFromWasteToCascade(final int laneIndex)
 	{
 		final String card = waste.removeFirst();
+		Log.d(TAG, "Drop " + "W -> " + (laneIndex + 1) + ": " + card);
 		activity.updateWasteUI();
 		lane[laneIndex].getCascade().add(card);
 		final Lane laneLayout = activity.getLane(laneIndex);
@@ -221,7 +256,9 @@ public class GameState
 
 	public void dropFromWasteToFoundation(final int foundationIndex)
 	{
-		foundation[foundationIndex] = waste.removeFirst();
+		final String card = waste.removeFirst();
+		Log.d(TAG, "Drop " + "W -> " + -1 * (foundationIndex + 1) + ": " + card);
+		foundation[foundationIndex] = card;
 		activity.updateFoundationUI(foundationIndex);
 		activity.updateWasteUI();
 		checkForWin();
@@ -230,6 +267,7 @@ public class GameState
 	public void flipCard(final int laneIndex)
 	{
 		final String card = lane[laneIndex].getStack().pop();
+		Log.d(TAG, "Flip " + (laneIndex + 1) + ": " + card);
 		lane[laneIndex].getCascade().add(card);
 		activity.getLane(laneIndex).flipOverTopStack(card);
 	}
@@ -479,6 +517,7 @@ public class GameState
 		activity.updateTime(timeInSeconds);
 		moveCount = 0;
 		activity.updateMoveCount(moveCount);
+		Log.d(TAG, "Game Started: " + gameId);
 	}
 
 	public String nextInSuit(final String card)

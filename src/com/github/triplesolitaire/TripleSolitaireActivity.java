@@ -35,7 +35,6 @@ public class TripleSolitaireActivity extends Activity
 		@Override
 		public void onClick(final View v)
 		{
-			Log.d(TAG, "Clicked " + (laneIndex + 1));
 			gameState.flipCard(laneIndex);
 		}
 	}
@@ -60,25 +59,17 @@ public class TripleSolitaireActivity extends Activity
 						.getFoundationCard(foundationIndex - 1);
 				if (isMyFoundation)
 				{
-					Log.d(TAG, -1 * foundationIndex
-							+ ": Drag started of mine of " + foundationCard
-							+ ": " + event);
+					Log.d(TAG, "Drag " + -1 * foundationIndex + ": Started of "
+							+ foundationCard);
 					return false;
 				}
 				final String card = event.getClipDescription().getLabel()
 						.toString();
-				final boolean acceptDrop = gameState.acceptFoundationDrop(
-						foundationIndex - 1, card);
-				if (acceptDrop)
-					Log.d(TAG, -1 * foundationIndex + ": Acceptable drag of "
-							+ card + " onto " + foundationCard);
-				return acceptDrop;
+				return gameState
+						.acceptFoundationDrop(foundationIndex - 1, card);
 			}
 			else if (event.getAction() == DragEvent.ACTION_DROP)
 			{
-				final String card = event.getClipData().getItemAt(0).getText()
-						.toString();
-				Log.d(TAG, -1 * foundationIndex + ": Drop of " + card);
 				final int from = (Integer) event.getLocalState();
 				if (from == 0)
 					gameState.dropFromWasteToFoundation(foundationIndex - 1);
@@ -91,8 +82,8 @@ public class TripleSolitaireActivity extends Activity
 			}
 			else if (event.getAction() == DragEvent.ACTION_DRAG_ENDED)
 				if (isMyFoundation)
-					Log.d(TAG, -1 * foundationIndex + ": Drag ended of mine: "
-							+ event.getResult());
+					Log.d(TAG, "Drag " + -1 * foundationIndex + ": Ended with "
+							+ (event.getResult() ? "success" : "failure"));
 			return true;
 		}
 	}
@@ -114,7 +105,6 @@ public class TripleSolitaireActivity extends Activity
 			if (event.getAction() != MotionEvent.ACTION_DOWN
 					|| foundationCard == null)
 				return false;
-			Log.d(TAG, -1 * foundationIndex + ": Starting drag at foundation");
 			final ClipData dragData = ClipData.newPlainText(foundationCard,
 					foundationCard);
 			v.startDrag(dragData, new View.DragShadowBuilder(v), -1
@@ -160,7 +150,6 @@ public class TripleSolitaireActivity extends Activity
 			@Override
 			public void onClick(final View v)
 			{
-				Log.d(TAG, "Clicked stock");
 				gameState.clickStock();
 			}
 		});
@@ -173,7 +162,6 @@ public class TripleSolitaireActivity extends Activity
 				if (event.getAction() != MotionEvent.ACTION_DOWN
 						|| gameState.isWasteEmpty())
 					return false;
-				Log.d(TAG, "W: Starting drag at waste");
 				final ClipData dragData = ClipData.newPlainText(
 						gameState.getWasteTop(), gameState.getWasteTop());
 				v.startDrag(dragData, new View.DragShadowBuilder(v), 0, 0);
@@ -192,12 +180,12 @@ public class TripleSolitaireActivity extends Activity
 				{
 					final String card = event.getClipDescription().getLabel()
 							.toString();
-					Log.d(TAG, "W: Drag started of mine of " + card + ": "
-							+ event);
+					Log.d(TAG, "Drag W: Started of " + card);
 				}
 				else if (event.getAction() == DragEvent.ACTION_DRAG_ENDED)
 				{
-					Log.d(TAG, "W: Drag ended of mine: " + event.getResult());
+					Log.d(TAG, "Drag W: Ended with "
+							+ (event.getResult() ? "success" : "failure"));
 					if (!event.getResult())
 						gameState.attemptAutoMoveFromWasteToFoundation();
 				}
@@ -336,7 +324,6 @@ public class TripleSolitaireActivity extends Activity
 	private void startGame()
 	{
 		gameState.newGame();
-		Log.d(TAG, "Game Started : " + gameState.getGameId());
 	}
 
 	public void updateFoundationUI(final int foundationIndex)
