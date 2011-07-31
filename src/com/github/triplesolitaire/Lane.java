@@ -164,8 +164,19 @@ public class Lane extends RelativeLayout implements OnDragListener
 			return acceptDrop;
 		}
 		else if (event.getAction() == DragEvent.ACTION_DROP)
-			Log.d(TAG, laneId + ": Drop of "
-					+ event.getClipData().getItemAt(0).getText());
+		{
+			final String card = event.getClipData().getItemAt(0).getText()
+					.toString();
+			Log.d(TAG, laneId + ": Drop of " + card);
+			final int from = (Integer) event.getLocalState();
+			if (from == 0)
+				gameState.dropFromWasteToCascade(laneId - 1);
+			else if (from < 0)
+				gameState
+						.dropFromFoundationToCascade(laneId - 1, -1 * from - 1);
+			else
+				gameState.dropFromCascadeToCascade(laneId - 1, from - 1, card);
+		}
 		else if (event.getAction() == DragEvent.ACTION_DRAG_ENDED
 				&& isMyCascade)
 			Log.d(TAG, laneId + ": Drag ended of mine: " + event.getResult());

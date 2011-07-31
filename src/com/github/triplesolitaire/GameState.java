@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 import java.util.Stack;
+import java.util.StringTokenizer;
 
 import android.os.Bundle;
 
@@ -114,11 +115,41 @@ public class GameState
 			activity.updateWasteUI(wasteIndex);
 	}
 
+	public void dropFromCascadeToCascade(final int laneIndex, final int from,
+			final String card)
+	{
+		final ArrayList<String> cascadeToAdd = new ArrayList<String>();
+		final StringTokenizer st = new StringTokenizer(card, ";");
+		while (st.hasMoreTokens())
+			cascadeToAdd.add(st.nextToken());
+		for (int cascadeIndex = 0; cascadeIndex < cascadeToAdd.size(); cascadeIndex++)
+			lane[from].getCascade().remove(0);
+		final Lane fromLaneLayout = activity.getLane(from);
+		fromLaneLayout.decrementCascadeSize(cascadeToAdd.size());
+		lane[laneIndex].getCascade().addAll(0, cascadeToAdd);
+		final Lane laneLayout = activity.getLane(laneIndex);
+		laneLayout.addCascade(cascadeToAdd);
+	}
+
 	public void dropFromCascadeToFoundation(final int foundationIndex,
 			final int from)
 	{
 		foundation[foundationIndex] = lane[from].getCascade().remove(0);
+		activity.updateFoundationUI(foundationIndex);
 		activity.getLane(from).decrementCascadeSize(1);
+	}
+
+	public void dropFromFoundationToCascade(final int laneIndex,
+			final int foundationIndex)
+	{
+		final String foundationCard = foundation[foundationIndex];
+		foundation[foundationIndex] = prevInSuit(foundationCard);
+		activity.updateFoundationUI(foundationIndex);
+		lane[laneIndex].getCascade().add(0, foundationCard);
+		final Lane laneLayout = activity.getLane(laneIndex);
+		final ArrayList<String> cascadeToAdd = new ArrayList<String>();
+		cascadeToAdd.add(foundationCard);
+		laneLayout.addCascade(cascadeToAdd);
 	}
 
 	public void dropFromFoundationToFoundation(final int foundationIndex,
@@ -128,6 +159,18 @@ public class GameState
 		foundation[from] = prevInSuit(foundation[from]);
 		activity.updateFoundationUI(foundationIndex);
 		activity.updateFoundationUI(from);
+	}
+
+	public void dropFromWasteToCascade(final int laneIndex)
+	{
+		final String card = waste.remove(0);
+		for (int wasteIndex = 0; wasteIndex < 3; wasteIndex++)
+			activity.updateWasteUI(wasteIndex);
+		lane[laneIndex].getCascade().add(0, card);
+		final Lane laneLayout = activity.getLane(laneIndex);
+		final ArrayList<String> cascadeToAdd = new ArrayList<String>();
+		cascadeToAdd.add(card);
+		laneLayout.addCascade(cascadeToAdd);
 	}
 
 	public void dropFromWasteToFoundation(final int foundationIndex)
