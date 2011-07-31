@@ -8,9 +8,14 @@ import java.util.Stack;
 import java.util.StringTokenizer;
 
 import android.os.Bundle;
+import android.util.Log;
 
 public class GameState
 {
+	/**
+	 * Logging tag
+	 */
+	private static final String TAG = "TripleSolitaireActivity";
 	private final TripleSolitaireActivity activity;
 	private String[] foundation;
 	private long gameId = 0;
@@ -92,9 +97,12 @@ public class GameState
 	public void attemptAutoMoveFromCascadeToFoundation(final int laneIndex)
 	{
 		final String card = lane[laneIndex].getCascade().getLast();
+		Log.d(TAG, laneIndex + 1 + ": Attempt auto move of " + card);
 		for (int foundationIndex = 0; foundationIndex < 12; foundationIndex++)
 			if (acceptFoundationDrop(foundationIndex, card))
 			{
+				Log.d(TAG, -1 * (foundationIndex + 1) + ": Found auto move of "
+						+ card + " from cascade " + (laneIndex + 1));
 				dropFromCascadeToFoundation(foundationIndex, laneIndex);
 				return;
 			}
@@ -103,9 +111,12 @@ public class GameState
 	public void attemptAutoMoveFromWasteToFoundation()
 	{
 		final String card = waste.getFirst();
+		Log.d(TAG, "W: Attempt auto move of " + card);
 		for (int foundationIndex = 0; foundationIndex < 12; foundationIndex++)
 			if (acceptFoundationDrop(foundationIndex, card))
 			{
+				Log.d(TAG, -1 * (foundationIndex + 1) + ": Found auto move of "
+						+ card + " from waste");
 				dropFromWasteToFoundation(foundationIndex);
 				return;
 			}
