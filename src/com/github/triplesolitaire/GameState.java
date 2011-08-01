@@ -181,13 +181,17 @@ public class GameState
 		do
 		{
 			foundAutoPlay = false;
-			if (attemptAutoMoveFromWasteToFoundation())
-				foundAutoPlay = true;
 			for (int laneIndex = 0; laneIndex < 13; laneIndex++)
 				if (!autoplayLaneIndexLocked[laneIndex]
 						&& attemptAutoMoveFromCascadeToFoundation(laneIndex))
+				{
 					foundAutoPlay = true;
+					break;
+				}
 		} while (foundAutoPlay);
+		do
+		{
+		} while (attemptAutoMoveFromWasteToFoundation());
 	}
 
 	public String buildCascadeString(final int laneIndex,
