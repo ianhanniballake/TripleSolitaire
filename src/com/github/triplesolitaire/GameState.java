@@ -136,7 +136,6 @@ public class GameState
 		if (lane[laneIndex].getCascade().isEmpty())
 			return false;
 		final String card = lane[laneIndex].getCascade().getLast();
-		Log.d(TAG, "Auto Move Attempt " + (laneIndex + 1) + ": " + card);
 		for (int foundationIndex = 0; foundationIndex < 12; foundationIndex++)
 			if (acceptFoundationDrop(foundationIndex, card))
 			{
@@ -153,7 +152,6 @@ public class GameState
 		if (waste.isEmpty())
 			return false;
 		final String card = waste.getFirst();
-		Log.d(TAG, "Auto Move Attempt W: " + card);
 		for (int foundationIndex = 0; foundationIndex < 12; foundationIndex++)
 			if (acceptFoundationDrop(foundationIndex, card))
 			{
@@ -213,7 +211,7 @@ public class GameState
 			if (!foundation[foundationIndex].endsWith("s13"))
 				return;
 		Log.d(TAG, "Game win detected");
-		gameInProgress = false;
+		pauseGame();
 		activity.showDialog(TripleSolitaireActivity.DIALOG_ID_WINNING);
 	}
 
@@ -330,13 +328,6 @@ public class GameState
 		autoPlay();
 	}
 
-	public String getCascadeTop(final int laneIndex)
-	{
-		if (lane[laneIndex].getCascade().isEmpty())
-			return null;
-		return lane[laneIndex].getCascade().getLast();
-	}
-
 	public String getFoundationCard(final int foundationIndex)
 	{
 		return foundation[foundationIndex];
@@ -347,7 +338,7 @@ public class GameState
 		return gameId;
 	}
 
-	public int getNumber(final String card)
+	private int getNumber(final String card)
 	{
 		int firstNumber;
 		for (firstNumber = 0; firstNumber < card.length(); firstNumber++)
@@ -356,7 +347,7 @@ public class GameState
 		return Integer.parseInt(card.substring(firstNumber));
 	}
 
-	public String getSuit(final String card)
+	private String getSuit(final String card)
 	{
 		int firstNumber;
 		for (firstNumber = 0; firstNumber < card.length(); firstNumber++)
@@ -370,11 +361,6 @@ public class GameState
 		if (wasteIndex < waste.size())
 			return waste.get(wasteIndex);
 		return null;
-	}
-
-	public String getWasteTop()
-	{
-		return waste.get(0);
 	}
 
 	private void incrementMoveCount(final boolean resetAutoplayLaneIndexLocked)
@@ -405,162 +391,61 @@ public class GameState
 	public void newGame()
 	{
 		final ArrayList<String> fullDeck = new ArrayList<String>();
-		fullDeck.add("clubs1");
-		fullDeck.add("clubs2");
-		fullDeck.add("clubs3");
-		fullDeck.add("clubs4");
-		fullDeck.add("clubs5");
-		fullDeck.add("clubs6");
-		fullDeck.add("clubs7");
-		fullDeck.add("clubs8");
-		fullDeck.add("clubs9");
-		fullDeck.add("clubs10");
-		fullDeck.add("clubs11");
-		fullDeck.add("clubs12");
-		fullDeck.add("clubs13");
-		fullDeck.add("diamonds1");
-		fullDeck.add("diamonds2");
-		fullDeck.add("diamonds3");
-		fullDeck.add("diamonds4");
-		fullDeck.add("diamonds5");
-		fullDeck.add("diamonds6");
-		fullDeck.add("diamonds7");
-		fullDeck.add("diamonds8");
-		fullDeck.add("diamonds9");
-		fullDeck.add("diamonds10");
-		fullDeck.add("diamonds11");
-		fullDeck.add("diamonds12");
-		fullDeck.add("diamonds13");
-		fullDeck.add("hearts1");
-		fullDeck.add("hearts2");
-		fullDeck.add("hearts3");
-		fullDeck.add("hearts4");
-		fullDeck.add("hearts5");
-		fullDeck.add("hearts6");
-		fullDeck.add("hearts7");
-		fullDeck.add("hearts8");
-		fullDeck.add("hearts9");
-		fullDeck.add("hearts10");
-		fullDeck.add("hearts11");
-		fullDeck.add("hearts12");
-		fullDeck.add("hearts13");
-		fullDeck.add("spades1");
-		fullDeck.add("spades2");
-		fullDeck.add("spades3");
-		fullDeck.add("spades4");
-		fullDeck.add("spades5");
-		fullDeck.add("spades6");
-		fullDeck.add("spades7");
-		fullDeck.add("spades8");
-		fullDeck.add("spades9");
-		fullDeck.add("spades10");
-		fullDeck.add("spades11");
-		fullDeck.add("spades12");
-		fullDeck.add("spades13");
-		fullDeck.add("clubs1");
-		fullDeck.add("clubs2");
-		fullDeck.add("clubs3");
-		fullDeck.add("clubs4");
-		fullDeck.add("clubs5");
-		fullDeck.add("clubs6");
-		fullDeck.add("clubs7");
-		fullDeck.add("clubs8");
-		fullDeck.add("clubs9");
-		fullDeck.add("clubs10");
-		fullDeck.add("clubs11");
-		fullDeck.add("clubs12");
-		fullDeck.add("clubs13");
-		fullDeck.add("diamonds1");
-		fullDeck.add("diamonds2");
-		fullDeck.add("diamonds3");
-		fullDeck.add("diamonds4");
-		fullDeck.add("diamonds5");
-		fullDeck.add("diamonds6");
-		fullDeck.add("diamonds7");
-		fullDeck.add("diamonds8");
-		fullDeck.add("diamonds9");
-		fullDeck.add("diamonds10");
-		fullDeck.add("diamonds11");
-		fullDeck.add("diamonds12");
-		fullDeck.add("diamonds13");
-		fullDeck.add("hearts1");
-		fullDeck.add("hearts2");
-		fullDeck.add("hearts3");
-		fullDeck.add("hearts4");
-		fullDeck.add("hearts5");
-		fullDeck.add("hearts6");
-		fullDeck.add("hearts7");
-		fullDeck.add("hearts8");
-		fullDeck.add("hearts9");
-		fullDeck.add("hearts10");
-		fullDeck.add("hearts11");
-		fullDeck.add("hearts12");
-		fullDeck.add("hearts13");
-		fullDeck.add("spades1");
-		fullDeck.add("spades2");
-		fullDeck.add("spades3");
-		fullDeck.add("spades4");
-		fullDeck.add("spades5");
-		fullDeck.add("spades6");
-		fullDeck.add("spades7");
-		fullDeck.add("spades8");
-		fullDeck.add("spades9");
-		fullDeck.add("spades10");
-		fullDeck.add("spades11");
-		fullDeck.add("spades12");
-		fullDeck.add("spades13");
-		fullDeck.add("clubs1");
-		fullDeck.add("clubs2");
-		fullDeck.add("clubs3");
-		fullDeck.add("clubs4");
-		fullDeck.add("clubs5");
-		fullDeck.add("clubs6");
-		fullDeck.add("clubs7");
-		fullDeck.add("clubs8");
-		fullDeck.add("clubs9");
-		fullDeck.add("clubs10");
-		fullDeck.add("clubs11");
-		fullDeck.add("clubs12");
-		fullDeck.add("clubs13");
-		fullDeck.add("diamonds1");
-		fullDeck.add("diamonds2");
-		fullDeck.add("diamonds3");
-		fullDeck.add("diamonds4");
-		fullDeck.add("diamonds5");
-		fullDeck.add("diamonds6");
-		fullDeck.add("diamonds7");
-		fullDeck.add("diamonds8");
-		fullDeck.add("diamonds9");
-		fullDeck.add("diamonds10");
-		fullDeck.add("diamonds11");
-		fullDeck.add("diamonds12");
-		fullDeck.add("diamonds13");
-		fullDeck.add("hearts1");
-		fullDeck.add("hearts2");
-		fullDeck.add("hearts3");
-		fullDeck.add("hearts4");
-		fullDeck.add("hearts5");
-		fullDeck.add("hearts6");
-		fullDeck.add("hearts7");
-		fullDeck.add("hearts8");
-		fullDeck.add("hearts9");
-		fullDeck.add("hearts10");
-		fullDeck.add("hearts11");
-		fullDeck.add("hearts12");
-		fullDeck.add("hearts13");
-		fullDeck.add("spades1");
-		fullDeck.add("spades2");
-		fullDeck.add("spades3");
-		fullDeck.add("spades4");
-		fullDeck.add("spades5");
-		fullDeck.add("spades6");
-		fullDeck.add("spades7");
-		fullDeck.add("spades8");
-		fullDeck.add("spades9");
-		fullDeck.add("spades10");
-		fullDeck.add("spades11");
-		fullDeck.add("spades12");
-		fullDeck.add("spades13");
+		for (int deckNum = 0; deckNum < 3; deckNum++)
+		{
+			fullDeck.add("clubs1");
+			fullDeck.add("clubs2");
+			fullDeck.add("clubs3");
+			fullDeck.add("clubs4");
+			fullDeck.add("clubs5");
+			fullDeck.add("clubs6");
+			fullDeck.add("clubs7");
+			fullDeck.add("clubs8");
+			fullDeck.add("clubs9");
+			fullDeck.add("clubs10");
+			fullDeck.add("clubs11");
+			fullDeck.add("clubs12");
+			fullDeck.add("clubs13");
+			fullDeck.add("diamonds1");
+			fullDeck.add("diamonds2");
+			fullDeck.add("diamonds3");
+			fullDeck.add("diamonds4");
+			fullDeck.add("diamonds5");
+			fullDeck.add("diamonds6");
+			fullDeck.add("diamonds7");
+			fullDeck.add("diamonds8");
+			fullDeck.add("diamonds9");
+			fullDeck.add("diamonds10");
+			fullDeck.add("diamonds11");
+			fullDeck.add("diamonds12");
+			fullDeck.add("diamonds13");
+			fullDeck.add("hearts1");
+			fullDeck.add("hearts2");
+			fullDeck.add("hearts3");
+			fullDeck.add("hearts4");
+			fullDeck.add("hearts5");
+			fullDeck.add("hearts6");
+			fullDeck.add("hearts7");
+			fullDeck.add("hearts8");
+			fullDeck.add("hearts9");
+			fullDeck.add("hearts10");
+			fullDeck.add("hearts11");
+			fullDeck.add("hearts12");
+			fullDeck.add("hearts13");
+			fullDeck.add("spades1");
+			fullDeck.add("spades2");
+			fullDeck.add("spades3");
+			fullDeck.add("spades4");
+			fullDeck.add("spades5");
+			fullDeck.add("spades6");
+			fullDeck.add("spades7");
+			fullDeck.add("spades8");
+			fullDeck.add("spades9");
+			fullDeck.add("spades10");
+			fullDeck.add("spades11");
+			fullDeck.add("spades12");
+			fullDeck.add("spades13");
+		}
 		final Random random = new Random();
 		gameId = random.nextLong();
 		random.setSeed(gameId);
@@ -595,7 +480,7 @@ public class GameState
 		Log.d(TAG, "Game Started: " + gameId);
 	}
 
-	public String nextInSuit(final String card)
+	private String nextInSuit(final String card)
 	{
 		return getSuit(card) + (getNumber(card) + 1);
 	}
@@ -663,7 +548,7 @@ public class GameState
 		gameInProgress = false;
 	}
 
-	public String prevInSuit(final String card)
+	private String prevInSuit(final String card)
 	{
 		if (card.endsWith("s1"))
 			return null;

@@ -178,7 +178,7 @@ public class TripleSolitaireActivity extends Activity
 						|| gameState.isWasteEmpty())
 					return false;
 				final ClipData dragData = ClipData.newPlainText(
-						gameState.getWasteTop(), gameState.getWasteTop());
+						gameState.getWasteCard(0), gameState.getWasteCard(0));
 				v.startDrag(dragData, new View.DragShadowBuilder(v), 0, 0);
 				return true;
 			}
@@ -203,7 +203,7 @@ public class TripleSolitaireActivity extends Activity
 					Log.d(TAG, "Drag W: Ended with "
 							+ (event.getResult() ? "success" : "failure"));
 					if (!event.getResult()
-							&& card.equals(gameState.getWasteTop()))
+							&& card.equals(gameState.getWasteCard(0)))
 						gameState.attemptAutoMoveFromWasteToFoundation();
 				}
 				return false;
@@ -305,7 +305,6 @@ public class TripleSolitaireActivity extends Activity
 	@Override
 	public boolean onOptionsItemSelected(final MenuItem item)
 	{
-		// Handle item selection
 		switch (item.getItemId())
 		{
 			case R.id.new_game:
@@ -329,21 +328,17 @@ public class TripleSolitaireActivity extends Activity
 	@Override
 	public boolean onPrepareOptionsMenu(final Menu menu)
 	{
-		Log.d(TAG, "onPrepare: ");
 		switch (getAutoPlayPreference())
 		{
 			case AUTOPLAY_WHEN_OBVIOUS:
-				Log.d(TAG, "onPrepare: AUTOPLAY_WHEN_OBVIOUS");
 				menu.findItem(R.id.autoplay).setTitle(
 						R.string.autoplay_when_obvious);
 				return true;
 			case AUTOPLAY_WHEN_WON:
-				Log.d(TAG, "onPrepare: AUTOPLAY_WHEN_WON");
 				menu.findItem(R.id.autoplay).setTitle(
 						R.string.autoplay_when_won);
 				return true;
 			case AUTOPLAY_NEVER:
-				Log.d(TAG, "onPrepare: AUTOPLAY_NEVER");
 				menu.findItem(R.id.autoplay).setTitle(R.string.autoplay_never);
 				return true;
 		}

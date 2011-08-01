@@ -88,15 +88,14 @@ public class Lane extends RelativeLayout implements OnDragListener
 			if (stackSize > 0)
 			{
 				// Remove the onCardFlipListener from the top card on the stack
-				// if
-				// there is a cascade now
+				// if there is a cascade now
 				final Card topStack = (Card) findViewById(stackSize);
 				topStack.setOnClickListener(null);
 			}
 			else
 			{
-				// Remove the onDragListener from the base of the stack if
-				// there is a cascade now
+				// Remove the onDragListener from the base of the stack if there
+				// is a cascade now
 				final Card laneBase = (Card) findViewById(0);
 				laneBase.setOnDragListener(null);
 			}
@@ -160,7 +159,7 @@ public class Lane extends RelativeLayout implements OnDragListener
 			String card = event.getClipDescription().getLabel().toString();
 			if (isMyCascade)
 			{
-				Log.d(TAG, "Drag " + laneId + ": Started of  " + card);
+				Log.d(TAG, "Drag " + laneId + ": Started of " + card);
 				return false;
 			}
 			// Take off MULTI prefix - we accept all cascades based on the top
@@ -214,7 +213,7 @@ public class Lane extends RelativeLayout implements OnDragListener
 
 	public void setStackSize(final int newStackSize)
 	{
-		// Remove the existing views
+		// Remove the existing views, including the cascade
 		removeViews(1, getChildCount() - 1);
 		cascadeSize = 0;
 		if (stackSize == 0 && newStackSize > 0)
