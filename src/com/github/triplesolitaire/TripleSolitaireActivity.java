@@ -8,6 +8,7 @@ import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -21,7 +22,9 @@ import android.view.View.OnClickListener;
 import android.view.View.OnDragListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 public class TripleSolitaireActivity extends Activity
@@ -129,6 +132,73 @@ public class TripleSolitaireActivity extends Activity
 	private final GameState gameState = new GameState(this);
 	private View progressBar;
 
+	public void animateFromCascadeToFoundation(final int foundationIndex,
+			final int from, final String card)
+	{
+		Log.d(TAG, "Animate " + (from + 1) + " -> " + -1
+				* (foundationIndex + 1) + ": " + card);
+		final Point cascadeLoc = getCascadeLoc(from);
+		final Point foundationLoc = getFoundationLoc(foundationIndex);
+		final Card toAnimate = new Card(getBaseContext(), getResources()
+				.getIdentifier(card, "drawable", getPackageName()));
+		animateView(toAnimate, cascadeLoc, foundationLoc, new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				Log.d(TAG, "Animate " + (from + 1) + " -> " + -1
+						* (foundationIndex + 1) + ": Ended for " + card);
+				updateFoundationUI(foundationIndex);
+				gameState.moveCompleted(true);
+			}
+		});
+	}
+
+	public void animateFromWasteToFoundation(final int foundationIndex,
+			final String card)
+	{
+		Log.d(TAG, "Animate " + "W -> " + -1 * (foundationIndex + 1) + ": "
+				+ card);
+		final Point wasteLoc = getWasteLoc();
+		final Point foundationLoc = getFoundationLoc(foundationIndex);
+		final Card toAnimate = new Card(getBaseContext(), getResources()
+				.getIdentifier(card, "drawable", getPackageName()));
+		animateView(toAnimate, wasteLoc, foundationLoc, new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				Log.d(TAG, "Animate " + "W -> " + -1 * (foundationIndex + 1)
+						+ ": Ended fr " + card);
+				updateFoundationUI(foundationIndex);
+				gameState.moveCompleted(true);
+			}
+		});
+	}
+
+	private void animateView(final View view, final Point start,
+			final Point end, final Runnable uiUpdate)
+	{
+		final FrameLayout layout = (FrameLayout) findViewById(R.id.animateLayout);
+		layout.addView(view);
+		layout.setVisibility(View.VISIBLE);
+		layout.setX(start.x);
+		layout.setY(start.y);
+		final int animationDuration = getResources().getInteger(
+				R.integer.animation_duration);
+		layout.animate().x(end.x).y(end.y).setDuration(animationDuration);
+		postDelayed(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				layout.removeAllViews();
+				layout.setVisibility(View.GONE);
+				uiUpdate.run();
+			}
+		}, 2 * animationDuration);
+	}
+
 	public AutoPlayPreference getAutoPlayPreference()
 	{
 		final SharedPreferences preferences = PreferenceManager
@@ -137,10 +207,49 @@ public class TripleSolitaireActivity extends Activity
 		return AutoPlayPreference.values()[preference];
 	}
 
+	private Point getCascadeLoc(final int laneIndex)
+	{
+		final RelativeLayout lane = (RelativeLayout) findViewById(R.id.lane);
+		final Card cascadeView = getLane(laneIndex).getTopCascadeCard();
+		final float x = cascadeView.getX() + cascadeView.getPaddingLeft()
+				+ getLane(laneIndex).getX()
+				+ getLane(laneIndex).getPaddingLeft() + lane.getX()
+				+ lane.getPaddingLeft();
+		final float y = cascadeView.getY() + cascadeView.getPaddingTop()
+				+ getLane(laneIndex).getY()
+				+ getLane(laneIndex).getPaddingTop() + lane.getY()
+				+ lane.getPaddingTop();
+		return new Point((int) x, (int) y);
+	}
+
+	private Point getFoundationLoc(final int foundationIndex)
+	{
+		final RelativeLayout foundationLayout = (RelativeLayout) findViewById(R.id.foundation);
+		final ImageView foundationView = (ImageView) findViewById(getResources()
+				.getIdentifier("foundation" + (foundationIndex + 1), "id",
+						getPackageName()));
+		final float x = foundationView.getX() + foundationView.getPaddingLeft()
+				+ foundationLayout.getX() + foundationLayout.getPaddingLeft();
+		final float y = foundationView.getY() + foundationView.getPaddingTop()
+				+ foundationLayout.getY() + foundationLayout.getPaddingTop();
+		return new Point((int) x, (int) y);
+	}
+
 	public Lane getLane(final int laneIndex)
 	{
 		return (Lane) findViewById(getResources().getIdentifier(
 				"lane" + (laneIndex + 1), "id", getPackageName()));
+	}
+
+	private Point getWasteLoc()
+	{
+		final RelativeLayout waste = (RelativeLayout) findViewById(R.id.waste);
+		final ImageView waste1View = (ImageView) findViewById(R.id.waste1);
+		final float x = waste.getX() + waste.getPaddingLeft()
+				+ waste1View.getX() + waste1View.getPaddingLeft();
+		final float y = waste.getY() + waste.getPaddingTop()
+				+ waste1View.getY() + waste1View.getPaddingTop();
+		return new Point((int) x, (int) y);
 	}
 
 	/** Called when the activity is first created. */
@@ -397,6 +506,16 @@ public class TripleSolitaireActivity extends Activity
 		// Request a call to onPrepareOptionsMenu so we can change the auto play
 		// title
 		invalidateOptionsMenu();
+	}
+
+	public void post(final Runnable action)
+	{
+		findViewById(R.id.base).post(action);
+	}
+
+	public void postDelayed(final Runnable action, final long delayMillis)
+	{
+		findViewById(R.id.base).postDelayed(action, delayMillis);
 	}
 
 	private void startGame()

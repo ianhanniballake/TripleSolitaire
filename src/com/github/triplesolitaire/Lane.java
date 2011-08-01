@@ -150,6 +150,11 @@ public class Lane extends RelativeLayout implements OnDragListener
 		cascadeSize += 1;
 	}
 
+	public Card getTopCascadeCard()
+	{
+		return (Card) findViewById(getChildCount() - 1);
+	}
+
 	@Override
 	public boolean onDrag(final View v, final DragEvent event)
 	{

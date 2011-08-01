@@ -17,7 +17,7 @@
 		android:id="@+id/waste"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-        android:layout_margin="@dimen/between_card_dim"
+		android:layout_margin="@dimen/between_card_dim"
 		android:layout_alignParentTop="true"
 		android:layout_toRightOf="@id/stock">
 		<ImageView
@@ -222,12 +222,17 @@
 			android:layout_margin="@dimen/between_card_dim"
 			android:layout_alignParentTop="true"
 			android:layout_toLeftOf="@id/lane3" />
-        <com.github.triplesolitaire.Lane
-            android:id="@+id/lane1"
-            android:layout_width="@dimen/card_width_dim"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/between_card_dim"
-            android:layout_alignParentTop="true"
-            android:layout_toLeftOf="@id/lane2" />
+		<com.github.triplesolitaire.Lane
+			android:id="@+id/lane1"
+			android:layout_width="@dimen/card_width_dim"
+			android:layout_height="wrap_content"
+			android:layout_margin="@dimen/between_card_dim"
+			android:layout_alignParentTop="true"
+			android:layout_toLeftOf="@id/lane2" />
 	</RelativeLayout>
+	<FrameLayout
+		android:id="@+id/animateLayout"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:visibility="gone" />
 </RelativeLayout>
