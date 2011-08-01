@@ -2,6 +2,24 @@
 <menu
 	xmlns:android="http://schemas.android.com/apk/res/android">
 	<item
+		android:id="@+id/autoplay"
+		android:showAsAction="ifRoom">
+		<menu>
+			<item
+				android:id="@+id/autoplay_when_obvious"
+				android:title="@string/autoplay_when_obvious"
+				android:onClick="onSetAutoPlay" />
+			<item
+				android:id="@+id/autoplay_when_won"
+				android:title="@string/autoplay_when_won"
+				android:onClick="onSetAutoPlay" />
+			<item
+				android:id="@+id/autoplay_never"
+				android:title="@string/autoplay_never"
+				android:onClick="onSetAutoPlay" />
+		</menu>
+	</item>
+	<item
 		android:id="@+id/new_game"
 		android:title="@string/new_game" />
 	<item

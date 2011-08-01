@@ -6,7 +6,10 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ClipData;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.DragEvent;
 import android.view.Gravity;
@@ -23,6 +26,10 @@ import android.widget.TextView;
 
 public class TripleSolitaireActivity extends Activity
 {
+	public enum AutoPlayPreference {
+		AUTOPLAY_NEVER, AUTOPLAY_WHEN_OBVIOUS, AUTOPLAY_WHEN_WON
+	}
+
 	private class OnCardFlipListener implements OnClickListener
 	{
 		private final int laneIndex;
@@ -121,6 +128,14 @@ public class TripleSolitaireActivity extends Activity
 	private static final String TAG = "TripleSolitaireActivity";
 	private final GameState gameState = new GameState(this);
 	private View progressBar;
+
+	public AutoPlayPreference getAutoPlayPreference()
+	{
+		final SharedPreferences preferences = PreferenceManager
+				.getDefaultSharedPreferences(this);
+		final int preference = preferences.getInt("auto_play", 0);
+		return AutoPlayPreference.values()[preference];
+	}
 
 	public Lane getLane(final int laneIndex)
 	{
@@ -305,6 +320,30 @@ public class TripleSolitaireActivity extends Activity
 	}
 
 	@Override
+	public boolean onPrepareOptionsMenu(final Menu menu)
+	{
+		Log.d(TAG, "onPrepare: ");
+		switch (getAutoPlayPreference())
+		{
+			case AUTOPLAY_WHEN_OBVIOUS:
+				Log.d(TAG, "onPrepare: AUTOPLAY_WHEN_OBVIOUS");
+				menu.findItem(R.id.autoplay).setTitle(
+						R.string.autoplay_when_obvious);
+				return true;
+			case AUTOPLAY_WHEN_WON:
+				Log.d(TAG, "onPrepare: AUTOPLAY_WHEN_WON");
+				menu.findItem(R.id.autoplay).setTitle(
+						R.string.autoplay_when_won);
+				return true;
+			case AUTOPLAY_NEVER:
+				Log.d(TAG, "onPrepare: AUTOPLAY_NEVER");
+				menu.findItem(R.id.autoplay).setTitle(R.string.autoplay_never);
+				return true;
+		}
+		return super.onPrepareOptionsMenu(menu);
+	}
+
+	@Override
 	public void onRestoreInstanceState(final Bundle savedInstanceState)
 	{
 		super.onRestoreInstanceState(savedInstanceState);
@@ -316,6 +355,38 @@ public class TripleSolitaireActivity extends Activity
 	{
 		super.onSaveInstanceState(outState);
 		gameState.onSaveInstanceState(outState);
+	}
+
+	/**
+	 * This method is specified as an onClick handler in the menu xml and will
+	 * take precedence over the Activity's onOptionsItemSelected method.
+	 * 
+	 * @param item
+	 *            menu item clicked
+	 */
+	public void onSetAutoPlay(final MenuItem item)
+	{
+		final SharedPreferences preferences = PreferenceManager
+				.getDefaultSharedPreferences(this);
+		final Editor editor = preferences.edit();
+		switch (item.getItemId())
+		{
+			case R.id.autoplay_when_obvious:
+				editor.putInt("auto_play",
+						AutoPlayPreference.AUTOPLAY_WHEN_OBVIOUS.ordinal());
+				break;
+			case R.id.autoplay_when_won:
+				editor.putInt("auto_play",
+						AutoPlayPreference.AUTOPLAY_WHEN_WON.ordinal());
+				break;
+			case R.id.autoplay_never:
+				editor.putInt("auto_play",
+						AutoPlayPreference.AUTOPLAY_NEVER.ordinal());
+				break;
+		}
+		editor.apply();
+		// Request a call to onPrepareOptionsMenu so we can change the sort icon
+		invalidateOptionsMenu();
 	}
 
 	private void startGame()
