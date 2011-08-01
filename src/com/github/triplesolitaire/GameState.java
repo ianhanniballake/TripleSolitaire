@@ -167,6 +167,18 @@ public class GameState
 
 	private void autoPlay()
 	{
+		final AutoPlayPreference autoPlayPreference = activity
+				.getAutoPlayPreference();
+		if (autoPlayPreference == AutoPlayPreference.AUTOPLAY_NEVER)
+			return;
+		else if (autoPlayPreference == AutoPlayPreference.AUTOPLAY_WHEN_WON)
+		{
+			int totalStackSize = 0;
+			for (int laneIndex = 0; laneIndex < 13; laneIndex++)
+				totalStackSize += lane[laneIndex].getStack().size();
+			if (totalStackSize > 0 || !stock.isEmpty() || waste.size() > 1)
+				return;
+		}
 		boolean foundAutoPlay;
 		do
 		{
@@ -315,6 +327,7 @@ public class GameState
 		Log.d(TAG, "Flip " + (laneIndex + 1) + ": " + card);
 		lane[laneIndex].getCascade().add(card);
 		activity.getLane(laneIndex).flipOverTopStack(card);
+		autoPlay();
 	}
 
 	public String getCascadeTop(final int laneIndex)
@@ -376,21 +389,7 @@ public class GameState
 		if (resetAutoplayLaneIndexLocked)
 			for (int laneIndex = 0; laneIndex < 13; laneIndex++)
 				autoplayLaneIndexLocked[laneIndex] = false;
-		final AutoPlayPreference autoPlayPreference = activity
-				.getAutoPlayPreference();
-		if (autoPlayPreference == AutoPlayPreference.AUTOPLAY_WHEN_OBVIOUS)
-		{
-			autoPlay();
-			return;
-		}
-		else if (autoPlayPreference == AutoPlayPreference.AUTOPLAY_WHEN_WON)
-		{
-			int totalStackSize = 0;
-			for (int laneIndex = 0; laneIndex < 13; laneIndex++)
-				totalStackSize += lane[laneIndex].getStack().size();
-			if (totalStackSize == 0 && stock.isEmpty() && waste.size() <= 1)
-				autoPlay();
-		}
+		autoPlay();
 	}
 
 	public boolean isStockEmpty()
