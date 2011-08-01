@@ -2,6 +2,4 @@
 <resources>
 	<integer
 		name="animation_duration">250</integer>
-	<integer
-		name="animation_hide_delay">800</integer>
 </resources>

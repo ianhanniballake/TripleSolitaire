@@ -1,5 +1,7 @@
 package com.github.triplesolitaire;
 
+import android.animation.Animator;
+import android.animation.Animator.AnimatorListener;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -184,18 +186,36 @@ public class TripleSolitaireActivity extends Activity
 		layout.setVisibility(View.VISIBLE);
 		final int animationDuration = getResources().getInteger(
 				R.integer.animation_duration);
-		layout.animate().x(end.x).y(end.y).setDuration(animationDuration);
-		postDelayed(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				uiUpdate.run();
-				layout.removeAllViews();
-				layout.setVisibility(View.GONE);
-				gameState.moveCompleted(true);
-			}
-		}, getResources().getInteger(R.integer.animation_hide_delay));
+		layout.animate().x(end.x).y(end.y).setDuration(animationDuration)
+				.setListener(new AnimatorListener()
+				{
+					@Override
+					public void onAnimationCancel(final Animator animation)
+					{
+						// Do nothing
+					}
+
+					@Override
+					public void onAnimationEnd(final Animator animation)
+					{
+						uiUpdate.run();
+						layout.removeAllViews();
+						layout.setVisibility(View.GONE);
+						gameState.moveCompleted(true);
+					}
+
+					@Override
+					public void onAnimationRepeat(final Animator animation)
+					{
+						// Do nothing
+					}
+
+					@Override
+					public void onAnimationStart(final Animator animation)
+					{
+						// Do nothing
+					}
+				});
 	}
 
 	public AutoPlayPreference getAutoPlayPreference()
