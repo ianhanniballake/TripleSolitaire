@@ -64,7 +64,7 @@ public class GameState
 			if (foundationIndex != -1)
 			{
 				autoMoveFromWaste(foundationIndex);
-				activity.postDelayed(new WasteAutoPlayer(), activity
+				activity.postDelayed(new LaneAutoPlayer(0), activity
 						.getResources().getInteger(R.integer.autoplay_delay));
 			}
 			else
