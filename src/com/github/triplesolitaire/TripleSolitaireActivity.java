@@ -385,7 +385,8 @@ public class TripleSolitaireActivity extends Activity
 				break;
 		}
 		editor.apply();
-		// Request a call to onPrepareOptionsMenu so we can change the sort icon
+		// Request a call to onPrepareOptionsMenu so we can change the auto play
+		// title
 		invalidateOptionsMenu();
 	}
 
