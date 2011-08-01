@@ -320,6 +320,13 @@ public class TripleSolitaireActivity extends Activity
 	}
 
 	@Override
+	protected void onPause()
+	{
+		super.onPause();
+		gameState.pauseGame();
+	}
+
+	@Override
 	public boolean onPrepareOptionsMenu(final Menu menu)
 	{
 		Log.d(TAG, "onPrepare: ");
@@ -348,6 +355,13 @@ public class TripleSolitaireActivity extends Activity
 	{
 		super.onRestoreInstanceState(savedInstanceState);
 		gameState.onRestoreInstanceState(savedInstanceState);
+	}
+
+	@Override
+	protected void onResume()
+	{
+		super.onResume();
+		gameState.resumeGame();
 	}
 
 	@Override

@@ -608,10 +608,6 @@ public class GameState
 		activity.updateTime(timeInSeconds);
 		moveCount = savedInstanceState.getInt("moveCount");
 		activity.updateMoveCount(moveCount);
-		gameInProgress = moveCount > 0;
-		if (gameInProgress)
-			activity.findViewById(R.id.base).postDelayed(
-					new GameTimerIncrement(), 1000);
 		autoplayLaneIndexLocked = savedInstanceState
 				.getBooleanArray("autoplayLaneIndexLocked");
 		// Restore the stack
@@ -672,5 +668,13 @@ public class GameState
 		if (card.endsWith("s1"))
 			return null;
 		return getSuit(card) + (getNumber(card) - 1);
+	}
+
+	public void resumeGame()
+	{
+		gameInProgress = moveCount > 0;
+		if (gameInProgress)
+			activity.findViewById(R.id.base).postDelayed(
+					new GameTimerIncrement(), 1000);
 	}
 }
