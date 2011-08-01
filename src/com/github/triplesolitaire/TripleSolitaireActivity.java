@@ -149,7 +149,6 @@ public class TripleSolitaireActivity extends Activity
 				Log.d(TAG, "Animate " + (from + 1) + " -> " + -1
 						* (foundationIndex + 1) + ": Ended for " + card);
 				updateFoundationUI(foundationIndex);
-				gameState.moveCompleted(true);
 			}
 		});
 	}
@@ -169,9 +168,8 @@ public class TripleSolitaireActivity extends Activity
 			public void run()
 			{
 				Log.d(TAG, "Animate " + "W -> " + -1 * (foundationIndex + 1)
-						+ ": Ended fr " + card);
+						+ ": Ended for " + card);
 				updateFoundationUI(foundationIndex);
-				gameState.moveCompleted(true);
 			}
 		});
 	}
@@ -181,9 +179,9 @@ public class TripleSolitaireActivity extends Activity
 	{
 		final FrameLayout layout = (FrameLayout) findViewById(R.id.animateLayout);
 		layout.addView(view);
-		layout.setVisibility(View.VISIBLE);
 		layout.setX(start.x);
 		layout.setY(start.y);
+		layout.setVisibility(View.VISIBLE);
 		final int animationDuration = getResources().getInteger(
 				R.integer.animation_duration);
 		layout.animate().x(end.x).y(end.y).setDuration(animationDuration);
@@ -192,11 +190,12 @@ public class TripleSolitaireActivity extends Activity
 			@Override
 			public void run()
 			{
+				uiUpdate.run();
 				layout.removeAllViews();
 				layout.setVisibility(View.GONE);
-				uiUpdate.run();
+				gameState.moveCompleted(true);
 			}
-		}, 2 * animationDuration);
+		}, getResources().getInteger(R.integer.animation_hide_delay));
 	}
 
 	public AutoPlayPreference getAutoPlayPreference()

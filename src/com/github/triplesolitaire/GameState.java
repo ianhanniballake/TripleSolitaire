@@ -26,58 +26,11 @@ public class GameState
 		}
 	}
 
-	private class LaneAutoPlayer implements Runnable
-	{
-		private final int laneIndex;
-
-		public LaneAutoPlayer(final int laneIndex)
-		{
-			this.laneIndex = laneIndex;
-		}
-
-		@Override
-		public void run()
-		{
-			final int foundationIndex = existsAutoMoveFromCascade(laneIndex);
-			Log.d(TAG, "LaneAutoPlay " + (laneIndex + 1) + ": " + -1
-					* (foundationIndex + 1));
-			if (foundationIndex != -1)
-			{
-				autoMoveFromCascade(laneIndex, foundationIndex);
-				activity.postDelayed(new LaneAutoPlayer(0), activity
-						.getResources().getInteger(R.integer.autoplay_delay));
-			}
-			else if (laneIndex != 12)
-				activity.post(new LaneAutoPlayer(laneIndex + 1));
-			else
-				activity.post(new WasteAutoPlayer());
-		}
-	}
-
-	private class WasteAutoPlayer implements Runnable
-	{
-		@Override
-		public void run()
-		{
-			final int foundationIndex = existsAutoMoveFromWaste();
-			Log.d(TAG, "WasteAutoPlay: " + -1 * (foundationIndex + 1));
-			if (foundationIndex != -1)
-			{
-				autoMoveFromWaste(foundationIndex);
-				activity.postDelayed(new LaneAutoPlayer(0), activity
-						.getResources().getInteger(R.integer.autoplay_delay));
-			}
-			else
-				autoPlaying = false;
-		}
-	}
-
 	/**
 	 * Logging tag
 	 */
 	private static final String TAG = "TripleSolitaireActivity";
 	private final TripleSolitaireActivity activity;
-	private boolean autoPlaying = false;
 	private boolean[] autoplayLaneIndexLocked = new boolean[13];
 	private String[] foundation;
 	private long gameId = 0;
@@ -177,18 +130,32 @@ public class GameState
 		return acceptDrop;
 	}
 
-	public void attemptAutoMoveFromCascadeToFoundation(final int laneIndex)
+	public boolean attemptAutoMoveFromCascadeToFoundation(final int laneIndex)
 	{
-		final int foundationIndex = existsAutoMoveFromCascade(laneIndex);
-		if (foundationIndex != -1)
-			autoMoveFromCascade(laneIndex, foundationIndex);
+		if (lane[laneIndex].getCascade().isEmpty())
+			return false;
+		final String card = lane[laneIndex].getCascade().getLast();
+		for (int foundationIndex = 0; foundationIndex < 12; foundationIndex++)
+			if (acceptFoundationDrop(foundationIndex, card))
+			{
+				autoMoveFromCascade(laneIndex, foundationIndex);
+				return true;
+			}
+		return false;
 	}
 
-	public void attemptAutoMoveFromWasteToFoundation()
+	public boolean attemptAutoMoveFromWasteToFoundation()
 	{
-		final int foundationIndex = existsAutoMoveFromWaste();
-		if (foundationIndex != -1)
-			autoMoveFromWaste(foundationIndex);
+		if (waste.isEmpty())
+			return false;
+		final String card = waste.getFirst();
+		for (int foundationIndex = 0; foundationIndex < 12; foundationIndex++)
+			if (acceptFoundationDrop(foundationIndex, card))
+			{
+				autoMoveFromWaste(foundationIndex);
+				return true;
+			}
+		return false;
 	}
 
 	private void autoMoveFromCascade(final int laneIndex,
@@ -221,8 +188,10 @@ public class GameState
 			if (totalStackSize > 0 || !stock.isEmpty() || waste.size() > 1)
 				return;
 		}
-		autoPlaying = true;
-		activity.post(new LaneAutoPlayer(0));
+		for (int laneIndex = 0; laneIndex < 13; laneIndex++)
+			if (attemptAutoMoveFromCascadeToFoundation(laneIndex))
+				return;
+		attemptAutoMoveFromWasteToFoundation();
 	}
 
 	public String buildCascadeString(final int laneIndex,
@@ -264,8 +233,8 @@ public class GameState
 		else
 			for (int wasteIndex = 0; wasteIndex < 3 && !stock.isEmpty(); wasteIndex++)
 				waste.addFirst(stock.pop());
-		activity.updateStockUI();
 		activity.updateWasteUI();
+		activity.updateStockUI();
 		moveCompleted(true);
 	}
 
@@ -280,10 +249,9 @@ public class GameState
 			cascadeToAdd.add(st.nextToken());
 		for (int cascadeIndex = 0; cascadeIndex < cascadeToAdd.size(); cascadeIndex++)
 			lane[from].getCascade().removeLast();
-		final Lane fromLaneLayout = activity.getLane(from);
-		fromLaneLayout.decrementCascadeSize(cascadeToAdd.size());
 		lane[laneIndex].getCascade().addAll(cascadeToAdd);
 		activity.getLane(laneIndex).addCascade(cascadeToAdd);
+		activity.getLane(from).decrementCascadeSize(cascadeToAdd.size());
 		moveCompleted(true);
 	}
 
@@ -305,12 +273,12 @@ public class GameState
 		Log.d(TAG, "Drop " + -1 * (foundationIndex + 1) + " -> "
 				+ (laneIndex + 1) + ": " + card);
 		foundation[foundationIndex] = prevInSuit(card);
-		activity.updateFoundationUI(foundationIndex);
 		lane[laneIndex].getCascade().add(card);
 		autoplayLaneIndexLocked[laneIndex] = true;
 		final ArrayList<String> cascadeToAdd = new ArrayList<String>();
 		cascadeToAdd.add(card);
 		activity.getLane(laneIndex).addCascade(cascadeToAdd);
+		activity.updateFoundationUI(foundationIndex);
 		moveCompleted(false);
 	}
 
@@ -322,8 +290,8 @@ public class GameState
 				* (foundationIndex + 1) + ": " + card);
 		foundation[foundationIndex] = card;
 		foundation[from] = prevInSuit(card);
-		activity.updateFoundationUI(from);
 		activity.updateFoundationUI(foundationIndex);
+		activity.updateFoundationUI(from);
 		moveCompleted(true);
 	}
 
@@ -331,11 +299,11 @@ public class GameState
 	{
 		final String card = waste.removeFirst();
 		Log.d(TAG, "Drop " + "W -> " + (laneIndex + 1) + ": " + card);
-		activity.updateWasteUI();
 		lane[laneIndex].getCascade().add(card);
 		final ArrayList<String> cascadeToAdd = new ArrayList<String>();
 		cascadeToAdd.add(card);
 		activity.getLane(laneIndex).addCascade(cascadeToAdd);
+		activity.updateWasteUI();
 		moveCompleted(true);
 	}
 
@@ -346,28 +314,6 @@ public class GameState
 		foundation[foundationIndex] = card;
 		activity.updateWasteUI();
 		activity.animateFromWasteToFoundation(foundationIndex, card);
-	}
-
-	private int existsAutoMoveFromCascade(final int laneIndex)
-	{
-		if (lane[laneIndex].getCascade().isEmpty())
-			return -1;
-		final String card = lane[laneIndex].getCascade().getLast();
-		for (int foundationIndex = 0; foundationIndex < 12; foundationIndex++)
-			if (acceptFoundationDrop(foundationIndex, card))
-				return foundationIndex;
-		return -1;
-	}
-
-	private int existsAutoMoveFromWaste()
-	{
-		if (waste.isEmpty())
-			return -1;
-		final String card = waste.getFirst();
-		for (int foundationIndex = 0; foundationIndex < 12; foundationIndex++)
-			if (acceptFoundationDrop(foundationIndex, card))
-				return foundationIndex;
-		return -1;
 	}
 
 	public void flipCard(final int laneIndex)
@@ -442,9 +388,8 @@ public class GameState
 		if (resetAutoplayLaneIndexLocked)
 			for (int laneIndex = 0; laneIndex < 13; laneIndex++)
 				autoplayLaneIndexLocked[laneIndex] = false;
-		if (!autoPlaying)
-			autoPlay();
 		checkForWin();
+		autoPlay();
 	}
 
 	public void newGame()
