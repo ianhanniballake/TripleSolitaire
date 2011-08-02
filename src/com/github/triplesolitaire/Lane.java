@@ -195,7 +195,14 @@ public class Lane extends RelativeLayout implements OnDragListener
 					+ (event.getResult() ? "success" : "failure"));
 			if (!event.getResult() && cascadeSizeOnStartDrag == cascadeSize
 					&& currentDragIndex + 1 == cascadeSize)
-				gameState.attemptAutoMoveFromCascadeToFoundation(laneId - 1);
+				postDelayed(new Runnable()
+				{
+					@Override
+					public void run()
+					{
+						gameState.attemptAutoMoveFromCascadeToFoundation(laneId - 1);
+					}
+				}, 10);
 			currentDragIndex = -1;
 		}
 		return true;

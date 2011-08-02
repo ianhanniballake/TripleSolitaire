@@ -332,7 +332,15 @@ public class TripleSolitaireActivity extends Activity
 							+ (event.getResult() ? "success" : "failure"));
 					if (!event.getResult()
 							&& card.equals(gameState.getWasteCard(0)))
-						gameState.attemptAutoMoveFromWasteToFoundation();
+						postDelayed(new Runnable()
+						{
+							@Override
+							public void run()
+							{
+								gameState
+										.attemptAutoMoveFromWasteToFoundation();
+							}
+						}, 10);
 				}
 				return false;
 			}
