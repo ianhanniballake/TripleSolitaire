@@ -189,7 +189,8 @@ public class GameState
 				return;
 		}
 		for (int laneIndex = 0; laneIndex < 13; laneIndex++)
-			if (attemptAutoMoveFromCascadeToFoundation(laneIndex))
+			if (!autoplayLaneIndexLocked[laneIndex]
+					&& attemptAutoMoveFromCascadeToFoundation(laneIndex))
 				return;
 		attemptAutoMoveFromWasteToFoundation();
 	}
