@@ -8,24 +8,13 @@ import java.util.Stack;
 import java.util.StringTokenizer;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 
 import com.github.triplesolitaire.TripleSolitaireActivity.AutoPlayPreference;
 
 public class GameState
 {
-	private class GameTimerIncrement implements Runnable
-	{
-		@Override
-		public void run()
-		{
-			timeInSeconds++;
-			activity.updateTime(timeInSeconds);
-			if (gameInProgress)
-				activity.postDelayed(new GameTimerIncrement(), 1000);
-		}
-	}
-
 	/**
 	 * Logging tag
 	 */
@@ -35,10 +24,24 @@ public class GameState
 	private String[] foundation;
 	private long gameId = 0;
 	private boolean gameInProgress = false;
+	private final Runnable gameTimerIncrement = new Runnable()
+	{
+		@Override
+		public void run()
+		{
+			if (moveCount == 0)
+				return;
+			timeInSeconds++;
+			activity.updateTime(timeInSeconds);
+			if (gameInProgress)
+				timerHandler.postDelayed(this, 1000);
+		}
+	};
 	private LaneData[] lane;
 	private int moveCount = 0;
 	private Stack<String> stock;
 	private int timeInSeconds = 0;
+	private final Handler timerHandler = new Handler();
 	private LinkedList<String> waste;
 
 	public GameState(final TripleSolitaireActivity activity)
@@ -382,10 +385,7 @@ public class GameState
 	{
 		activity.updateMoveCount(++moveCount);
 		if (moveCount == 1)
-		{
-			gameInProgress = true;
-			activity.postDelayed(new GameTimerIncrement(), 1000);
-		}
+			resumeGame();
 		if (resetAutoplayLaneIndexLocked)
 			for (int laneIndex = 0; laneIndex < 13; laneIndex++)
 				autoplayLaneIndexLocked[laneIndex] = false;
@@ -551,6 +551,7 @@ public class GameState
 	public void pauseGame()
 	{
 		gameInProgress = false;
+		timerHandler.removeCallbacks(gameTimerIncrement);
 	}
 
 	private String prevInSuit(final String card)
@@ -564,6 +565,9 @@ public class GameState
 	{
 		gameInProgress = moveCount > 0;
 		if (gameInProgress)
-			activity.postDelayed(new GameTimerIncrement(), 1000);
+		{
+			timerHandler.removeCallbacks(gameTimerIncrement);
+			timerHandler.postDelayed(gameTimerIncrement, 1000);
+		}
 	}
 }

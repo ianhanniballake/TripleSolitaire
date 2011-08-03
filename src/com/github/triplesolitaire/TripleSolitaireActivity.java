@@ -12,6 +12,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.graphics.Point;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.DragEvent;
@@ -132,6 +133,7 @@ public class TripleSolitaireActivity extends Activity
 	 */
 	private static final String TAG = "TripleSolitaireActivity";
 	private final GameState gameState = new GameState(this);
+	private final Handler handler = new Handler();
 	private View progressBar;
 
 	public void animateFromCascadeToFoundation(final int foundationIndex,
@@ -332,7 +334,7 @@ public class TripleSolitaireActivity extends Activity
 							+ (event.getResult() ? "success" : "failure"));
 					if (!event.getResult()
 							&& card.equals(gameState.getWasteCard(0)))
-						postDelayed(new Runnable()
+						handler.postDelayed(new Runnable()
 						{
 							@Override
 							public void run()
@@ -455,13 +457,6 @@ public class TripleSolitaireActivity extends Activity
 	}
 
 	@Override
-	protected void onPause()
-	{
-		super.onPause();
-		gameState.pauseGame();
-	}
-
-	@Override
 	public boolean onPrepareOptionsMenu(final Menu menu)
 	{
 		switch (getAutoPlayPreference())
@@ -486,13 +481,6 @@ public class TripleSolitaireActivity extends Activity
 	{
 		super.onRestoreInstanceState(savedInstanceState);
 		gameState.onRestoreInstanceState(savedInstanceState);
-	}
-
-	@Override
-	protected void onResume()
-	{
-		super.onResume();
-		gameState.resumeGame();
 	}
 
 	@Override
@@ -535,14 +523,13 @@ public class TripleSolitaireActivity extends Activity
 		invalidateOptionsMenu();
 	}
 
-	public void post(final Runnable action)
+	@Override
+	public void onWindowFocusChanged(final boolean hasFocus)
 	{
-		findViewById(R.id.base).post(action);
-	}
-
-	public void postDelayed(final Runnable action, final long delayMillis)
-	{
-		findViewById(R.id.base).postDelayed(action, delayMillis);
+		if (hasFocus)
+			gameState.resumeGame();
+		else
+			gameState.pauseGame();
 	}
 
 	private void startGame()
