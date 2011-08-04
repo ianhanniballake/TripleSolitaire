@@ -134,7 +134,6 @@ public class TripleSolitaireActivity extends Activity
 	private static final String TAG = "TripleSolitaireActivity";
 	private final GameState gameState = new GameState(this);
 	private final Handler handler = new Handler();
-	private View progressBar;
 
 	public void animateFromCascadeToFoundation(final int foundationIndex,
 			final int from, final String card)
@@ -262,10 +261,10 @@ public class TripleSolitaireActivity extends Activity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		// Set up the progress bar area
-		progressBar = getLayoutInflater().inflate(R.layout.progress_bar, null);
+		final View progressBar = getLayoutInflater().inflate(
+				R.layout.progress_bar, null);
 		final ActionBar bar = getActionBar();
-		bar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM,
-				ActionBar.DISPLAY_SHOW_CUSTOM);
+		bar.setDisplayShowCustomEnabled(true);
 		final ActionBar.LayoutParams layoutParams = new ActionBar.LayoutParams(
 				LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 		layoutParams.gravity = Gravity.LEFT;
@@ -349,7 +348,7 @@ public class TripleSolitaireActivity extends Activity
 			laneLayout.setGameState(gameState);
 		}
 		if (savedInstanceState == null)
-			startGame();
+			gameState.newGame();
 	}
 
 	@Override
@@ -359,11 +358,11 @@ public class TripleSolitaireActivity extends Activity
 		switch (dialogId)
 		{
 			case DIALOG_ID_WINNING:
-				final TextView timeView = (TextView) progressBar
-						.findViewById(R.id.time);
+				final TextView timeView = (TextView) getActionBar()
+						.getCustomView().findViewById(R.id.time);
 				final CharSequence time = timeView.getText();
-				final TextView moveCountView = (TextView) progressBar
-						.findViewById(R.id.move_count);
+				final TextView moveCountView = (TextView) getActionBar()
+						.getCustomView().findViewById(R.id.move_count);
 				final CharSequence moveCount = moveCountView.getText();
 				final String message = getString(R.string.win_dialog_1) + " "
 						+ time + " " + getString(R.string.win_dialog_2) + " "
@@ -428,7 +427,7 @@ public class TripleSolitaireActivity extends Activity
 		switch (item.getItemId())
 		{
 			case R.id.new_game:
-				startGame();
+				gameState.newGame();
 				return true;
 			case R.id.game_id:
 				showDialog(DIALOG_ID_SHOW_GAME_ID);
@@ -514,11 +513,6 @@ public class TripleSolitaireActivity extends Activity
 			gameState.pauseGame();
 	}
 
-	private void startGame()
-	{
-		gameState.newGame();
-	}
-
 	public void updateFoundationUI(final int foundationIndex)
 	{
 		final String foundationCard = gameState
@@ -540,17 +534,10 @@ public class TripleSolitaireActivity extends Activity
 		}
 	}
 
-	public void updateGameId(final long gameId)
-	{
-		final TextView gameIdView = (TextView) progressBar
-				.findViewById(R.id.game_id);
-		gameIdView.setText(Long.toString(gameId));
-	}
-
 	public void updateMoveCount(final int moveCount)
 	{
-		final TextView moveCountView = (TextView) progressBar
-				.findViewById(R.id.move_count);
+		final TextView moveCountView = (TextView) getActionBar()
+				.getCustomView().findViewById(R.id.move_count);
 		moveCountView.setText(Integer.toString(moveCount));
 	}
 
@@ -567,7 +554,7 @@ public class TripleSolitaireActivity extends Activity
 	{
 		final int minutes = timeInSeconds / 60;
 		final int seconds = timeInSeconds % 60;
-		final TextView timeView = (TextView) progressBar
+		final TextView timeView = (TextView) getActionBar().getCustomView()
 				.findViewById(R.id.time);
 		final StringBuilder sb = new StringBuilder();
 		sb.append(minutes);

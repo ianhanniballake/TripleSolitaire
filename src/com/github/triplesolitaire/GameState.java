@@ -59,43 +59,15 @@ public class GameState
 		final String topNewCardSuit = getSuit(topNewCard);
 		final int topNewCardNum = getNumber(topNewCard);
 		boolean acceptDrop = false;
+		final boolean cascadeCardIsBlack = cascadeSuit.equals("clubs")
+				|| cascadeSuit.equals("spades");
+		final boolean topNewCardIsBlack = topNewCardSuit.equals("clubs")
+				|| topNewCardSuit.equals("spades");
 		if (topNewCardNum != cascadeNum - 1)
 			acceptDrop = false;
-		else if (cascadeSuit.equals("clubs")
-				&& topNewCardSuit.equals("diamonds"))
-			acceptDrop = true;
-		else if (cascadeSuit.equals("clubs") && topNewCardSuit.equals("hearts"))
-			acceptDrop = true;
-		else if (cascadeSuit.equals("clubs") && topNewCardSuit.equals("spades"))
-			acceptDrop = false;
-		else if (cascadeSuit.equals("diamonds")
-				&& topNewCardSuit.equals("clubs"))
-			acceptDrop = true;
-		else if (cascadeSuit.equals("diamonds")
-				&& topNewCardSuit.equals("hearts"))
-			acceptDrop = false;
-		else if (cascadeSuit.equals("diamonds")
-				&& topNewCardSuit.equals("spades"))
-			acceptDrop = true;
-		else if (cascadeSuit.equals("hearts") && topNewCardSuit.equals("clubs"))
-			acceptDrop = true;
-		else if (cascadeSuit.equals("hearts")
-				&& topNewCardSuit.equals("diamonds"))
-			acceptDrop = false;
-		else if (cascadeSuit.equals("hearts")
-				&& topNewCardSuit.equals("spades"))
-			acceptDrop = true;
-		else if (cascadeSuit.equals("spades") && topNewCardSuit.equals("clubs"))
-			acceptDrop = false;
-		else if (cascadeSuit.equals("spades")
-				&& topNewCardSuit.equals("diamonds"))
-			acceptDrop = true;
-		else if (cascadeSuit.equals("spades")
-				&& topNewCardSuit.equals("hearts"))
-			acceptDrop = true;
 		else
-			// same suit
-			acceptDrop = false;
+			acceptDrop = cascadeCardIsBlack && !topNewCardIsBlack
+					|| !cascadeCardIsBlack && topNewCardIsBlack;
 		if (acceptDrop)
 			Log.d(TAG, "Drag -> " + (laneIndex + 1) + ": Acceptable drag of "
 					+ topNewCard + " onto " + cascadeCard);
@@ -310,7 +282,7 @@ public class GameState
 	public void dropFromWasteToCascade(final int laneIndex)
 	{
 		final String card = waste.removeFirst();
-		Log.d(TAG, "Drop " + "W -> " + (laneIndex + 1) + ": " + card);
+		Log.d(TAG, "Drop W -> " + (laneIndex + 1) + ": " + card);
 		lane[laneIndex].getCascade().add(card);
 		final ArrayList<String> cascadeToAdd = new ArrayList<String>();
 		cascadeToAdd.add(card);
@@ -322,7 +294,7 @@ public class GameState
 	public void dropFromWasteToFoundation(final int foundationIndex)
 	{
 		final String card = waste.removeFirst();
-		Log.d(TAG, "Drop " + "W -> " + -1 * (foundationIndex + 1) + ": " + card);
+		Log.d(TAG, "Drop W -> " + -1 * (foundationIndex + 1) + ": " + card);
 		foundation[foundationIndex] = card;
 		activity.updateWasteUI();
 		pendingMoves++;
@@ -336,13 +308,6 @@ public class GameState
 		lane[laneIndex].getCascade().add(card);
 		activity.getLane(laneIndex).flipOverTopStack(card);
 		autoPlay();
-	}
-
-	public String getCascadeTop(final int laneIndex)
-	{
-		if (lane[laneIndex].getCascade().isEmpty())
-			return null;
-		return lane[laneIndex].getCascade().getLast();
 	}
 
 	public String getFoundationCard(final int foundationIndex)
@@ -406,61 +371,11 @@ public class GameState
 	public void newGame()
 	{
 		final ArrayList<String> fullDeck = new ArrayList<String>();
+		final String[] suitList = { "clubs", "diamonds", "hearts", "spades" };
 		for (int deckNum = 0; deckNum < 3; deckNum++)
-		{
-			fullDeck.add("clubs1");
-			fullDeck.add("clubs2");
-			fullDeck.add("clubs3");
-			fullDeck.add("clubs4");
-			fullDeck.add("clubs5");
-			fullDeck.add("clubs6");
-			fullDeck.add("clubs7");
-			fullDeck.add("clubs8");
-			fullDeck.add("clubs9");
-			fullDeck.add("clubs10");
-			fullDeck.add("clubs11");
-			fullDeck.add("clubs12");
-			fullDeck.add("clubs13");
-			fullDeck.add("diamonds1");
-			fullDeck.add("diamonds2");
-			fullDeck.add("diamonds3");
-			fullDeck.add("diamonds4");
-			fullDeck.add("diamonds5");
-			fullDeck.add("diamonds6");
-			fullDeck.add("diamonds7");
-			fullDeck.add("diamonds8");
-			fullDeck.add("diamonds9");
-			fullDeck.add("diamonds10");
-			fullDeck.add("diamonds11");
-			fullDeck.add("diamonds12");
-			fullDeck.add("diamonds13");
-			fullDeck.add("hearts1");
-			fullDeck.add("hearts2");
-			fullDeck.add("hearts3");
-			fullDeck.add("hearts4");
-			fullDeck.add("hearts5");
-			fullDeck.add("hearts6");
-			fullDeck.add("hearts7");
-			fullDeck.add("hearts8");
-			fullDeck.add("hearts9");
-			fullDeck.add("hearts10");
-			fullDeck.add("hearts11");
-			fullDeck.add("hearts12");
-			fullDeck.add("hearts13");
-			fullDeck.add("spades1");
-			fullDeck.add("spades2");
-			fullDeck.add("spades3");
-			fullDeck.add("spades4");
-			fullDeck.add("spades5");
-			fullDeck.add("spades6");
-			fullDeck.add("spades7");
-			fullDeck.add("spades8");
-			fullDeck.add("spades9");
-			fullDeck.add("spades10");
-			fullDeck.add("spades11");
-			fullDeck.add("spades12");
-			fullDeck.add("spades13");
-		}
+			for (final String suit : suitList)
+				for (int cardNum = 1; cardNum <= 13; cardNum++)
+					fullDeck.add(suit + cardNum);
 		final Random random = new Random();
 		gameId = random.nextLong();
 		random.setSeed(gameId);
