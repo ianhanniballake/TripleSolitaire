@@ -352,22 +352,15 @@ public class TripleSolitaireActivity extends Activity
 	}
 
 	@Override
-	protected Dialog onCreateDialog(final int dialogId)
+	protected Dialog onCreateDialog(final int id)
 	{
 		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		switch (dialogId)
+		switch (id)
 		{
 			case DIALOG_ID_WINNING:
-				final TextView timeView = (TextView) getActionBar()
-						.getCustomView().findViewById(R.id.time);
-				final CharSequence time = timeView.getText();
-				final TextView moveCountView = (TextView) getActionBar()
-						.getCustomView().findViewById(R.id.move_count);
-				final CharSequence moveCount = moveCountView.getText();
-				final String message = getString(R.string.win_dialog_1) + " "
-						+ time + " " + getString(R.string.win_dialog_2) + " "
-						+ moveCount + " " + getString(R.string.win_dialog_3);
-				builder.setMessage(message)
+				// Message is filled in by onPrepareDialog, which runs every
+				// time the dialog is shown (unlike this, which runs only once)
+				builder.setMessage("")
 						.setCancelable(false)
 						.setPositiveButton(getString(R.string.new_game),
 								new DialogInterface.OnClickListener()
@@ -375,7 +368,7 @@ public class TripleSolitaireActivity extends Activity
 									@Override
 									public void onClick(
 											final DialogInterface dialog,
-											final int id)
+											final int dialogId)
 									{
 										dialog.cancel();
 										gameState.newGame();
@@ -387,28 +380,25 @@ public class TripleSolitaireActivity extends Activity
 									@Override
 									public void onClick(
 											final DialogInterface dialog,
-											final int id)
+											final int dialogId)
 									{
 										TripleSolitaireActivity.this.finish();
 									}
 								});
 				return builder.create();
 			case DIALOG_ID_SHOW_GAME_ID:
-				builder.setMessage(
-						getString(R.string.game_id_label) + " "
-								+ gameState.getGameId())
-						.setCancelable(false)
-						.setPositiveButton("OK",
-								new DialogInterface.OnClickListener()
-								{
-									@Override
-									public void onClick(
-											final DialogInterface dialog,
-											final int id)
-									{
-										dialog.cancel();
-									}
-								});
+				// Message is filled in by onPrepareDialog, which runs every
+				// time the dialog is shown (unlike this, which runs only once)
+				builder.setMessage("").setPositiveButton("OK",
+						new DialogInterface.OnClickListener()
+						{
+							@Override
+							public void onClick(final DialogInterface dialog,
+									final int dialogId)
+							{
+								dialog.cancel();
+							}
+						});
 				return builder.create();
 		}
 		return null;
@@ -434,6 +424,31 @@ public class TripleSolitaireActivity extends Activity
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
+		}
+	}
+
+	@Override
+	public void onPrepareDialog(final int id, final Dialog dialog)
+	{
+		switch (id)
+		{
+			case DIALOG_ID_WINNING:
+				final TextView timeView = (TextView) getActionBar()
+						.getCustomView().findViewById(R.id.time);
+				final CharSequence time = timeView.getText();
+				final TextView moveCountView = (TextView) getActionBar()
+						.getCustomView().findViewById(R.id.move_count);
+				final CharSequence moveCount = moveCountView.getText();
+				final String message = getString(R.string.win_dialog_1) + " "
+						+ time + " " + getString(R.string.win_dialog_2) + " "
+						+ moveCount + " " + getString(R.string.win_dialog_3);
+				((AlertDialog) dialog).setMessage(message);
+				break;
+			case DIALOG_ID_SHOW_GAME_ID:
+				((AlertDialog) dialog)
+						.setMessage(getString(R.string.game_id_label) + " "
+								+ gameState.getGameId());
+				break;
 		}
 	}
 
