@@ -12,18 +12,18 @@
 		style="@android:style/TextAppearance.Medium"
 		android:text="@string/time" />
     <TextView
+        android:id="@+id/time"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:layout_marginLeft="5dp"
+        style="@android:style/TextAppearance.Medium" />
+    <TextView
         android:id="@+id/move_count_label"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
         android:layout_marginLeft="20dp"
         style="@android:style/TextAppearance.Medium"
         android:text="@string/move_count" />
-	<TextView
-		android:id="@+id/time"
-		android:layout_width="wrap_content"
-		android:layout_height="fill_parent"
-		android:layout_marginLeft="5dp"
-        style="@android:style/TextAppearance.Medium" />
 	<TextView
 		android:id="@+id/move_count"
 		android:layout_width="wrap_content"
