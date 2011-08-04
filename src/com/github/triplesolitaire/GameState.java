@@ -39,6 +39,7 @@ public class GameState
 	};
 	private LaneData[] lane;
 	private int moveCount = 0;
+	private int pendingMoves = 0;
 	private Stack<String> stock;
 	private int timeInSeconds = 0;
 	private final Handler timerHandler = new Handler();
@@ -131,6 +132,12 @@ public class GameState
 			Log.d(TAG, "Drag -> " + (laneIndex + 1) + ": Acceptable drag of "
 					+ topNewCard + " onto empty lane");
 		return acceptDrop;
+	}
+
+	public void animationCompleted()
+	{
+		pendingMoves--;
+		moveCompleted(true);
 	}
 
 	public boolean attemptAutoMoveFromCascadeToFoundation(final int laneIndex)
@@ -267,6 +274,7 @@ public class GameState
 				+ ": " + card);
 		foundation[foundationIndex] = card;
 		activity.getLane(from).decrementCascadeSize(1);
+		pendingMoves++;
 		activity.animateFromCascadeToFoundation(foundationIndex, from, card);
 	}
 
@@ -317,6 +325,7 @@ public class GameState
 		Log.d(TAG, "Drop " + "W -> " + -1 * (foundationIndex + 1) + ": " + card);
 		foundation[foundationIndex] = card;
 		activity.updateWasteUI();
+		pendingMoves++;
 		activity.animateFromWasteToFoundation(foundationIndex, card);
 	}
 
@@ -381,7 +390,7 @@ public class GameState
 		return waste.isEmpty();
 	}
 
-	public void moveCompleted(final boolean resetAutoplayLaneIndexLocked)
+	private void moveCompleted(final boolean resetAutoplayLaneIndexLocked)
 	{
 		activity.updateMoveCount(++moveCount);
 		if (moveCount == 1)
@@ -390,7 +399,8 @@ public class GameState
 			for (int laneIndex = 0; laneIndex < 13; laneIndex++)
 				autoplayLaneIndexLocked[laneIndex] = false;
 		checkForWin();
-		autoPlay();
+		if (pendingMoves == 0)
+			autoPlay();
 	}
 
 	public void newGame()
