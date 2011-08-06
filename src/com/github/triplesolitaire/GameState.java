@@ -376,8 +376,8 @@ public class GameState
 						dropFromFoundationToFoundation(foundationIndex, -1
 								* move.getFromIndex() - 1);
 					else
-						dropFromFoundationToCascade(move.getToIndex() - 1,
-								foundationIndex);
+						dropFromFoundationToCascade(move.getToIndex() - 1, -1
+								* foundationIndex - 1);
 				}
 				else if (move.getFromIndex() == 0)
 				{
