@@ -171,22 +171,15 @@ public class Lane extends RelativeLayout implements OnDragListener
 			// card alone
 			if (card.startsWith("MULTI"))
 				card = card.substring(5, card.indexOf(';'));
-			return cascadeSize == 0 ? gameState
-					.acceptLaneDrop(laneId - 1, card) : gameState
-					.acceptCascadeDrop(laneId - 1, card);
+			return cascadeSize == 0 ? gameState.acceptLaneDrop(laneId, card)
+					: gameState.acceptCascadeDrop(laneId, card);
 		}
 		else if (event.getAction() == DragEvent.ACTION_DROP)
 		{
 			final String card = event.getClipData().getItemAt(0).getText()
 					.toString();
 			final int from = (Integer) event.getLocalState();
-			if (from == 0)
-				gameState.dropFromWasteToCascade(laneId - 1);
-			else if (from < 0)
-				gameState
-						.dropFromFoundationToCascade(laneId - 1, -1 * from - 1);
-			else
-				gameState.dropFromCascadeToCascade(laneId - 1, from - 1, card);
+			gameState.move(new Move(Move.Type.PLAYER_MOVE, laneId, from, card));
 		}
 		else if (event.getAction() == DragEvent.ACTION_DRAG_ENDED
 				&& isMyCascade)
@@ -200,7 +193,7 @@ public class Lane extends RelativeLayout implements OnDragListener
 					@Override
 					public void run()
 					{
-						gameState.attemptAutoMoveFromCascadeToFoundation(laneId - 1);
+						gameState.attemptAutoMoveFromCascadeToFoundation(laneId);
 					}
 				}, 10);
 			currentDragIndex = -1;

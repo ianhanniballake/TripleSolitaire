@@ -30,6 +30,8 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.github.triplesolitaire.Move.Type;
+
 public class TripleSolitaireActivity extends Activity
 {
 	public enum AutoPlayPreference {
@@ -48,7 +50,7 @@ public class TripleSolitaireActivity extends Activity
 		@Override
 		public void onClick(final View v)
 		{
-			gameState.flipCard(laneIndex);
+			gameState.move(new Move(Move.Type.FLIP, laneIndex));
 		}
 	}
 
@@ -64,38 +66,31 @@ public class TripleSolitaireActivity extends Activity
 		@Override
 		public boolean onDrag(final View v, final DragEvent event)
 		{
-			final boolean isMyFoundation = -1 * foundationIndex == (Integer) event
+			final boolean isMyFoundation = foundationIndex == (Integer) event
 					.getLocalState();
 			if (event.getAction() == DragEvent.ACTION_DRAG_STARTED)
 			{
-				final String foundationCard = gameState
-						.getFoundationCard(foundationIndex - 1);
+				final String foundationCard = gameState.getFoundationCard(-1
+						* foundationIndex - 1);
 				if (isMyFoundation)
 				{
-					Log.d(TAG, "Drag " + -1 * foundationIndex + ": Started of "
+					Log.d(TAG, "Drag " + foundationIndex + ": Started of "
 							+ foundationCard);
 					return false;
 				}
 				final String card = event.getClipDescription().getLabel()
 						.toString();
-				return gameState
-						.acceptFoundationDrop(foundationIndex - 1, card);
+				return gameState.acceptFoundationDrop(foundationIndex, card);
 			}
 			else if (event.getAction() == DragEvent.ACTION_DROP)
 			{
 				final int from = (Integer) event.getLocalState();
-				if (from == 0)
-					gameState.dropFromWasteToFoundation(foundationIndex - 1);
-				else if (from < 0)
-					gameState.dropFromFoundationToFoundation(
-							foundationIndex - 1, -1 * from - 1);
-				else
-					gameState.dropFromCascadeToFoundation(foundationIndex - 1,
-							from - 1);
+				gameState
+						.move(new Move(Type.PLAYER_MOVE, foundationIndex, from));
 			}
 			else if (event.getAction() == DragEvent.ACTION_DRAG_ENDED)
 				if (isMyFoundation)
-					Log.d(TAG, "Drag " + -1 * foundationIndex + ": Ended with "
+					Log.d(TAG, "Drag " + foundationIndex + ": Ended with "
 							+ (event.getResult() ? "success" : "failure"));
 			return true;
 		}
@@ -113,15 +108,15 @@ public class TripleSolitaireActivity extends Activity
 		@Override
 		public boolean onTouch(final View v, final MotionEvent event)
 		{
-			final String foundationCard = gameState
-					.getFoundationCard(foundationIndex - 1);
+			final String foundationCard = gameState.getFoundationCard(-1
+					* foundationIndex - 1);
 			if (event.getAction() != MotionEvent.ACTION_DOWN
 					|| foundationCard == null)
 				return false;
 			final ClipData dragData = ClipData.newPlainText(foundationCard,
 					foundationCard);
-			v.startDrag(dragData, new View.DragShadowBuilder(v), -1
-					* foundationIndex, 0);
+			v.startDrag(dragData, new View.DragShadowBuilder(v),
+					foundationIndex, 0);
 			return true;
 		}
 	}
@@ -276,7 +271,7 @@ public class TripleSolitaireActivity extends Activity
 			@Override
 			public void onClick(final View v)
 			{
-				gameState.clickStock();
+				gameState.move(new Move(Move.Type.STOCK));
 			}
 		});
 		final ImageView wasteTopView = (ImageView) findViewById(R.id.waste1);
@@ -334,9 +329,9 @@ public class TripleSolitaireActivity extends Activity
 					"foundation" + (curFoundation + 1), "id", getPackageName());
 			final ImageView foundationLayout = (ImageView) findViewById(foundationId);
 			foundationLayout.setOnTouchListener(new OnFoundationTouchListener(
-					curFoundation + 1));
-			foundationLayout.setOnDragListener(new OnFoundationDragListener(
-					curFoundation + 1));
+					-1 * (curFoundation + 1)));
+			foundationLayout.setOnDragListener(new OnFoundationDragListener(-1
+					* (curFoundation + 1)));
 		}
 		for (int curLane = 0; curLane < 13; curLane++)
 		{
@@ -544,8 +539,8 @@ public class TripleSolitaireActivity extends Activity
 		{
 			foundationView.setBackgroundResource(getResources().getIdentifier(
 					foundationCard, "drawable", getPackageName()));
-			foundationView.setOnTouchListener(new OnFoundationTouchListener(
-					foundationIndex + 1));
+			foundationView.setOnTouchListener(new OnFoundationTouchListener(-1
+					* (foundationIndex + 1)));
 		}
 	}
 
