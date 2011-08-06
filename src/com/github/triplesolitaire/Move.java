@@ -83,4 +83,9 @@ public class Move
 	{
 		return type.toString() + ":" + fromIndex + ">" + toIndex + ":" + card;
 	}
+
+	public Move toUndo()
+	{
+		return new Move(Type.UNDO, fromIndex, toIndex, card);
+	}
 }

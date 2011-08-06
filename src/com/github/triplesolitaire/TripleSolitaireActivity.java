@@ -338,7 +338,8 @@ public class TripleSolitaireActivity extends Activity
 			final int laneId = getResources().getIdentifier(
 					"lane" + (curLane + 1), "id", getPackageName());
 			final Lane laneLayout = (Lane) findViewById(laneId);
-			laneLayout.setOnCardFlipListener(new OnCardFlipListener(curLane));
+			laneLayout
+					.setOnCardFlipListener(new OnCardFlipListener(curLane + 1));
 			laneLayout.setLaneId(curLane + 1);
 			laneLayout.setGameState(gameState);
 		}
@@ -412,7 +413,7 @@ public class TripleSolitaireActivity extends Activity
 		switch (item.getItemId())
 		{
 			case R.id.undo:
-				gameState.move(new Move(Move.Type.UNDO));
+				gameState.undo();
 				return true;
 			case R.id.new_game:
 				gameState.newGame();
