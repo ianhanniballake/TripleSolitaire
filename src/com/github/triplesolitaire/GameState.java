@@ -2,15 +2,14 @@ package com.github.triplesolitaire;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.Stack;
-import java.util.StringTokenizer;
 
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.github.triplesolitaire.Move.Type;
 import com.github.triplesolitaire.TripleSolitaireActivity.AutoPlayPreference;
@@ -130,7 +129,7 @@ public class GameState
 		for (int foundationIndex = -1; foundationIndex >= -12; foundationIndex--)
 			if (acceptFoundationDrop(foundationIndex, card))
 			{
-				move(new Move(Type.AUTO_PLAY, foundationIndex, laneIndex));
+				move(new Move(Type.AUTO_PLAY, foundationIndex, laneIndex, card));
 				return true;
 			}
 		return false;
@@ -144,7 +143,7 @@ public class GameState
 		for (int foundationIndex = -1; foundationIndex >= -12; foundationIndex--)
 			if (acceptFoundationDrop(foundationIndex, card))
 			{
-				move(new Move(Type.AUTO_PLAY, foundationIndex));
+				move(new Move(Type.AUTO_PLAY, foundationIndex, card));
 				return true;
 			}
 		return false;
@@ -202,113 +201,6 @@ public class GameState
 		activity.showDialog(TripleSolitaireActivity.DIALOG_ID_WINNING);
 	}
 
-	private void clickStock()
-	{
-		if (stock.isEmpty() && waste.isEmpty())
-			return;
-		if (stock.isEmpty())
-		{
-			stock.addAll(waste);
-			waste.clear();
-		}
-		else
-			for (int wasteIndex = 0; wasteIndex < 3 && !stock.isEmpty(); wasteIndex++)
-				waste.addFirst(stock.pop());
-		addMoveToUndo(new Move(Move.Type.STOCK));
-		activity.updateWasteUI();
-		activity.updateStockUI();
-		moveCompleted(true);
-	}
-
-	private void dropFromCascadeToCascade(final int laneIndex, final int from,
-			final String card)
-	{
-		final ArrayList<String> cascadeToAdd = new ArrayList<String>();
-		final StringTokenizer st = new StringTokenizer(card, ";");
-		while (st.hasMoreTokens())
-			cascadeToAdd.add(st.nextToken());
-		for (int cascadeIndex = 0; cascadeIndex < cascadeToAdd.size(); cascadeIndex++)
-			lane[from].getCascade().removeLast();
-		lane[laneIndex].getCascade().addAll(cascadeToAdd);
-		addMoveToUndo(new Move(Move.Type.PLAYER_MOVE, laneIndex + 1, from + 1));
-		activity.getLane(laneIndex).addCascade(cascadeToAdd);
-		activity.getLane(from).decrementCascadeSize(cascadeToAdd.size());
-		moveCompleted(true);
-	}
-
-	private void dropFromCascadeToFoundation(final int foundationIndex,
-			final int from)
-	{
-		final String card = lane[from].getCascade().removeLast();
-		foundation[foundationIndex] = card;
-		addMoveToUndo(new Move(Move.Type.PLAYER_MOVE, -1
-				* (foundationIndex + 1), from + 1));
-		activity.getLane(from).decrementCascadeSize(1);
-		pendingMoves++;
-		activity.animateFromCascadeToFoundation(foundationIndex, from, card);
-	}
-
-	private void dropFromFoundationToCascade(final int laneIndex,
-			final int foundationIndex)
-	{
-		final String card = foundation[foundationIndex];
-		foundation[foundationIndex] = prevInSuit(card);
-		lane[laneIndex].getCascade().add(card);
-		addMoveToUndo(new Move(Move.Type.PLAYER_MOVE, laneIndex + 1, -1
-				* (foundationIndex + 1)));
-		autoplayLaneIndexLocked[laneIndex] = true;
-		final ArrayList<String> cascadeToAdd = new ArrayList<String>();
-		cascadeToAdd.add(card);
-		activity.getLane(laneIndex).addCascade(cascadeToAdd);
-		activity.updateFoundationUI(foundationIndex);
-		moveCompleted(false);
-	}
-
-	private void dropFromFoundationToFoundation(final int foundationIndex,
-			final int from)
-	{
-		final String card = foundation[from];
-		foundation[foundationIndex] = card;
-		foundation[from] = prevInSuit(card);
-		addMoveToUndo(new Move(Move.Type.PLAYER_MOVE, -1
-				* (foundationIndex + 1), -1 * (from + 1)));
-		activity.updateFoundationUI(foundationIndex);
-		activity.updateFoundationUI(from);
-		moveCompleted(true);
-	}
-
-	private void dropFromWasteToCascade(final int laneIndex)
-	{
-		final String card = waste.removeFirst();
-		lane[laneIndex].getCascade().add(card);
-		addMoveToUndo(new Move(Move.Type.PLAYER_MOVE, laneIndex + 1));
-		final ArrayList<String> cascadeToAdd = new ArrayList<String>();
-		cascadeToAdd.add(card);
-		activity.getLane(laneIndex).addCascade(cascadeToAdd);
-		activity.updateWasteUI();
-		moveCompleted(true);
-	}
-
-	private void dropFromWasteToFoundation(final int foundationIndex)
-	{
-		final String card = waste.removeFirst();
-		foundation[foundationIndex] = card;
-		addMoveToUndo(new Move(Move.Type.PLAYER_MOVE, -1
-				* (foundationIndex + 1)));
-		activity.updateWasteUI();
-		pendingMoves++;
-		activity.animateFromWasteToFoundation(foundationIndex, card);
-	}
-
-	private void flipCard(final int laneIndex)
-	{
-		final String card = lane[laneIndex - 1].getStack().pop();
-		lane[laneIndex - 1].getCascade().add(card);
-		addMoveToUndo(new Move(Move.Type.FLIP, laneIndex));
-		activity.getLane(laneIndex - 1).flipOverTopStack(card);
-		autoPlay();
-	}
-
 	public String getFoundationCard(final int foundationIndex)
 	{
 		return foundation[foundationIndex];
@@ -360,38 +252,122 @@ public class GameState
 		switch (move.getType())
 		{
 			case STOCK:
-				clickStock();
+				if (stock.isEmpty())
+				{
+					stock.addAll(waste);
+					waste.clear();
+					addMoveToUndo(move);
+				}
+				else
+				{
+					final StringBuffer sb = new StringBuffer();
+					String card = stock.pop();
+					sb.append(card);
+					waste.addFirst(card);
+					for (int wasteIndex = 1; wasteIndex < 3 && !stock.isEmpty(); wasteIndex++)
+					{
+						card = stock.pop();
+						sb.append(';');
+						sb.append(card);
+						waste.addFirst(card);
+					}
+					addMoveToUndo(new Move(Move.Type.STOCK, sb.toString()));
+				}
+				activity.updateWasteUI();
+				activity.updateStockUI();
+				moveCompleted(true);
+				break;
+			case UNDO_STOCK:
+				if (waste.isEmpty())
+				{
+					waste.addAll(stock);
+					stock.clear();
+				}
+				else
+				{
+					final Iterator<String> iterator = move.getCascade()
+							.descendingIterator();
+					while (iterator.hasNext())
+					{
+						stock.push(iterator.next());
+						waste.removeFirst();
+					}
+				}
+				activity.updateWasteUI();
+				activity.updateStockUI();
 				break;
 			case FLIP:
-				flipCard(move.getToIndex());
+				final String toFlip = lane[move.getToIndex() - 1].getStack()
+						.pop();
+				lane[move.getToIndex() - 1].getCascade().add(toFlip);
+				addMoveToUndo(move);
+				activity.getLane(move.getToIndex() - 1)
+						.flipOverTopStack(toFlip);
+				autoPlay();
 				break;
-			case UNDO:
+			case UNDO_FLIP:
+				final String flippedCard = lane[move.getToIndex() - 1]
+						.getCascade().removeFirst();
+				lane[move.getToIndex() - 1].getStack().add(flippedCard);
+				final int newStackSize = lane[move.getToIndex() - 1].getStack()
+						.size();
+				activity.getLane(move.getToIndex() - 1).setStackSize(
+						newStackSize);
 				break;
 			case AUTO_PLAY:
+			case UNDO:
 			case PLAYER_MOVE:
-				if (move.getFromIndex() < 0) // from foundation
-				{
-					final int foundationIndex = -1 * move.getFromIndex() - 1;
-					if (move.getToIndex() < 0)
-						dropFromFoundationToFoundation(-1 * move.getToIndex()
-								- 1, foundationIndex);
-					else
-						dropFromFoundationToCascade(move.getToIndex() - 1, -1
-								* foundationIndex - 1);
-				}
+				// Update game state at from location
+				if (move.getFromIndex() < 0)
+					foundation[-1 * move.getFromIndex() - 1] = prevInSuit(move
+							.getCard());
 				else if (move.getFromIndex() == 0)
-				{
-					if (move.getToIndex() < 0)
-						dropFromWasteToFoundation(-1 * move.getToIndex() - 1);
-					else
-						dropFromWasteToCascade(move.getToIndex() - 1);
-				}
-				else if (move.getToIndex() < 0)
-					dropFromCascadeToFoundation(-1 * move.getToIndex() - 1,
-							move.getFromIndex() - 1);
+					waste.removeFirst();
 				else
-					dropFromCascadeToCascade(move.getToIndex() - 1,
-							move.getFromIndex() - 1, move.getCard());
+					for (@SuppressWarnings("unused")
+					final String card : move.getCascade())
+						lane[move.getFromIndex() - 1].getCascade().removeLast();
+				// Update game state at to location
+				if (move.getToIndex() < 0)
+					foundation[-1 * move.getToIndex() - 1] = move.getCard();
+				else if (move.getToIndex() == 0)
+					waste.addFirst(move.getCard());
+				else
+					lane[move.getToIndex() - 1].getCascade().addAll(
+							move.getCascade());
+				// Add move to the undo list if it isn't an undo move
+				if (move.getType() != Move.Type.UNDO)
+					addMoveToUndo(move);
+				// Update the from UI
+				if (move.getFromIndex() < 0)
+					activity.updateFoundationUI(-1 * move.getFromIndex() - 1);
+				else if (move.getFromIndex() == 0)
+					activity.updateWasteUI();
+				else
+					activity.getLane(move.getFromIndex() - 1)
+							.decrementCascadeSize(move.getCascade().size());
+				// Update the to UI
+				if (move.getType() == Move.Type.AUTO_PLAY)
+				{
+					pendingMoves++;
+					activity.animate(move);
+				}
+				else if (move.getType() == Move.Type.UNDO)
+					activity.animate(move);
+				else if (move.getToIndex() < 0)
+				{
+					activity.updateFoundationUI(-1 * move.getToIndex() - 1);
+					moveCompleted(move.getFromIndex() < 0);
+				}
+				else if (move.getToIndex() == 0)
+					activity.updateWasteUI();
+				else
+				{
+					if (move.getFromIndex() < 0)
+						autoplayLaneIndexLocked[move.getToIndex() - 1] = true;
+					activity.getLane(move.getToIndex() - 1).addCascade(
+							move.getCascade());
+				}
 				break;
 		}
 	}
@@ -552,11 +528,7 @@ public class GameState
 	{
 		if (moves.empty())
 			return;
-		final Move moveToUndo = moves.pop();
-		Log.d(TAG, "Undoing " + moveToUndo.toString());
-		Toast.makeText(activity, moveToUndo.toString(), Toast.LENGTH_SHORT)
-				.show();
-		move(moveToUndo.toUndo());
+		move(moves.pop().toUndo());
 		if (moves.empty())
 			activity.invalidateOptionsMenu();
 	}

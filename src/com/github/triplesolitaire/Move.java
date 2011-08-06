@@ -1,14 +1,16 @@
 package com.github.triplesolitaire;
 
+import java.util.LinkedList;
+import java.util.ListIterator;
 import java.util.StringTokenizer;
 
 public class Move
 {
 	public enum Type {
-		AUTO_PLAY, FLIP, PLAYER_MOVE, STOCK, UNDO
+		AUTO_PLAY, FLIP, PLAYER_MOVE, STOCK, UNDO, UNDO_FLIP, UNDO_STOCK
 	}
 
-	private final String card;
+	private final LinkedList<String> cascade = new LinkedList<String>();
 	private final int fromIndex;
 	private final int toIndex;
 	private final Type type;
@@ -20,9 +22,7 @@ public class Move
 		fromIndex = Integer.parseInt(st.nextToken());
 		toIndex = Integer.parseInt(st.nextToken());
 		if (st.hasMoreTokens())
-			card = st.nextToken();
-		else
-			card = "";
+			fillCascade(st.nextToken());
 	}
 
 	public Move(final Type type)
@@ -30,7 +30,6 @@ public class Move
 		this.type = type;
 		toIndex = 0;
 		fromIndex = 0;
-		card = "";
 	}
 
 	public Move(final Type type, final int toIndex)
@@ -38,7 +37,6 @@ public class Move
 		this.type = type;
 		this.toIndex = toIndex;
 		fromIndex = 0;
-		card = "";
 	}
 
 	public Move(final Type type, final int toIndex, final int fromIndex)
@@ -46,7 +44,6 @@ public class Move
 		this.type = type;
 		this.toIndex = toIndex;
 		this.fromIndex = fromIndex;
-		card = "";
 	}
 
 	public Move(final Type type, final int toIndex, final int fromIndex,
@@ -55,12 +52,57 @@ public class Move
 		this.type = type;
 		this.toIndex = toIndex;
 		this.fromIndex = fromIndex;
-		this.card = card;
+		fillCascade(card);
+	}
+
+	public Move(final Type type, final int toIndex, final String card)
+	{
+		this.type = type;
+		this.toIndex = toIndex;
+		fromIndex = 0;
+		fillCascade(card);
+	}
+
+	public Move(final Type type, final String card)
+	{
+		this.type = type;
+		toIndex = 0;
+		fromIndex = 0;
+		fillCascade(card);
+	}
+
+	private void fillCascade(final String card)
+	{
+		final StringTokenizer st = new StringTokenizer(card, ";");
+		while (st.hasMoreTokens())
+			cascade.add(st.nextToken());
 	}
 
 	public String getCard()
 	{
-		return card;
+		if (cascade.isEmpty())
+			return "";
+		return cascade.getFirst();
+	}
+
+	public LinkedList<String> getCascade()
+	{
+		return cascade;
+	}
+
+	private String getCascadeAsString()
+	{
+		if (cascade.isEmpty())
+			return "";
+		final StringBuffer sb = new StringBuffer();
+		final ListIterator<String> listIterator = cascade.listIterator();
+		sb.append(listIterator.next());
+		while (listIterator.hasNext())
+		{
+			sb.append(';');
+			sb.append(listIterator.next());
+		}
+		return sb.toString();
 	}
 
 	public int getFromIndex()
@@ -81,11 +123,23 @@ public class Move
 	@Override
 	public String toString()
 	{
-		return type.toString() + ":" + fromIndex + ">" + toIndex + ":" + card;
+		final StringBuffer sb = new StringBuffer();
+		sb.append(type.toString());
+		sb.append(':');
+		sb.append(fromIndex);
+		sb.append('>');
+		sb.append(toIndex);
+		sb.append(':');
+		sb.append(getCascadeAsString());
+		return sb.toString();
 	}
 
 	public Move toUndo()
 	{
-		return new Move(Type.UNDO, fromIndex, toIndex, card);
+		if (type == Type.FLIP)
+			return new Move(Type.UNDO_FLIP, toIndex);
+		else if (type == Type.STOCK)
+			return new Move(Type.UNDO_STOCK, getCascadeAsString());
+		return new Move(Type.UNDO, fromIndex, toIndex, getCascadeAsString());
 	}
 }

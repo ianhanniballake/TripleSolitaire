@@ -84,9 +84,11 @@ public class TripleSolitaireActivity extends Activity
 			}
 			else if (event.getAction() == DragEvent.ACTION_DROP)
 			{
+				final String card = event.getClipData().getItemAt(0).getText()
+						.toString();
 				final int from = (Integer) event.getLocalState();
-				gameState
-						.move(new Move(Type.PLAYER_MOVE, foundationIndex, from));
+				gameState.move(new Move(Type.PLAYER_MOVE, foundationIndex,
+						from, card));
 			}
 			else if (event.getAction() == DragEvent.ACTION_DRAG_ENDED)
 				if (isMyFoundation)
@@ -130,68 +132,53 @@ public class TripleSolitaireActivity extends Activity
 	private final GameState gameState = new GameState(this);
 	private final Handler handler = new Handler();
 
-	public void animateFromCascadeToFoundation(final int foundationIndex,
-			final int from, final String card)
+	public void animate(final Move move)
 	{
-		Log.d(TAG, "Animate " + (from + 1) + " -> " + -1
-				* (foundationIndex + 1) + ": " + card);
-		final Point cascadeLoc = getCascadeLoc(from);
-		final Point foundationLoc = getFoundationLoc(foundationIndex);
+		final Point fromLoc;
+		if (move.getFromIndex() < 0)
+			fromLoc = getFoundationLoc(-1 * move.getFromIndex() - 1);
+		else if (move.getFromIndex() == 0)
+			fromLoc = getWasteLoc();
+		else
+			fromLoc = getCascadeLoc(move.getFromIndex() - 1);
+		final Point toLoc;
+		if (move.getToIndex() < 0)
+			toLoc = getFoundationLoc(-1 * move.getToIndex() - 1);
+		else if (move.getToIndex() == 0)
+			toLoc = getWasteLoc();
+		else
+			toLoc = getCascadeLoc(move.getToIndex() - 1);
 		final Card toAnimate = new Card(getBaseContext(), getResources()
-				.getIdentifier(card, "drawable", getPackageName()));
-		animateView(toAnimate, cascadeLoc, foundationLoc, new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				Log.d(TAG, "Animate " + (from + 1) + " -> " + -1
-						* (foundationIndex + 1) + ": Ended for " + card);
-				updateFoundationUI(foundationIndex);
-			}
-		});
-	}
-
-	public void animateFromWasteToFoundation(final int foundationIndex,
-			final String card)
-	{
-		Log.d(TAG, "Animate " + "W -> " + -1 * (foundationIndex + 1) + ": "
-				+ card);
-		final Point wasteLoc = getWasteLoc();
-		final Point foundationLoc = getFoundationLoc(foundationIndex);
-		final Card toAnimate = new Card(getBaseContext(), getResources()
-				.getIdentifier(card, "drawable", getPackageName()));
-		animateView(toAnimate, wasteLoc, foundationLoc, new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				Log.d(TAG, "Animate " + "W -> " + -1 * (foundationIndex + 1)
-						+ ": Ended for " + card);
-				updateFoundationUI(foundationIndex);
-			}
-		});
-	}
-
-	private void animateView(final View view, final Point start,
-			final Point end, final Runnable uiUpdate)
-	{
+				.getIdentifier(move.getCard(), "drawable", getPackageName()));
 		final FrameLayout layout = (FrameLayout) findViewById(R.id.animateLayout);
-		layout.addView(view);
-		layout.setX(start.x);
-		layout.setY(start.y);
+		layout.addView(toAnimate);
+		layout.setX(fromLoc.x);
+		layout.setY(fromLoc.y);
 		layout.setVisibility(View.VISIBLE);
-		final int animationDuration = getResources().getInteger(
-				R.integer.animation_duration);
-		layout.animate().x(end.x).y(end.y).setDuration(animationDuration)
+		final int animationDuration;
+		if (move.getType() == Move.Type.UNDO)
+			animationDuration = getResources().getInteger(
+					R.integer.undo_animation_duration);
+		else
+			animationDuration = getResources().getInteger(
+					R.integer.animation_duration);
+		layout.animate().x(toLoc.x).y(toLoc.y).setDuration(animationDuration)
 				.setListener(new AnimatorListenerAdapter()
 				{
 					@Override
 					public void onAnimationEnd(final Animator animation)
 					{
-						uiUpdate.run();
+						if (move.getToIndex() < 0)
+							updateFoundationUI(-1 * move.getToIndex() - 1);
+						else if (move.getToIndex() == 0)
+							updateWasteUI();
+						else
+							getLane(move.getToIndex() - 1).addCascade(
+									move.getCascade());
 						layout.removeAllViews();
 						layout.setVisibility(View.GONE);
-						gameState.animationCompleted();
+						if (move.getType() != Move.Type.UNDO)
+							gameState.animationCompleted();
 					}
 				});
 	}
@@ -271,7 +258,8 @@ public class TripleSolitaireActivity extends Activity
 			@Override
 			public void onClick(final View v)
 			{
-				gameState.move(new Move(Move.Type.STOCK));
+				if (!gameState.isStockEmpty() || !gameState.isWasteEmpty())
+					gameState.move(new Move(Move.Type.STOCK));
 			}
 		});
 		final ImageView wasteTopView = (ImageView) findViewById(R.id.waste1);
