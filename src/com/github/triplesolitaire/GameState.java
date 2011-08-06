@@ -371,10 +371,10 @@ public class GameState
 			case PLAYER_MOVE:
 				if (move.getFromIndex() < 0) // from foundation
 				{
-					final int foundationIndex = -1 * move.getToIndex() - 1;
+					final int foundationIndex = -1 * move.getFromIndex() - 1;
 					if (move.getToIndex() < 0)
-						dropFromFoundationToFoundation(foundationIndex, -1
-								* move.getFromIndex() - 1);
+						dropFromFoundationToFoundation(-1 * move.getToIndex()
+								- 1, foundationIndex);
 					else
 						dropFromFoundationToCascade(move.getToIndex() - 1,
 								foundationIndex);
