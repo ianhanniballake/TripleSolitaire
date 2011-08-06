@@ -303,6 +303,8 @@ public class GameState
 				addMoveToUndo(move);
 				activity.getLane(move.getToIndex() - 1)
 						.flipOverTopStack(toFlip);
+				for (int laneIndex = 0; laneIndex < 13; laneIndex++)
+					autoplayLaneIndexLocked[laneIndex] = false;
 				autoPlay();
 				break;
 			case UNDO_FLIP:
@@ -357,16 +359,20 @@ public class GameState
 				else if (move.getToIndex() < 0)
 				{
 					activity.updateFoundationUI(-1 * move.getToIndex() - 1);
-					moveCompleted(move.getFromIndex() < 0);
+					moveCompleted(true);
 				}
 				else if (move.getToIndex() == 0)
+				{
 					activity.updateWasteUI();
+					moveCompleted(true);
+				}
 				else
 				{
 					if (move.getFromIndex() < 0)
 						autoplayLaneIndexLocked[move.getToIndex() - 1] = true;
 					activity.getLane(move.getToIndex() - 1).addCascade(
 							move.getCascade());
+					moveCompleted(move.getFromIndex() >= 0);
 				}
 				break;
 		}
