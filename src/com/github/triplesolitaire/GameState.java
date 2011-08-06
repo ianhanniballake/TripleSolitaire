@@ -195,6 +195,11 @@ public class GameState
 		return cascadeData.toString();
 	}
 
+	public boolean canUndo()
+	{
+		return !moves.empty();
+	}
+
 	private void checkForWin()
 	{
 		for (int foundationIndex = 0; foundationIndex < 12; foundationIndex++)
@@ -220,6 +225,8 @@ public class GameState
 			for (int wasteIndex = 0; wasteIndex < 3 && !stock.isEmpty(); wasteIndex++)
 				waste.addFirst(stock.pop());
 		moves.push(new Move(Move.Type.STOCK));
+		if (moves.size() == 1)
+			activity.invalidateOptionsMenu();
 		activity.updateWasteUI();
 		activity.updateStockUI();
 		moveCompleted(true);
@@ -238,6 +245,8 @@ public class GameState
 			lane[from].getCascade().removeLast();
 		lane[laneIndex].getCascade().addAll(cascadeToAdd);
 		moves.push(new Move(Move.Type.PLAYER_MOVE, laneIndex, from));
+		if (moves.size() == 1)
+			activity.invalidateOptionsMenu();
 		activity.getLane(laneIndex).addCascade(cascadeToAdd);
 		activity.getLane(from).decrementCascadeSize(cascadeToAdd.size());
 		moveCompleted(true);
@@ -251,6 +260,8 @@ public class GameState
 				+ ": " + card);
 		foundation[foundationIndex] = card;
 		moves.push(new Move(Move.Type.PLAYER_MOVE, foundationIndex, from));
+		if (moves.size() == 1)
+			activity.invalidateOptionsMenu();
 		activity.getLane(from).decrementCascadeSize(1);
 		pendingMoves++;
 		activity.animateFromCascadeToFoundation(foundationIndex, from, card);
@@ -265,6 +276,8 @@ public class GameState
 		foundation[foundationIndex] = prevInSuit(card);
 		lane[laneIndex].getCascade().add(card);
 		moves.push(new Move(Move.Type.PLAYER_MOVE, laneIndex, foundationIndex));
+		if (moves.size() == 1)
+			activity.invalidateOptionsMenu();
 		autoplayLaneIndexLocked[laneIndex] = true;
 		final ArrayList<String> cascadeToAdd = new ArrayList<String>();
 		cascadeToAdd.add(card);
@@ -282,6 +295,8 @@ public class GameState
 		foundation[foundationIndex] = card;
 		foundation[from] = prevInSuit(card);
 		moves.push(new Move(Move.Type.PLAYER_MOVE, foundationIndex, from));
+		if (moves.size() == 1)
+			activity.invalidateOptionsMenu();
 		activity.updateFoundationUI(foundationIndex);
 		activity.updateFoundationUI(from);
 		moveCompleted(true);
@@ -293,6 +308,8 @@ public class GameState
 		Log.d(TAG, "Drop W -> " + (laneIndex + 1) + ": " + card);
 		lane[laneIndex].getCascade().add(card);
 		moves.push(new Move(Move.Type.PLAYER_MOVE, laneIndex));
+		if (moves.size() == 1)
+			activity.invalidateOptionsMenu();
 		final ArrayList<String> cascadeToAdd = new ArrayList<String>();
 		cascadeToAdd.add(card);
 		activity.getLane(laneIndex).addCascade(cascadeToAdd);
@@ -306,6 +323,8 @@ public class GameState
 		Log.d(TAG, "Drop W -> " + -1 * (foundationIndex + 1) + ": " + card);
 		foundation[foundationIndex] = card;
 		moves.push(new Move(Move.Type.PLAYER_MOVE, foundationIndex));
+		if (moves.size() == 1)
+			activity.invalidateOptionsMenu();
 		activity.updateWasteUI();
 		pendingMoves++;
 		activity.animateFromWasteToFoundation(foundationIndex, card);
@@ -317,6 +336,8 @@ public class GameState
 		Log.d(TAG, "Flip " + (laneIndex + 1) + ": " + card);
 		lane[laneIndex].getCascade().add(card);
 		moves.push(new Move(Move.Type.FLIP, laneIndex));
+		if (moves.size() == 1)
+			activity.invalidateOptionsMenu();
 		activity.getLane(laneIndex).flipOverTopStack(card);
 		autoPlay();
 	}
@@ -444,6 +465,7 @@ public class GameState
 		for (int h = 0; h < 13; h++)
 			autoplayLaneIndexLocked[h] = false;
 		moves = new Stack<Move>();
+		activity.invalidateOptionsMenu();
 		Collections.shuffle(fullDeck, random);
 		int currentIndex = 0;
 		stock = new Stack<String>();
@@ -564,12 +586,14 @@ public class GameState
 		}
 	}
 
-	private boolean undo()
+	private void undo()
 	{
-		if (moves.empty())
-			return false;
-		Toast.makeText(activity.getBaseContext(), moves.pop().toString(),
-				Toast.LENGTH_SHORT);
-		return true;
+		if (!moves.empty())
+		{
+			Toast.makeText(activity, moves.pop().toString(), Toast.LENGTH_SHORT)
+					.show();
+			if (moves.empty())
+				activity.invalidateOptionsMenu();
+		}
 	}
 }

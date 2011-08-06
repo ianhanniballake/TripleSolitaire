@@ -411,6 +411,9 @@ public class TripleSolitaireActivity extends Activity
 	{
 		switch (item.getItemId())
 		{
+			case R.id.undo:
+				gameState.move(new Move(Move.Type.UNDO));
+				return true;
 			case R.id.new_game:
 				gameState.newGame();
 				return true;
@@ -450,19 +453,20 @@ public class TripleSolitaireActivity extends Activity
 	@Override
 	public boolean onPrepareOptionsMenu(final Menu menu)
 	{
+		menu.findItem(R.id.undo).setEnabled(gameState.canUndo());
 		switch (getAutoPlayPreference())
 		{
 			case AUTOPLAY_WHEN_OBVIOUS:
 				menu.findItem(R.id.autoplay).setTitle(
 						R.string.autoplay_when_obvious);
-				return true;
+				break;
 			case AUTOPLAY_WHEN_WON:
 				menu.findItem(R.id.autoplay).setTitle(
 						R.string.autoplay_when_won);
-				return true;
+				break;
 			case AUTOPLAY_NEVER:
 				menu.findItem(R.id.autoplay).setTitle(R.string.autoplay_never);
-				return true;
+				break;
 		}
 		return super.onPrepareOptionsMenu(menu);
 	}

@@ -3,6 +3,7 @@
     <string name="app_name">Triple Solitaire</string>
     <string name="time">Time:</string>
     <string name="move_count">Moves:</string>
+    <string name="undo">Undo</string>
     <string name="autoplay_when_obvious">Autoplay When Obvious</string>
     <string name="autoplay_when_won">Autoplay When Won</string>
     <string name="autoplay_never">Never Auto Play</string>
