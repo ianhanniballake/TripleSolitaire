@@ -110,31 +110,31 @@ public class GameState
 	 * 
 	 * @param laneIndex
 	 *            One-based index (1 through 13) of the lane drop target
-	 * @param topNewCard
-	 *            Top card of the cascade/the card to be dropped
+	 * @param bottomNewCard
+	 *            Bottom card of the cascade/the card to be dropped
 	 * @return Whether the lane should accept the drop
 	 */
 	public boolean acceptCascadeDrop(final int laneIndex,
-			final String topNewCard)
+			final String bottomNewCard)
 	{
 		final String cascadeCard = lane[laneIndex - 1].getCascade().getLast();
 		final String cascadeSuit = getSuit(cascadeCard);
 		final int cascadeNum = getNumber(cascadeCard);
-		final String topNewCardSuit = getSuit(topNewCard);
-		final int topNewCardNum = getNumber(topNewCard);
+		final String bottomNewCardSuit = getSuit(bottomNewCard);
+		final int bottomNewCardNum = getNumber(bottomNewCard);
 		boolean acceptDrop = false;
 		final boolean cascadeCardIsBlack = cascadeSuit.equals("clubs")
 				|| cascadeSuit.equals("spades");
-		final boolean topNewCardIsBlack = topNewCardSuit.equals("clubs")
-				|| topNewCardSuit.equals("spades");
-		if (topNewCardNum != cascadeNum - 1)
+		final boolean bottomNewCardIsBlack = bottomNewCardSuit.equals("clubs")
+				|| bottomNewCardSuit.equals("spades");
+		if (bottomNewCardNum != cascadeNum - 1)
 			acceptDrop = false;
 		else
-			acceptDrop = cascadeCardIsBlack && !topNewCardIsBlack
-					|| !cascadeCardIsBlack && topNewCardIsBlack;
+			acceptDrop = cascadeCardIsBlack && !bottomNewCardIsBlack
+					|| !cascadeCardIsBlack && bottomNewCardIsBlack;
 		if (acceptDrop)
 			Log.d(TAG, "Drag -> " + laneIndex + ": Acceptable drag of "
-					+ topNewCard + " onto " + cascadeCard);
+					+ bottomNewCard + " onto " + cascadeCard);
 		return acceptDrop;
 	}
 
@@ -249,7 +249,7 @@ public class GameState
 		for (int foundationIndex = -1; foundationIndex >= -12; foundationIndex--)
 			if (acceptFoundationDrop(foundationIndex, card))
 			{
-				move(new Move(Type.AUTO_PLAY, foundationIndex, card));
+				move(new Move(Type.AUTO_PLAY, foundationIndex, 0, card));
 				return true;
 			}
 		return false;
