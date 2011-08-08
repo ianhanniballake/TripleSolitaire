@@ -14,17 +14,40 @@ import android.util.Log;
 import com.github.triplesolitaire.Move.Type;
 import com.github.triplesolitaire.TripleSolitaireActivity.AutoPlayPreference;
 
+/**
+ * Class to manage the game state associated with a Triple Solitaire game
+ */
 public class GameState
 {
 	/**
 	 * Logging tag
 	 */
 	private static final String TAG = "TripleSolitaireActivity";
+	/**
+	 * Activity to issue UI update callbacks
+	 */
 	private final TripleSolitaireActivity activity;
+	/**
+	 * Whether a lane should be excluded from autoplay (i.e., if the user just
+	 * dragged a card from the foundation to that column
+	 */
 	private boolean[] autoplayLaneIndexLocked = new boolean[13];
+	/**
+	 * Cards in the Foundation
+	 */
 	private String[] foundation;
+	/**
+	 * Current Game ID, used for debugging a specific game
+	 */
 	private long gameId = 0;
+	/**
+	 * Whether a game is in progress
+	 */
 	private boolean gameInProgress = false;
+	/**
+	 * Increments the game timer is there is at least one move. Posts another
+	 * copy of itself to trigger in 1 second if the game is in progress.
+	 */
 	private final Runnable gameTimerIncrement = new Runnable()
 	{
 		@Override
@@ -38,20 +61,59 @@ public class GameState
 				timerHandler.postDelayed(this, 1000);
 		}
 	};
+	/**
+	 * Data (stack and cascade information) for each lane
+	 */
 	private LaneData[] lane;
+	/**
+	 * Number of player moves in the current game
+	 */
 	private int moveCount = 0;
+	/**
+	 * A list of all undoable moves
+	 */
 	private Stack<Move> moves;
+	/**
+	 * Number of auto play moves that are pending animation complete
+	 */
 	private int pendingMoves = 0;
+	/**
+	 * Represents the cards in the stock
+	 */
 	private Stack<String> stock;
+	/**
+	 * How much time has elapsed in the current game
+	 */
 	private int timeInSeconds = 0;
+	/**
+	 * Handler for running the game timer
+	 */
 	private final Handler timerHandler = new Handler();
+	/**
+	 * Represents the cards in the waste
+	 */
 	private LinkedList<String> waste;
 
+	/**
+	 * Creates a new GameState instance
+	 * 
+	 * @param activity
+	 *            Activity to send UI update commands
+	 */
 	public GameState(final TripleSolitaireActivity activity)
 	{
 		this.activity = activity;
 	}
 
+	/**
+	 * Whether the given lane should accept the given dropped card/cascade
+	 * 
+	 * @param laneIndex
+	 *            One-based index (1 through 13) of the lane drop target
+	 * @param topNewCard
+	 *            Top card of the cascade/the card to be dropped
+	 * @return Whether the lane should accept the drop
+	 */
 	public boolean acceptCascadeDrop(final int laneIndex,
 			final String topNewCard)
 	{
@@ -76,6 +138,17 @@ public class GameState
 		return acceptDrop;
 	}
 
+	/**
+	 * Whether the given foundation should accept the given dropped card. Note,
+	 * that no multi-card drops are accepted on the foundation
+	 * 
+	 * @param foundationIndex
+	 *            Negative One-based index (-1 through -12) of the foundation
+	 *            drop target
+	 * @param newCard
+	 *            The card to be dropped
+	 * @return Whether the foundation should accept the drop
+	 */
 	public boolean acceptFoundationDrop(final int foundationIndex,
 			final String newCard)
 	{
@@ -99,6 +172,15 @@ public class GameState
 		return acceptDrop;
 	}
 
+	/**
+	 * Whether the empty lane should accept a dropped card/cascade
+	 * 
+	 * @param laneIndex
+	 *            One-based index (1 through 13) of the lane drop target
+	 * @param topNewCard
+	 *            Top card of the cascade/the card to be dropped
+	 * @return Whether the lane should accept the drop
+	 */
 	public boolean acceptLaneDrop(final int laneIndex, final String topNewCard)
 	{
 		final boolean acceptDrop = topNewCard.endsWith("s13");
@@ -108,6 +190,13 @@ public class GameState
 		return acceptDrop;
 	}
 
+	/**
+	 * Adds the given move to the undo stack and updates the UI if this is the
+	 * first move in the undo stack
+	 * 
+	 * @param move
+	 *            Move to add to the undo stack
+	 */
 	private void addMoveToUndo(final Move move)
 	{
 		moves.push(move);
@@ -115,12 +204,23 @@ public class GameState
 			activity.invalidateOptionsMenu();
 	}
 
+	/**
+	 * Callback from the UI to inform us of animation completion
+	 */
 	public void animationCompleted()
 	{
 		pendingMoves--;
 		moveCompleted(true);
 	}
 
+	/**
+	 * Attempts to auto play the first card in the given cascade to the
+	 * foundation (moving from -1 to -12 i.e., left to right)
+	 * 
+	 * @param laneIndex
+	 *            One-based index (1 through 13)
+	 * @return Whether an auto play was found
+	 */
 	public boolean attemptAutoMoveFromCascadeToFoundation(final int laneIndex)
 	{
 		if (lane[laneIndex - 1].getCascade().isEmpty())
@@ -135,6 +235,12 @@ public class GameState
 		return false;
 	}
 
+	/**
+	 * Attempts to auto play the first card in the waste to the foundation
+	 * (moving from -1 to -12 i.e., left to right)
+	 * 
+	 * @return Whether an auto play was found
+	 */
 	public boolean attemptAutoMoveFromWasteToFoundation()
 	{
 		if (waste.isEmpty())
@@ -149,6 +255,11 @@ public class GameState
 		return false;
 	}
 
+	/**
+	 * Using the user's Autoplay preference, attempts to auto play a single
+	 * card, first looking through the lanes (from 1 to 13 i.e., left to right)
+	 * and then to the waste
+	 */
 	private void autoPlay()
 	{
 		final AutoPlayPreference autoPlayPreference = activity
@@ -170,10 +281,20 @@ public class GameState
 		attemptAutoMoveFromWasteToFoundation();
 	}
 
+	/**
+	 * Builds a string containing a semicolon separated list of the top
+	 * numCardsToInclude cards from the given lane
+	 * 
+	 * @param laneIndex
+	 *            One-based index (1 through 13)
+	 * @param numCardsToInclude
+	 *            The number of cards to include
+	 * @return A semicolon separated list of the cards in the requested cascade
+	 */
 	public String buildCascadeString(final int laneIndex,
 			final int numCardsToInclude)
 	{
-		final LinkedList<String> cascade = lane[laneIndex].getCascade();
+		final LinkedList<String> cascade = lane[laneIndex - 1].getCascade();
 		final StringBuilder cascadeData = new StringBuilder(cascade.get(cascade
 				.size() - numCardsToInclude));
 		for (int cascadeIndex = cascade.size() - numCardsToInclude + 1; cascadeIndex < cascade
@@ -185,11 +306,20 @@ public class GameState
 		return cascadeData.toString();
 	}
 
+	/**
+	 * Whether there exists a move to undo
+	 * 
+	 * @return Whether there exists a move to undo
+	 */
 	public boolean canUndo()
 	{
 		return !moves.empty();
 	}
 
+	/**
+	 * Checks to determine if the player has won the game (all foundations have
+	 * a king). If so, shows the 'you won' dialog.
+	 */
 	private void checkForWin()
 	{
 		for (int foundationIndex = 0; foundationIndex < 12; foundationIndex++)
@@ -201,16 +331,36 @@ public class GameState
 		activity.showDialog(TripleSolitaireActivity.DIALOG_ID_WINNING);
 	}
 
+	/**
+	 * Gets the foundation card in the given foundation index
+	 * 
+	 * @param foundationIndex
+	 *            Negative One-based index (-1 through -12) of the foundation
+	 * @return the card in the given foundation location
+	 */
 	public String getFoundationCard(final int foundationIndex)
 	{
-		return foundation[foundationIndex];
+		return foundation[-1 * foundationIndex - 1];
 	}
 
+	/**
+	 * Gets the current game's game id
+	 * 
+	 * @return The current game's game id
+	 */
 	public long getGameId()
 	{
 		return gameId;
 	}
 
+	/**
+	 * Parses a given card to return the card number (from ace at 1 to king at
+	 * 13)
+	 * 
+	 * @param card
+	 *            Card to get the number from
+	 * @return The number of the card, ranging from ace at 1 to king at 13
+	 */
 	private int getNumber(final String card)
 	{
 		int firstNumber;
@@ -220,6 +370,13 @@ public class GameState
 		return Integer.parseInt(card.substring(firstNumber));
 	}
 
+	/**
+	 * Parses a given card to return its suit
+	 * 
+	 * @param card
+	 *            Card to get the suit from
+	 * @return The suit of the card
+	 */
 	private String getSuit(final String card)
 	{
 		int firstNumber;
@@ -229,6 +386,13 @@ public class GameState
 		return card.substring(0, firstNumber);
 	}
 
+	/**
+	 * Gets the requested card from the waste
+	 * 
+	 * @param wasteIndex
+	 *            Zero-based index of what waste card to return
+	 * @return The card in the given position in the waste
+	 */
 	public String getWasteCard(final int wasteIndex)
 	{
 		if (wasteIndex < waste.size())
@@ -236,30 +400,55 @@ public class GameState
 		return null;
 	}
 
+	/**
+	 * Whether there are any cards in the stock
+	 * 
+	 * @return Whether there are any cards in the stock
+	 */
 	public boolean isStockEmpty()
 	{
 		return stock.isEmpty();
 	}
 
+	/**
+	 * Whether there are any cards in the waste
+	 * 
+	 * @return Whether there are any cards in the waste
+	 */
 	public boolean isWasteEmpty()
 	{
 		return waste.isEmpty();
 	}
 
+	/**
+	 * Triggers a move, whether player initiated or an auto play move. Moves are
+	 * assumed to be valid. Note that moves should have to and from locations in
+	 * the following format:
+	 * <ul>
+	 * <li>Lanes: One-based index (1 through 13)</li>
+	 * <li>Waste: 0</li>
+	 * <li>Foundation: Negative One-based index (-1 through -12)</li>
+	 * </ul>
+	 * 
+	 * @param move
+	 *            Move to do
+	 */
 	public void move(final Move move)
 	{
 		Log.d(TAG, move.toString());
 		switch (move.getType())
 		{
-			case STOCK:
+			case STOCK: // Clicked the stock
 				if (stock.isEmpty())
 				{
+					// Flip are cards from the waste over into the stock
 					stock.addAll(waste);
 					waste.clear();
 					addMoveToUndo(move);
 				}
 				else
 				{
+					// Move up to 3 cards from the stock to the waste
 					final StringBuffer sb = new StringBuffer();
 					String card = stock.pop();
 					sb.append(card);
@@ -277,14 +466,17 @@ public class GameState
 				activity.updateStockUI();
 				moveCompleted(true);
 				break;
-			case UNDO_STOCK:
+			case UNDO_STOCK: // Undo'ing a stock click
 				if (waste.isEmpty())
 				{
+					// An empty waste means we had an empty stock right before
+					// the stock click, so we move everything back to the waste
 					waste.addAll(stock);
 					stock.clear();
 				}
 				else
 				{
+					// We undo the move of cards from the stock to the waste
 					final Iterator<String> iterator = move.getCascade()
 							.descendingIterator();
 					while (iterator.hasNext())
@@ -296,7 +488,7 @@ public class GameState
 				activity.updateWasteUI();
 				activity.updateStockUI();
 				break;
-			case FLIP:
+			case FLIP: // Flipping over a face down card in a lane
 				final String toFlip = lane[move.getToIndex() - 1].getStack()
 						.pop();
 				lane[move.getToIndex() - 1].getCascade().add(toFlip);
@@ -307,7 +499,7 @@ public class GameState
 					autoplayLaneIndexLocked[laneIndex] = false;
 				autoPlay();
 				break;
-			case UNDO_FLIP:
+			case UNDO_FLIP: // Undo'ing the flip of a face down card in a lane
 				final String flippedCard = lane[move.getToIndex() - 1]
 						.getCascade().removeFirst();
 				lane[move.getToIndex() - 1].getStack().add(flippedCard);
@@ -316,9 +508,9 @@ public class GameState
 				activity.getLane(move.getToIndex() - 1).setStackSize(
 						newStackSize);
 				break;
-			case AUTO_PLAY:
-			case UNDO:
-			case PLAYER_MOVE:
+			case AUTO_PLAY: // Auto play
+			case UNDO: // Undo of a player move or auto play
+			case PLAYER_MOVE: // Player dragged move
 				// Update game state at from location
 				if (move.getFromIndex() < 0)
 					foundation[-1 * move.getFromIndex() - 1] = prevInSuit(move
@@ -351,22 +543,27 @@ public class GameState
 				// Update the to UI
 				if (move.getType() == Move.Type.AUTO_PLAY)
 				{
+					// Animate an auto play and wait for its completion before
+					// doing anything else. We need to keep track of how many
+					// moves are currently being animated so that we don't kick
+					// off multiple auto plays
 					pendingMoves++;
 					activity.animate(move);
 				}
 				else if (move.getType() == Move.Type.UNDO)
 					activity.animate(move);
-				else if (move.getToIndex() < 0)
+				else if (move.getToIndex() < 0) // PLAYER_MOVE
 				{
 					activity.updateFoundationUI(-1 * move.getToIndex() - 1);
 					moveCompleted(true);
 				}
-				else if (move.getToIndex() == 0)
+				else if (move.getToIndex() == 0) // PLAYER_MOVE
 				{
 					activity.updateWasteUI();
 					moveCompleted(true);
 				}
 				else
+				// PLAYER_MOVE, move.getToIndex > 0
 				{
 					if (move.getFromIndex() < 0)
 						autoplayLaneIndexLocked[move.getToIndex() - 1] = true;
@@ -378,6 +575,15 @@ public class GameState
 		}
 	}
 
+	/**
+	 * Signals completion of a move, updating the move count, starting the game
+	 * timer, resetting the auto play lane locks if requested, checking for
+	 * wins, and starting auto play if there are no other pending animations
+	 * (which will eventually call this method).
+	 * 
+	 * @param resetAutoplayLaneIndexLocked
+	 *            Whether to reset the auto play lane locks
+	 */
 	private void moveCompleted(final boolean resetAutoplayLaneIndexLocked)
 	{
 		activity.updateMoveCount(++moveCount);
@@ -391,6 +597,9 @@ public class GameState
 			autoPlay();
 	}
 
+	/**
+	 * Starts a new game, resetting the game state and updating the UI to match
+	 */
 	public void newGame()
 	{
 		final ArrayList<String> fullDeck = new ArrayList<String>();
@@ -435,11 +644,24 @@ public class GameState
 		Log.d(TAG, "Game Started: " + gameId);
 	}
 
+	/**
+	 * Gets the next card (sequentially higher) than the given card
+	 * 
+	 * @param card
+	 *            Card to 'increment'
+	 * @return A card of the same suit and one number higher
+	 */
 	private String nextInSuit(final String card)
 	{
 		return getSuit(card) + (getNumber(card) + 1);
 	}
 
+	/**
+	 * Restores the game state from a Bundle and updates the UI to match
+	 * 
+	 * @param savedInstanceState
+	 *            Bundle to restore from
+	 */
 	public void onRestoreInstanceState(final Bundle savedInstanceState)
 	{
 		// Restore the current game information
@@ -484,6 +706,12 @@ public class GameState
 		}
 	}
 
+	/**
+	 * Saves the current game state to the given Bundle
+	 * 
+	 * @param outState
+	 *            Bundle to save game state to
+	 */
 	public void onSaveInstanceState(final Bundle outState)
 	{
 		outState.putLong("gameId", gameId);
@@ -507,12 +735,24 @@ public class GameState
 		}
 	}
 
+	/**
+	 * Pauses the game, stopping any pending game time increment calls
+	 */
 	public void pauseGame()
 	{
 		gameInProgress = false;
 		timerHandler.removeCallbacks(gameTimerIncrement);
 	}
 
+	/**
+	 * Returns the previous (one number less) card in the same suit as the given
+	 * card
+	 * 
+	 * @param card
+	 *            Card to 'decrement'
+	 * @return A card one number less and in the same suit as the given card, or
+	 *         null if the card was an Ace (number=1)
+	 */
 	private String prevInSuit(final String card)
 	{
 		if (card.endsWith("s1"))
@@ -520,6 +760,10 @@ public class GameState
 		return getSuit(card) + (getNumber(card) - 1);
 	}
 
+	/**
+	 * Resumes the game, starting the game timer increment if there has been at
+	 * least one move
+	 */
 	public void resumeGame()
 	{
 		gameInProgress = moveCount > 0;
@@ -530,6 +774,9 @@ public class GameState
 		}
 	}
 
+	/**
+	 * Undo's the last move
+	 */
 	public void undo()
 	{
 		if (moves.empty())

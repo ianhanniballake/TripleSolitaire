@@ -28,7 +28,7 @@ public class Lane extends RelativeLayout implements OnDragListener
 		{
 			if (event.getAction() != MotionEvent.ACTION_DOWN)
 				return false;
-			final String cascadeData = gameState.buildCascadeString(laneId - 1,
+			final String cascadeData = gameState.buildCascadeString(laneId,
 					cascadeSize - cascadeIndex);
 			final ClipData dragData = ClipData.newPlainText(
 					(cascadeIndex + 1 != cascadeSize ? "MULTI" : "")

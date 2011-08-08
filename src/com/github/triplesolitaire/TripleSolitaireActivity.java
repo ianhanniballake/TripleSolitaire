@@ -70,8 +70,8 @@ public class TripleSolitaireActivity extends Activity
 					.getLocalState();
 			if (event.getAction() == DragEvent.ACTION_DRAG_STARTED)
 			{
-				final String foundationCard = gameState.getFoundationCard(-1
-						* foundationIndex - 1);
+				final String foundationCard = gameState
+						.getFoundationCard(foundationIndex);
 				if (isMyFoundation)
 				{
 					Log.d(TAG, "Drag " + foundationIndex + ": Started of "
@@ -110,8 +110,8 @@ public class TripleSolitaireActivity extends Activity
 		@Override
 		public boolean onTouch(final View v, final MotionEvent event)
 		{
-			final String foundationCard = gameState.getFoundationCard(-1
-					* foundationIndex - 1);
+			final String foundationCard = gameState
+					.getFoundationCard(foundationIndex);
 			if (event.getAction() != MotionEvent.ACTION_DOWN
 					|| foundationCard == null)
 				return false;
@@ -518,8 +518,8 @@ public class TripleSolitaireActivity extends Activity
 
 	public void updateFoundationUI(final int foundationIndex)
 	{
-		final String foundationCard = gameState
-				.getFoundationCard(foundationIndex);
+		final String foundationCard = gameState.getFoundationCard(-1
+				* (foundationIndex + 1));
 		final int foundationViewId = getResources().getIdentifier(
 				"foundation" + (foundationIndex + 1), "id", getPackageName());
 		final ImageView foundationView = (ImageView) findViewById(foundationViewId);
