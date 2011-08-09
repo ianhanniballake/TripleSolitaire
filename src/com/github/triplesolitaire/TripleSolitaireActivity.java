@@ -32,21 +32,56 @@ import android.widget.TextView;
 
 import com.github.triplesolitaire.Move.Type;
 
+/**
+ * Main class which controls the UI of the Triple Solitaire game
+ */
 public class TripleSolitaireActivity extends Activity
 {
+	/**
+	 * Types of Auto play
+	 */
 	public enum AutoPlayPreference {
-		AUTOPLAY_NEVER, AUTOPLAY_WHEN_OBVIOUS, AUTOPLAY_WHEN_WON
+		/**
+		 * Never auto play cards to the foundation
+		 */
+		AUTOPLAY_NEVER, /**
+		 * Auto play whenever there is a valid move of a card
+		 * from the cascade or waste to the foundation
+		 */
+		AUTOPLAY_WHEN_OBVIOUS, /**
+		 * Auto play only when the player has more or
+		 * less won the game - no face down cards, no cards in the stock, and at
+		 * most one card in the waste
+		 */
+		AUTOPLAY_WHEN_WON
 	}
 
+	/**
+	 * Handles Card flip clicks
+	 */
 	private class OnCardFlipListener implements OnClickListener
 	{
+		/**
+		 * One-based index (1 through 13) of the lane clicked
+		 */
 		private final int laneIndex;
 
+		/**
+		 * Creates a new listener for the given lane
+		 * 
+		 * @param laneIndex
+		 *            One-based index (1 through 13) of the lane to be clicked
+		 */
 		public OnCardFlipListener(final int laneIndex)
 		{
 			this.laneIndex = laneIndex;
 		}
 
+		/**
+		 * Triggers flipping over a card in this lane
+		 * 
+		 * @see android.view.View.OnClickListener#onClick(android.view.View)
+		 */
 		@Override
 		public void onClick(final View v)
 		{
@@ -54,15 +89,33 @@ public class TripleSolitaireActivity extends Activity
 		}
 	}
 
+	/**
+	 * Responds to dragging/dropping events on the foundation
+	 */
 	private class OnFoundationDragListener implements OnDragListener
 	{
+		/**
+		 * Negative One-based index (-1 through -12) for the foundation index
+		 */
 		private final int foundationIndex;
 
+		/**
+		 * Creates a new drag listener for the given foundation
+		 * 
+		 * @param foundationIndex
+		 *            Negative One-based index (-1 through -12)
+		 */
 		public OnFoundationDragListener(final int foundationIndex)
 		{
 			this.foundationIndex = foundationIndex;
 		}
 
+		/**
+		 * Responds to drag events on the foundation
+		 * 
+		 * @see android.view.View.OnDragListener#onDrag(android.view.View,
+		 *      android.view.DragEvent)
+		 */
 		@Override
 		public boolean onDrag(final View v, final DragEvent event)
 		{
@@ -98,15 +151,33 @@ public class TripleSolitaireActivity extends Activity
 		}
 	}
 
+	/**
+	 * Touch listener used to start a drag event from a foundation
+	 */
 	private class OnFoundationTouchListener implements OnTouchListener
 	{
+		/**
+		 * Negative One-based index (-1 through -12)
+		 */
 		private final int foundationIndex;
 
+		/**
+		 * Creates a new listener for the given foundation
+		 * 
+		 * @param foundationIndex
+		 *            Negative One-based index (-1 through -12)
+		 */
 		public OnFoundationTouchListener(final int foundationIndex)
 		{
 			this.foundationIndex = foundationIndex;
 		}
 
+		/**
+		 * Responds to ACTION_DOWN events to start drags from the foundation
+		 * 
+		 * @see android.view.View.OnTouchListener#onTouch(android.view.View,
+		 *      android.view.MotionEvent)
+		 */
 		@Override
 		public boolean onTouch(final View v, final MotionEvent event)
 		{
@@ -123,15 +194,35 @@ public class TripleSolitaireActivity extends Activity
 		}
 	}
 
+	/**
+	 * ID for the 'Show Game ID' dialog box
+	 */
 	public static final int DIALOG_ID_SHOW_GAME_ID = 1;
+	/**
+	 * ID for the 'You've Won' dialog box
+	 */
 	public static final int DIALOG_ID_WINNING = 0;
 	/**
 	 * Logging tag
 	 */
 	private static final String TAG = "TripleSolitaireActivity";
+	/**
+	 * Game state which saves and manages the current game
+	 */
 	private final GameState gameState = new GameState(this);
+	/**
+	 * Handler used to post delayed calls
+	 */
 	private final Handler handler = new Handler();
 
+	/**
+	 * Animates the given move by creating a copy of the source view and
+	 * animating it over to the final position before hiding the temporary view
+	 * and showing the final destination
+	 * 
+	 * @param move
+	 *            Move to animate
+	 */
 	public void animate(final Move move)
 	{
 		final Point fromLoc;
@@ -183,6 +274,11 @@ public class TripleSolitaireActivity extends Activity
 				});
 	}
 
+	/**
+	 * Gets the current auto play preference
+	 * 
+	 * @return The current auto play preference
+	 */
 	public AutoPlayPreference getAutoPlayPreference()
 	{
 		final SharedPreferences preferences = PreferenceManager
@@ -191,6 +287,13 @@ public class TripleSolitaireActivity extends Activity
 		return AutoPlayPreference.values()[preference];
 	}
 
+	/**
+	 * Gets the screen location for the top cascade card of the given lane
+	 * 
+	 * @param laneIndex
+	 *            One-based index (1 through 13) for the lane
+	 * @return The exact (x,y) position of the top cascade card in the lane
+	 */
 	private Point getCascadeLoc(final int laneIndex)
 	{
 		final RelativeLayout lane = (RelativeLayout) findViewById(R.id.lane);
@@ -206,6 +309,13 @@ public class TripleSolitaireActivity extends Activity
 		return new Point((int) x, (int) y);
 	}
 
+	/**
+	 * Gets the screen location for the given foundation
+	 * 
+	 * @param foundationIndex
+	 *            Negative One-based index (-1 through -12)
+	 * @return The exact (x,y) position of the foundation
+	 */
 	private Point getFoundationLoc(final int foundationIndex)
 	{
 		final RelativeLayout foundationLayout = (RelativeLayout) findViewById(R.id.foundation);
@@ -219,12 +329,24 @@ public class TripleSolitaireActivity extends Activity
 		return new Point((int) x, (int) y);
 	}
 
+	/**
+	 * Gets the Lane associated with the given index
+	 * 
+	 * @param laneIndex
+	 *            One-based index (1 through 13) for the lane
+	 * @return The Lane for the given index
+	 */
 	public Lane getLane(final int laneIndex)
 	{
 		return (Lane) findViewById(getResources().getIdentifier(
 				"lane" + (laneIndex + 1), "id", getPackageName()));
 	}
 
+	/**
+	 * Gets the screen location for the top card in the waste
+	 * 
+	 * @return The exact (x,y) position of the top card in the waste
+	 */
 	private Point getWasteLoc()
 	{
 		final RelativeLayout waste = (RelativeLayout) findViewById(R.id.waste);
@@ -236,7 +358,12 @@ public class TripleSolitaireActivity extends Activity
 		return new Point((int) x, (int) y);
 	}
 
-	/** Called when the activity is first created. */
+	/**
+	 * Called when the activity is first created. Sets up the appropriate
+	 * listeners and starts a new game
+	 * 
+	 * @see android.app.Activity#onCreate(android.os.Bundle)
+	 */
 	@Override
 	public void onCreate(final Bundle savedInstanceState)
 	{
@@ -335,6 +462,12 @@ public class TripleSolitaireActivity extends Activity
 			gameState.newGame();
 	}
 
+	/**
+	 * One time method to create the 'You've won' and the 'Show Game Id' dialog
+	 * boxes
+	 * 
+	 * @see android.app.Activity#onCreateDialog(int)
+	 */
 	@Override
 	protected Dialog onCreateDialog(final int id)
 	{
@@ -388,6 +521,11 @@ public class TripleSolitaireActivity extends Activity
 		return null;
 	}
 
+	/**
+	 * One time method to inflate the options menu / action bar
+	 * 
+	 * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
+	 */
 	@Override
 	public boolean onCreateOptionsMenu(final Menu menu)
 	{
@@ -395,6 +533,11 @@ public class TripleSolitaireActivity extends Activity
 		return true;
 	}
 
+	/**
+	 * Called to handle when options menu / action bar buttons are tapped
+	 * 
+	 * @see android.app.Activity#onOptionsItemSelected(android.view.MenuItem)
+	 */
 	@Override
 	public boolean onOptionsItemSelected(final MenuItem item)
 	{
@@ -414,6 +557,12 @@ public class TripleSolitaireActivity extends Activity
 		}
 	}
 
+	/**
+	 * Method called every time a dialog is shown. Updates the messages to
+	 * ensure the most up to date information
+	 * 
+	 * @see android.app.Activity#onPrepareDialog(int, android.app.Dialog)
+	 */
 	@Override
 	public void onPrepareDialog(final int id, final Dialog dialog)
 	{
@@ -439,6 +588,12 @@ public class TripleSolitaireActivity extends Activity
 		}
 	}
 
+	/**
+	 * Method called every time the options menu is invalidated/repainted.
+	 * Enables/disables the undo button and updates the Auto play title
+	 * 
+	 * @see android.app.Activity#onPrepareOptionsMenu(android.view.Menu)
+	 */
 	@Override
 	public boolean onPrepareOptionsMenu(final Menu menu)
 	{
@@ -460,6 +615,11 @@ public class TripleSolitaireActivity extends Activity
 		return super.onPrepareOptionsMenu(menu);
 	}
 
+	/**
+	 * Restores the game state
+	 * 
+	 * @see android.app.Activity#onRestoreInstanceState(android.os.Bundle)
+	 */
 	@Override
 	public void onRestoreInstanceState(final Bundle savedInstanceState)
 	{
@@ -467,6 +627,11 @@ public class TripleSolitaireActivity extends Activity
 		gameState.onRestoreInstanceState(savedInstanceState);
 	}
 
+	/**
+	 * Saves the game state
+	 * 
+	 * @see android.app.Activity#onSaveInstanceState(android.os.Bundle)
+	 */
 	@Override
 	public void onSaveInstanceState(final Bundle outState)
 	{
@@ -479,7 +644,7 @@ public class TripleSolitaireActivity extends Activity
 	 * take precedence over the Activity's onOptionsItemSelected method.
 	 * 
 	 * @param item
-	 *            menu item clicked
+	 *            Menu item clicked
 	 */
 	public void onSetAutoPlay(final MenuItem item)
 	{
@@ -507,6 +672,12 @@ public class TripleSolitaireActivity extends Activity
 		invalidateOptionsMenu();
 	}
 
+	/**
+	 * Pauses/resumes the game timer when window focus is lost/gained,
+	 * respectively
+	 * 
+	 * @see android.app.Activity#onWindowFocusChanged(boolean)
+	 */
 	@Override
 	public void onWindowFocusChanged(final boolean hasFocus)
 	{
@@ -516,6 +687,12 @@ public class TripleSolitaireActivity extends Activity
 			gameState.pauseGame();
 	}
 
+	/**
+	 * Updates the given foundation UI
+	 * 
+	 * @param foundationIndex
+	 *            Negative One-based index (-1 through -12) for the foundation
+	 */
 	public void updateFoundationUI(final int foundationIndex)
 	{
 		final String foundationCard = gameState.getFoundationCard(-1
@@ -537,6 +714,12 @@ public class TripleSolitaireActivity extends Activity
 		}
 	}
 
+	/**
+	 * Updates the move count UI
+	 * 
+	 * @param moveCount
+	 *            New move count
+	 */
 	public void updateMoveCount(final int moveCount)
 	{
 		final TextView moveCountView = (TextView) getActionBar()
@@ -544,6 +727,9 @@ public class TripleSolitaireActivity extends Activity
 		moveCountView.setText(Integer.toString(moveCount));
 	}
 
+	/**
+	 * Updates the stock UI
+	 */
 	public void updateStockUI()
 	{
 		final ImageView stockView = (ImageView) findViewById(R.id.stock);
@@ -553,6 +739,12 @@ public class TripleSolitaireActivity extends Activity
 			stockView.setBackgroundResource(R.drawable.back);
 	}
 
+	/**
+	 * Updates the current game time UI
+	 * 
+	 * @param timeInSeconds
+	 *            New time (in seconds)
+	 */
 	public void updateTime(final int timeInSeconds)
 	{
 		final int minutes = timeInSeconds / 60;
@@ -568,12 +760,21 @@ public class TripleSolitaireActivity extends Activity
 		timeView.setText(sb);
 	}
 
+	/**
+	 * Updates the waste UI
+	 */
 	public void updateWasteUI()
 	{
 		for (int wasteIndex = 0; wasteIndex < 3; wasteIndex++)
 			updateWasteUI(wasteIndex);
 	}
 
+	/**
+	 * Updates each card in the waste
+	 * 
+	 * @param wasteIndex
+	 *            Index of the card (0-2)
+	 */
 	private void updateWasteUI(final int wasteIndex)
 	{
 		final String wasteCard = gameState.getWasteCard(wasteIndex);
