@@ -17,6 +17,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.DragEvent;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -24,6 +25,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnDragListener;
 import android.view.View.OnTouchListener;
+import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -194,6 +196,10 @@ public class TripleSolitaireActivity extends Activity
 		}
 	}
 
+	/**
+	 * ID for the 'About' dialog box
+	 */
+	public static final int DIALOG_ID_ABOUT = 2;
 	/**
 	 * ID for the 'Show Game ID' dialog box
 	 */
@@ -506,16 +512,36 @@ public class TripleSolitaireActivity extends Activity
 			case DIALOG_ID_SHOW_GAME_ID:
 				// Message is filled in by onPrepareDialog, which runs every
 				// time the dialog is shown (unlike this, which runs only once)
-				builder.setMessage("").setPositiveButton("OK",
+				builder.setMessage("").setPositiveButton(
+						getText(R.string.close),
 						new DialogInterface.OnClickListener()
 						{
 							@Override
 							public void onClick(final DialogInterface dialog,
 									final int dialogId)
 							{
-								dialog.cancel();
+								dialog.dismiss();
 							}
 						});
+				return builder.create();
+			case DIALOG_ID_ABOUT:
+				final LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+				final View layout = inflater.inflate(R.layout.about_dialog,
+						(ViewGroup) findViewById(R.id.about_dialog_root));
+				builder.setTitle(R.string.app_name)
+						.setIcon(R.drawable.icon)
+						.setView(layout)
+						.setPositiveButton(getText(R.string.close),
+								new DialogInterface.OnClickListener()
+								{
+									@Override
+									public void onClick(
+											final DialogInterface dialog,
+											final int dialogId)
+									{
+										dialog.dismiss();
+									}
+								});
 				return builder.create();
 		}
 		return null;
@@ -551,6 +577,10 @@ public class TripleSolitaireActivity extends Activity
 				return true;
 			case R.id.game_id:
 				showDialog(DIALOG_ID_SHOW_GAME_ID);
+				return true;
+			case android.R.id.home:
+			case R.id.about:
+				showDialog(DIALOG_ID_ABOUT);
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);

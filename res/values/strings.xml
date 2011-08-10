@@ -14,4 +14,16 @@
     <string name="exit">Exit</string>
     <string name="show_game_id">Show Game ID</string>
     <string name="game_id_label">Game Id:</string>
+    <string name="close">Close</string>
+    <string name="about">About</string>
+    <string name="description">Three deck variation of the classic three turn Solitaire, built specifically for tablets.</string>
+    <string name="project">For issues or more information:</string>
+    <string name="project_link">http://dft.ba/-TripleSolitaire</string>
+    <string name="created_by_label">Created by:</string>
+    <string name="creator">Ian Lake</string>
+    <string name="separator">:</string>
+    <string name="creator_link">https://github.com/ianhanniballake</string>
+    <string name="graphics_and_testing_by_label">Graphics and Testing by:</string>
+    <string name="artist_and_tester">Andrea Lake</string>
+    <string name="artist_and_tester_link">http://kamiawolf.deviantart.com</string>
 </resources>
