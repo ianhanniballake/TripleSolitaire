@@ -144,12 +144,9 @@ public class TripleSolitaireActivity extends Activity
 				final int from = (Integer) event.getLocalState();
 				gameState.move(new Move(Type.PLAYER_MOVE, foundationIndex,
 						from, card));
+				return true;
 			}
-			else if (event.getAction() == DragEvent.ACTION_DRAG_ENDED)
-				if (isMyFoundation)
-					Log.d(TAG, "Drag " + foundationIndex + ": Ended with "
-							+ (event.getResult() ? "success" : "failure"));
-			return true;
+			return false;
 		}
 	}
 
@@ -412,34 +409,30 @@ public class TripleSolitaireActivity extends Activity
 		});
 		wasteTopView.setOnDragListener(new OnDragListener()
 		{
-			private String card;
-
 			@Override
 			public boolean onDrag(final View v, final DragEvent event)
 			{
 				final boolean fromMe = (Integer) event.getLocalState() == 0;
-				if (!fromMe)
-					return false;
-				if (event.getAction() == DragEvent.ACTION_DRAG_STARTED)
+				if (event.getAction() == DragEvent.ACTION_DRAG_STARTED
+						&& fromMe)
 				{
-					card = event.getClipDescription().getLabel().toString();
+					final String card = event.getClipDescription().getLabel()
+							.toString();
 					Log.d(TAG, "Drag W: Started of " + card);
+					return true;
 				}
-				else if (event.getAction() == DragEvent.ACTION_DRAG_ENDED)
+				else if (event.getAction() == DragEvent.ACTION_DRAG_ENDED
+						&& !event.getResult() && fromMe)
 				{
-					Log.d(TAG, "Drag W: Ended with "
-							+ (event.getResult() ? "success" : "failure"));
-					if (!event.getResult()
-							&& card.equals(gameState.getWasteCard(0)))
-						handler.postDelayed(new Runnable()
+					handler.post(new Runnable()
+					{
+						@Override
+						public void run()
 						{
-							@Override
-							public void run()
-							{
-								gameState
-										.attemptAutoMoveFromWasteToFoundation();
-							}
-						}, 10);
+							gameState.attemptAutoMoveFromWasteToFoundation();
+						}
+					});
+					return true;
 				}
 				return false;
 			}

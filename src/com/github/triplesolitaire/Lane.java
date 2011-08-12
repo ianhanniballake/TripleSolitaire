@@ -58,8 +58,6 @@ public class Lane extends RelativeLayout implements OnDragListener
 			final ClipData dragData = ClipData.newPlainText(
 					(cascadeIndex + 1 != cascadeSize ? "MULTI" : "")
 							+ cascadeData, cascadeData);
-			currentDragIndex = cascadeIndex;
-			cascadeSizeOnStartDrag = cascadeSize;
 			v.startDrag(dragData, new View.DragShadowBuilder(v), laneId, 0);
 			return true;
 		}
@@ -73,14 +71,6 @@ public class Lane extends RelativeLayout implements OnDragListener
 	 * Current size of the cascade
 	 */
 	private int cascadeSize;
-	/**
-	 * Size of the cascade when a drag event started
-	 */
-	private int cascadeSizeOnStartDrag = 0;
-	/**
-	 * Which card was dragged
-	 */
-	private int currentDragIndex = -1;
 	/**
 	 * Callback to the game state
 	 */
@@ -253,7 +243,7 @@ public class Lane extends RelativeLayout implements OnDragListener
 			if (isMyCascade)
 			{
 				Log.d(TAG, "Drag " + laneId + ": Started of " + card);
-				return false;
+				return true;
 			}
 			// Take off MULTI prefix - we accept all cascades based on the
 			// bottom card alone
@@ -262,31 +252,27 @@ public class Lane extends RelativeLayout implements OnDragListener
 			return cascadeSize == 0 ? gameState.acceptLaneDrop(laneId, card)
 					: gameState.acceptCascadeDrop(laneId, card);
 		}
-		else if (event.getAction() == DragEvent.ACTION_DROP)
+		else if (event.getAction() == DragEvent.ACTION_DROP && !isMyCascade)
 		{
 			final String card = event.getClipData().getItemAt(0).getText()
 					.toString();
 			final int from = (Integer) event.getLocalState();
 			gameState.move(new Move(Move.Type.PLAYER_MOVE, laneId, from, card));
+			return true;
 		}
-		else if (event.getAction() == DragEvent.ACTION_DRAG_ENDED
-				&& isMyCascade)
+		else if (event.getAction() == DragEvent.ACTION_DROP && isMyCascade)
 		{
-			Log.d(TAG, "Drag " + laneId + ": Ended with "
-					+ (event.getResult() ? "success" : "failure"));
-			if (!event.getResult() && cascadeSizeOnStartDrag == cascadeSize
-					&& currentDragIndex + 1 == cascadeSize)
-				postDelayed(new Runnable()
+			post(new Runnable()
+			{
+				@Override
+				public void run()
 				{
-					@Override
-					public void run()
-					{
-						gameState.attemptAutoMoveFromCascadeToFoundation(laneId);
-					}
-				}, 10);
-			currentDragIndex = -1;
+					gameState.attemptAutoMoveFromCascadeToFoundation(laneId);
+				}
+			});
+			return true;
 		}
-		return true;
+		return false;
 	}
 
 	/**
