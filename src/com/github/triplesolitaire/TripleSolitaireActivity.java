@@ -146,7 +146,7 @@ public class TripleSolitaireActivity extends Activity
 						from, card));
 				return true;
 			}
-			return false;
+			return true;
 		}
 	}
 

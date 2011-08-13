@@ -272,7 +272,7 @@ public class Lane extends RelativeLayout implements OnDragListener
 			});
 			return true;
 		}
-		return false;
+		return true;
 	}
 
 	/**
