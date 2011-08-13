@@ -187,9 +187,8 @@ public class TripleSolitaireActivity extends Activity
 				return false;
 			final ClipData dragData = ClipData.newPlainText(foundationCard,
 					foundationCard);
-			v.startDrag(dragData, new View.DragShadowBuilder(v),
+			return v.startDrag(dragData, new View.DragShadowBuilder(v),
 					foundationIndex, 0);
-			return true;
 		}
 	}
 
@@ -403,8 +402,8 @@ public class TripleSolitaireActivity extends Activity
 					return false;
 				final ClipData dragData = ClipData.newPlainText(
 						gameState.getWasteCard(0), gameState.getWasteCard(0));
-				v.startDrag(dragData, new View.DragShadowBuilder(v), 0, 0);
-				return true;
+				return v.startDrag(dragData, new View.DragShadowBuilder(v), 0,
+						0);
 			}
 		});
 		wasteTopView.setOnDragListener(new OnDragListener()

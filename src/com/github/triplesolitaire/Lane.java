@@ -58,8 +58,8 @@ public class Lane extends RelativeLayout implements OnDragListener
 			final ClipData dragData = ClipData.newPlainText(
 					(cascadeIndex + 1 != cascadeSize ? "MULTI" : "")
 							+ cascadeData, cascadeData);
-			v.startDrag(dragData, new View.DragShadowBuilder(v), laneId, 0);
-			return true;
+			return v.startDrag(dragData, new View.DragShadowBuilder(v), laneId,
+					0);
 		}
 	}
 

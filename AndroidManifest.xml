@@ -6,7 +6,7 @@
     <uses-sdk android:minSdkVersion="12" />
     <supports-screens android:smallScreens="false" android:normalScreens="false" android:largeScreens="false" android:xlargeScreens="true"></supports-screens>
 
-    <application android:icon="@drawable/icon" android:label="@string/app_name" android:debuggable="true" android:hardwareAccelerated="true">
+    <application android:icon="@drawable/icon" android:label="@string/app_name" android:debuggable="true" android:hardwareAccelerated="true" android:name="TripleSolitaireApplication">
         <activity android:name=".TripleSolitaireActivity"
                   android:label="@string/app_name">
             <intent-filter>
