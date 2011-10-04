@@ -254,6 +254,7 @@ public class Lane extends RelativeLayout implements OnDragListener
 		}
 		else if (event.getAction() == DragEvent.ACTION_DROP && !isMyCascade)
 		{
+			System.gc();
 			final String card = event.getClipData().getItemAt(0).getText()
 					.toString();
 			final int from = (Integer) event.getLocalState();
@@ -262,6 +263,7 @@ public class Lane extends RelativeLayout implements OnDragListener
 		}
 		else if (event.getAction() == DragEvent.ACTION_DROP && isMyCascade)
 		{
+			System.gc();
 			post(new Runnable()
 			{
 				@Override

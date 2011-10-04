@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.util.Log;
 
 import com.github.triplesolitaire.Move.Type;
+import com.github.triplesolitaire.TripleSolitaireActivity.AutoPlayPreference;
 
 /**
  * Class to manage the game state associated with a Triple Solitaire game
@@ -261,6 +262,18 @@ public class GameState
 	 */
 	private void autoPlay()
 	{
+		final AutoPlayPreference autoPlayPreference = activity
+				.getAutoPlayPreference();
+		if (autoPlayPreference == AutoPlayPreference.AUTOPLAY_NEVER)
+			return;
+		else if (autoPlayPreference == AutoPlayPreference.AUTOPLAY_WHEN_WON)
+		{
+			int totalStackSize = 0;
+			for (int laneIndex = 0; laneIndex < 13; laneIndex++)
+				totalStackSize += lane[laneIndex].getStack().size();
+			if (totalStackSize > 0 || !stock.isEmpty() || waste.size() > 1)
+				return;
+		}
 		for (int laneIndex = 0; laneIndex < 13; laneIndex++)
 			if (!autoplayLaneIndexLocked[laneIndex]
 					&& attemptAutoMoveFromCascadeToFoundation(laneIndex + 1))

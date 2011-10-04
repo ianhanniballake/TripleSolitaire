@@ -4,6 +4,9 @@
     <string name="time">Time:</string>
     <string name="move_count">Moves:</string>
     <string name="undo">Undo</string>
+    <string name="autoplay_when_obvious">Autoplay When Obvious</string>
+    <string name="autoplay_when_won">Autoplay When Won</string>
+    <string name="autoplay_never">Never Auto Play</string>
     <string name="new_game">New Game</string>
     <string name="win_dialog_1">You won in</string>
     <string name="win_dialog_2">and</string>

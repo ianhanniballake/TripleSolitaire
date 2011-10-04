@@ -8,9 +8,12 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ClipData;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.DragEvent;
 import android.view.Gravity;
@@ -36,6 +39,25 @@ import com.github.triplesolitaire.Move.Type;
  */
 public class TripleSolitaireActivity extends Activity
 {
+	/**
+	 * Types of Auto play
+	 */
+	public enum AutoPlayPreference {
+		/**
+		 * Never auto play cards to the foundation
+		 */
+		AUTOPLAY_NEVER, /**
+		 * Auto play whenever there is a valid move of a card
+		 * from the cascade or waste to the foundation
+		 */
+		AUTOPLAY_WHEN_OBVIOUS, /**
+		 * Auto play only when the player has more or
+		 * less won the game - no face down cards, no cards in the stock, and at
+		 * most one card in the waste
+		 */
+		AUTOPLAY_WHEN_WON
+	}
+
 	/**
 	 * Handles Card flip clicks
 	 */
@@ -117,6 +139,7 @@ public class TripleSolitaireActivity extends Activity
 			}
 			else if (event.getAction() == DragEvent.ACTION_DROP)
 			{
+				System.gc();
 				final String card = event.getClipData().getItemAt(0).getText()
 						.toString();
 				final int from = (Integer) event.getLocalState();
@@ -255,6 +278,19 @@ public class TripleSolitaireActivity extends Activity
 	}
 
 	/**
+	 * Gets the current auto play preference
+	 * 
+	 * @return The current auto play preference
+	 */
+	public AutoPlayPreference getAutoPlayPreference()
+	{
+		final SharedPreferences preferences = PreferenceManager
+				.getDefaultSharedPreferences(this);
+		final int preference = preferences.getInt("auto_play", 0);
+		return AutoPlayPreference.values()[preference];
+	}
+
+	/**
 	 * Gets the screen location for the top cascade card of the given lane
 	 * 
 	 * @param laneIndex
@@ -388,6 +424,7 @@ public class TripleSolitaireActivity extends Activity
 				else if (event.getAction() == DragEvent.ACTION_DRAG_ENDED
 						&& !event.getResult() && fromMe)
 				{
+					System.gc();
 					handler.post(new Runnable()
 					{
 						@Override
@@ -585,6 +622,20 @@ public class TripleSolitaireActivity extends Activity
 	public boolean onPrepareOptionsMenu(final Menu menu)
 	{
 		menu.findItem(R.id.undo).setEnabled(gameState.canUndo());
+		switch (getAutoPlayPreference())
+		{
+			case AUTOPLAY_WHEN_OBVIOUS:
+				menu.findItem(R.id.autoplay).setTitle(
+						R.string.autoplay_when_obvious);
+				break;
+			case AUTOPLAY_WHEN_WON:
+				menu.findItem(R.id.autoplay).setTitle(
+						R.string.autoplay_when_won);
+				break;
+			case AUTOPLAY_NEVER:
+				menu.findItem(R.id.autoplay).setTitle(R.string.autoplay_never);
+				break;
+		}
 		return super.onPrepareOptionsMenu(menu);
 	}
 
@@ -610,6 +661,39 @@ public class TripleSolitaireActivity extends Activity
 	{
 		super.onSaveInstanceState(outState);
 		gameState.onSaveInstanceState(outState);
+	}
+
+	/**
+	 * This method is specified as an onClick handler in the menu xml and will
+	 * take precedence over the Activity's onOptionsItemSelected method.
+	 * 
+	 * @param item
+	 *            Menu item clicked
+	 */
+	public void onSetAutoPlay(final MenuItem item)
+	{
+		final SharedPreferences preferences = PreferenceManager
+				.getDefaultSharedPreferences(this);
+		final Editor editor = preferences.edit();
+		switch (item.getItemId())
+		{
+			case R.id.autoplay_when_obvious:
+				editor.putInt("auto_play",
+						AutoPlayPreference.AUTOPLAY_WHEN_OBVIOUS.ordinal());
+				break;
+			case R.id.autoplay_when_won:
+				editor.putInt("auto_play",
+						AutoPlayPreference.AUTOPLAY_WHEN_WON.ordinal());
+				break;
+			case R.id.autoplay_never:
+				editor.putInt("auto_play",
+						AutoPlayPreference.AUTOPLAY_NEVER.ordinal());
+				break;
+		}
+		editor.apply();
+		// Request a call to onPrepareOptionsMenu so we can change the auto play
+		// title
+		invalidateOptionsMenu();
 	}
 
 	/**
