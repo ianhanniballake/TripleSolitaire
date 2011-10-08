@@ -4,9 +4,6 @@
     <string name="time">Time:</string>
     <string name="move_count">Moves:</string>
     <string name="undo">Undo</string>
-    <string name="autoplay_when_obvious">Autoplay When Obvious</string>
-    <string name="autoplay_when_won">Autoplay When Won</string>
-    <string name="autoplay_never">Never Auto Play</string>
     <string name="new_game">New Game</string>
     <string name="win_dialog_1">You won in</string>
     <string name="win_dialog_2">and</string>
@@ -15,6 +12,7 @@
     <string name="show_game_id">Show Game ID</string>
     <string name="game_id_label">Game Id:</string>
     <string name="close">Close</string>
+    <string name="settings">Settings</string>
     <string name="about">About</string>
     <string name="description">Three deck variation of the classic three turn Solitaire, built specifically for tablets.</string>
     <string name="project">For issues or more information:</string>
@@ -26,4 +24,8 @@
     <string name="graphics_and_testing_by_label">Graphics and Testing by:</string>
     <string name="artist_and_tester">Andrea Lake</string>
     <string name="artist_and_tester_link">http://kamiawolf.deviantart.com</string>
+    <string name="pref_auto_play_category">Auto Play Preferences</string>
+    <string name="pref_auto_play_default">never</string>
+    <string name="pref_auto_play_title">Auto Play Mode</string>
+    <string name="pref_auto_play_dialog_title">Choose Auto Play Mode</string>
 </resources>

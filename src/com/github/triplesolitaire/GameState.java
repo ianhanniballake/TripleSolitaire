@@ -7,12 +7,13 @@ import java.util.LinkedList;
 import java.util.Random;
 import java.util.Stack;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.github.triplesolitaire.Move.Type;
-import com.github.triplesolitaire.TripleSolitaireActivity.AutoPlayPreference;
 
 /**
  * Class to manage the game state associated with a Triple Solitaire game
@@ -262,18 +263,24 @@ public class GameState
 	 */
 	private void autoPlay()
 	{
-		final AutoPlayPreference autoPlayPreference = activity
-				.getAutoPlayPreference();
-		if (autoPlayPreference == AutoPlayPreference.AUTOPLAY_NEVER)
+		final SharedPreferences preferences = PreferenceManager
+				.getDefaultSharedPreferences(activity);
+		final String preference = preferences.getString(
+				Preferences.AUTO_PLAY_PREFERENCE_KEY,
+				activity.getString(R.string.pref_auto_play_default));
+		// If preference is never we have nothing to do
+		if (preference.equals("never"))
 			return;
-		else if (autoPlayPreference == AutoPlayPreference.AUTOPLAY_WHEN_WON)
+		else if (preference.equals("won"))
 		{
+			// Check to make sure the user has 'won'
 			int totalStackSize = 0;
 			for (int laneIndex = 0; laneIndex < 13; laneIndex++)
 				totalStackSize += lane[laneIndex].getStack().size();
 			if (totalStackSize > 0 || !stock.isEmpty() || waste.size() > 1)
 				return;
 		}
+		// Auto play
 		for (int laneIndex = 0; laneIndex < 13; laneIndex++)
 			if (!autoplayLaneIndexLocked[laneIndex]
 					&& attemptAutoMoveFromCascadeToFoundation(laneIndex + 1))

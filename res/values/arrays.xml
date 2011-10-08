@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string-array
+		name="pref_auto_play_entries">
+		<item>Auto Play When Obvious</item>
+		<item>Auto Play When Won</item>
+		<item>Never Auto Play</item>
+	</string-array>
+	<string-array
+		name="pref_auto_play_entryvalues">
+		<item>obvious</item>
+		<item>won</item>
+		<item>never</item>
+	</string-array>
+</resources>

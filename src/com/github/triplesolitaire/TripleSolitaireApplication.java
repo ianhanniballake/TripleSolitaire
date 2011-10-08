@@ -3,6 +3,7 @@ package com.github.triplesolitaire;
 import android.app.Application;
 import android.content.pm.ApplicationInfo;
 import android.os.StrictMode;
+import android.preference.PreferenceManager;
 
 /**
  * Creates the Triple Solitaire application, setting strict mode in debug mode
@@ -23,5 +24,7 @@ public class TripleSolitaireApplication extends Application
 			StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
 					.detectDiskReads().detectDiskWrites().detectNetwork()
 					.penaltyLog().penaltyFlashScreen().build());
+		PreferenceManager.setDefaultValues(this, R.xml.preferences_default,
+				false);
 	}
 }

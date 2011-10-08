@@ -3,8 +3,8 @@
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	package="com.github.triplesolitaire"
 	android:installLocation="auto"
-	android:versionName="1.0.2"
-	android:versionCode="1244102">
+	android:versionName="1.1"
+	android:versionCode="1244110">
 	<uses-sdk
 		android:minSdkVersion="12" />
 	<supports-screens
@@ -28,5 +28,8 @@
 					android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
+		<activity
+			android:name=".Preferences"
+			android:label="@string/settings" />
 	</application>
 </manifest>
