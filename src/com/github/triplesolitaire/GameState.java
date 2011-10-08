@@ -38,10 +38,6 @@ public class GameState
 	 */
 	private String[] foundation;
 	/**
-	 * Current Game ID, used for debugging a specific game
-	 */
-	private long gameId = 0;
-	/**
 	 * Whether a game is in progress
 	 */
 	private boolean gameInProgress = false;
@@ -351,16 +347,6 @@ public class GameState
 	}
 
 	/**
-	 * Gets the current game's game id
-	 * 
-	 * @return The current game's game id
-	 */
-	public long getGameId()
-	{
-		return gameId;
-	}
-
-	/**
 	 * Parses a given card to return the card number (from ace at 1 to king at
 	 * 13)
 	 * 
@@ -616,8 +602,7 @@ public class GameState
 				for (int cardNum = 1; cardNum <= 13; cardNum++)
 					fullDeck.add(suit + cardNum);
 		final Random random = new Random();
-		gameId = random.nextLong();
-		random.setSeed(gameId);
+		random.setSeed(random.nextLong());
 		timeInSeconds = 0;
 		activity.updateTime(timeInSeconds);
 		moveCount = 0;
@@ -648,7 +633,6 @@ public class GameState
 			laneLayout.setStackSize(lane[laneIndex].getStack().size());
 			laneLayout.addCascade(lane[laneIndex].getCascade());
 		}
-		Log.d(TAG, "Game Started: " + gameId);
 	}
 
 	/**
@@ -672,7 +656,6 @@ public class GameState
 	public void onRestoreInstanceState(final Bundle savedInstanceState)
 	{
 		// Restore the current game information
-		gameId = savedInstanceState.getLong("gameId");
 		timeInSeconds = savedInstanceState.getInt("timeInSeconds");
 		activity.updateTime(timeInSeconds);
 		moveCount = savedInstanceState.getInt("moveCount");
@@ -721,7 +704,6 @@ public class GameState
 	 */
 	public void onSaveInstanceState(final Bundle outState)
 	{
-		outState.putLong("gameId", gameId);
 		outState.putInt("timeInSeconds", timeInSeconds);
 		outState.putInt("moveCount", moveCount);
 		outState.putBooleanArray("autoplayLaneIndexLocked",

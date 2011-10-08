@@ -177,10 +177,6 @@ public class TripleSolitaireActivity extends Activity
 	 */
 	public static final int DIALOG_ID_ABOUT = 2;
 	/**
-	 * ID for the 'Show Game ID' dialog box
-	 */
-	public static final int DIALOG_ID_SHOW_GAME_ID = 1;
-	/**
 	 * ID for the 'You've Won' dialog box
 	 */
 	public static final int DIALOG_ID_WINNING = 0;
@@ -469,21 +465,6 @@ public class TripleSolitaireActivity extends Activity
 									}
 								});
 				return builder.create();
-			case DIALOG_ID_SHOW_GAME_ID:
-				// Message is filled in by onPrepareDialog, which runs every
-				// time the dialog is shown (unlike this, which runs only once)
-				builder.setMessage("").setPositiveButton(
-						getText(R.string.close),
-						new DialogInterface.OnClickListener()
-						{
-							@Override
-							public void onClick(final DialogInterface dialog,
-									final int dialogId)
-							{
-								dialog.dismiss();
-							}
-						});
-				return builder.create();
 			case DIALOG_ID_ABOUT:
 				final LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
 				final View layout = inflater.inflate(R.layout.about_dialog,
@@ -535,9 +516,6 @@ public class TripleSolitaireActivity extends Activity
 			case R.id.new_game:
 				gameState.newGame();
 				return true;
-			case R.id.game_id:
-				showDialog(DIALOG_ID_SHOW_GAME_ID);
-				return true;
 			case R.id.settings:
 				startActivity(new Intent(this, Preferences.class));
 				return true;
@@ -572,11 +550,6 @@ public class TripleSolitaireActivity extends Activity
 						+ time + " " + getString(R.string.win_dialog_2) + " "
 						+ moveCount + " " + getString(R.string.win_dialog_3);
 				((AlertDialog) dialog).setMessage(message);
-				break;
-			case DIALOG_ID_SHOW_GAME_ID:
-				((AlertDialog) dialog)
-						.setMessage(getString(R.string.game_id_label) + " "
-								+ gameState.getGameId());
 				break;
 		}
 	}
