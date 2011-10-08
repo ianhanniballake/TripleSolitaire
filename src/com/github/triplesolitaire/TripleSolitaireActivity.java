@@ -4,10 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.ClipData;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Point;
 import android.os.Bundle;
@@ -15,7 +12,6 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.DragEvent;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -23,7 +19,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnDragListener;
 import android.view.View.OnTouchListener;
-import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -172,14 +167,6 @@ public class TripleSolitaireActivity extends Activity
 		}
 	}
 
-	/**
-	 * ID for the 'About' dialog box
-	 */
-	public static final int DIALOG_ID_ABOUT = 2;
-	/**
-	 * ID for the 'You've Won' dialog box
-	 */
-	public static final int DIALOG_ID_WINNING = 0;
 	/**
 	 * Logging tag
 	 */
@@ -425,70 +412,6 @@ public class TripleSolitaireActivity extends Activity
 	}
 
 	/**
-	 * One time method to create the 'You've won' and the 'Show Game Id' dialog
-	 * boxes
-	 * 
-	 * @see android.app.Activity#onCreateDialog(int)
-	 */
-	@Override
-	protected Dialog onCreateDialog(final int id)
-	{
-		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		switch (id)
-		{
-			case DIALOG_ID_WINNING:
-				// Message is filled in by onPrepareDialog, which runs every
-				// time the dialog is shown (unlike this, which runs only once)
-				builder.setMessage("")
-						.setCancelable(false)
-						.setPositiveButton(getString(R.string.new_game),
-								new DialogInterface.OnClickListener()
-								{
-									@Override
-									public void onClick(
-											final DialogInterface dialog,
-											final int dialogId)
-									{
-										dialog.cancel();
-										gameState.newGame();
-									}
-								})
-						.setNegativeButton(getString(R.string.exit),
-								new DialogInterface.OnClickListener()
-								{
-									@Override
-									public void onClick(
-											final DialogInterface dialog,
-											final int dialogId)
-									{
-										TripleSolitaireActivity.this.finish();
-									}
-								});
-				return builder.create();
-			case DIALOG_ID_ABOUT:
-				final LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
-				final View layout = inflater.inflate(R.layout.about_dialog,
-						(ViewGroup) findViewById(R.id.about_dialog_root));
-				builder.setTitle(R.string.app_name)
-						.setIcon(R.drawable.icon)
-						.setView(layout)
-						.setPositiveButton(getText(R.string.close),
-								new DialogInterface.OnClickListener()
-								{
-									@Override
-									public void onClick(
-											final DialogInterface dialog,
-											final int dialogId)
-									{
-										dialog.dismiss();
-									}
-								});
-				return builder.create();
-		}
-		return null;
-	}
-
-	/**
 	 * One time method to inflate the options menu / action bar
 	 * 
 	 * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
@@ -521,36 +444,11 @@ public class TripleSolitaireActivity extends Activity
 				return true;
 			case android.R.id.home:
 			case R.id.about:
-				showDialog(DIALOG_ID_ABOUT);
+				final AboutDialogFragment aboutDialogFragment = new AboutDialogFragment();
+				aboutDialogFragment.show(getFragmentManager(), "about");
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
-		}
-	}
-
-	/**
-	 * Method called every time a dialog is shown. Updates the messages to
-	 * ensure the most up to date information
-	 * 
-	 * @see android.app.Activity#onPrepareDialog(int, android.app.Dialog)
-	 */
-	@Override
-	public void onPrepareDialog(final int id, final Dialog dialog)
-	{
-		switch (id)
-		{
-			case DIALOG_ID_WINNING:
-				final TextView timeView = (TextView) getActionBar()
-						.getCustomView().findViewById(R.id.time);
-				final CharSequence time = timeView.getText();
-				final TextView moveCountView = (TextView) getActionBar()
-						.getCustomView().findViewById(R.id.move_count);
-				final CharSequence moveCount = moveCountView.getText();
-				final String message = getString(R.string.win_dialog_1) + " "
-						+ time + " " + getString(R.string.win_dialog_2) + " "
-						+ moveCount + " " + getString(R.string.win_dialog_3);
-				((AlertDialog) dialog).setMessage(message);
-				break;
 		}
 	}
 

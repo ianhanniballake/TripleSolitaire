@@ -331,7 +331,8 @@ public class GameState
 				return;
 		Log.d(TAG, "Game win detected");
 		pauseGame();
-		activity.showDialog(TripleSolitaireActivity.DIALOG_ID_WINNING);
+		final WinDialogFragment winDialogFragment = new WinDialogFragment(this);
+		winDialogFragment.show(activity.getFragmentManager(), "win");
 	}
 
 	/**
