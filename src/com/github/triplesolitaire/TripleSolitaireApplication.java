@@ -24,7 +24,6 @@ public class TripleSolitaireApplication extends Application
 			StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
 					.detectDiskReads().detectDiskWrites().detectNetwork()
 					.penaltyLog().penaltyFlashScreen().build());
-		PreferenceManager.setDefaultValues(this, R.xml.preferences_default,
-				false);
+		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 	}
 }
