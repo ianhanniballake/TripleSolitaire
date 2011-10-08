@@ -13,6 +13,10 @@ public class Preferences extends PreferenceActivity implements
 		OnSharedPreferenceChangeListener
 {
 	/**
+	 * Auto Flip preference name
+	 */
+	public static final String AUTO_FLIP_PREFERENCE_KEY = "auto_flip";
+	/**
 	 * Auto Play preference name
 	 */
 	public static final String AUTO_PLAY_PREFERENCE_KEY = "auto_play";

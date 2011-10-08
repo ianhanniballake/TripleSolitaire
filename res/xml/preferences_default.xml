@@ -10,5 +10,10 @@
 			android:entries="@array/pref_auto_play_entries"
 			android:entryValues="@array/pref_auto_play_entryvalues"
 			android:dialogTitle="@string/pref_auto_play_dialog_title" />
+        <CheckBoxPreference
+            android:key="auto_flip"
+            android:defaultValue="@bool/pref_auto_flip_default"
+            android:title="@string/pref_auto_flip_title"
+            android:summary="@string/pref_auto_flip_summary" />
 	</PreferenceCategory>
 </PreferenceScreen>

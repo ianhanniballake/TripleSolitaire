@@ -26,4 +26,6 @@
     <string name="pref_auto_play_default">never</string>
     <string name="pref_auto_play_title">Auto Play Mode</string>
     <string name="pref_auto_play_dialog_title">Choose Auto Play Mode</string>
+    <string name="pref_auto_flip_title">Auto Flip</string>
+    <string name="pref_auto_flip_summary">Whether face down cards should automatically flip over when uncovered</string>
 </resources>

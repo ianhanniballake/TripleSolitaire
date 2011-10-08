@@ -211,6 +211,24 @@ public class GameState
 	}
 
 	/**
+	 * Attempts to auto flip the top stack card in the given lane
+	 * 
+	 * @param laneIndex
+	 *            One-based index (1 through 13)
+	 * @return Whether an auto flip was found
+	 */
+	private boolean attemptAutoFlip(final int laneIndex)
+	{
+		if (lane[laneIndex - 1].getCascade().isEmpty()
+				&& !lane[laneIndex - 1].getStack().isEmpty())
+		{
+			move(new Move(Move.Type.FLIP, laneIndex));
+			return true;
+		}
+		return false;
+	}
+
+	/**
 	 * Attempts to auto play the first card in the given cascade to the
 	 * foundation (moving from -1 to -12 i.e., left to right)
 	 * 
@@ -261,13 +279,21 @@ public class GameState
 	{
 		final SharedPreferences preferences = PreferenceManager
 				.getDefaultSharedPreferences(activity);
-		final String preference = preferences.getString(
+		final boolean autoFlip = preferences.getBoolean(
+				Preferences.AUTO_FLIP_PREFERENCE_KEY, activity.getResources()
+						.getBoolean(R.bool.pref_auto_flip_default));
+		if (autoFlip)
+			for (int laneIndex = 0; laneIndex < 13; laneIndex++)
+				if (!autoplayLaneIndexLocked[laneIndex]
+						&& attemptAutoFlip(laneIndex + 1))
+					return;
+		final String autoPlayMode = preferences.getString(
 				Preferences.AUTO_PLAY_PREFERENCE_KEY,
 				activity.getString(R.string.pref_auto_play_default));
 		// If preference is never we have nothing to do
-		if (preference.equals("never"))
+		if (autoPlayMode.equals("never"))
 			return;
-		else if (preference.equals("won"))
+		else if (autoPlayMode.equals("won"))
 		{
 			// Check to make sure the user has 'won'
 			int totalStackSize = 0;
