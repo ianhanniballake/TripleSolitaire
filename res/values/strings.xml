@@ -42,4 +42,11 @@
     <string name="pref_auto_play_dialog_title">Choose Auto Play Mode</string>
     <string name="pref_auto_flip_title">Auto Flip</string>
     <string name="pref_auto_flip_summary">Whether face down cards should automatically flip over when uncovered</string>
+    <string name="pref_animation_title">Animation</string>
+    <string name="pref_animation_summary">Control animations</string>
+    <string name="pref_animation_category">Animation</string>
+    <string name="pref_animate_auto_play_title">Animate Auto Play</string>
+    <string name="pref_animate_auto_play_summary">Whether auto play moves should be animated</string>
+    <string name="pref_animate_undo_title">Animate Undo</string>
+    <string name="pref_animate_undo_summary">Whether undo moves should be animated</string>
 </resources>

@@ -5,4 +5,8 @@
 		android:fragment="com.github.triplesolitaire.Preferences$GameplayPreferenceFragment"
 		android:title="@string/pref_game_play_title"
 		android:summary="@string/pref_game_play_summary" />
+    <header
+        android:fragment="com.github.triplesolitaire.Preferences$AnimationPreferenceFragment"
+        android:title="@string/pref_animation_title"
+        android:summary="@string/pref_animation_summary" />
 </preference-headers>

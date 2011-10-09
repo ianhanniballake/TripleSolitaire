@@ -494,6 +494,8 @@ public class GameState
 	public void move(final Move move)
 	{
 		Log.d(TAG, move.toString());
+		final SharedPreferences preferences = PreferenceManager
+				.getDefaultSharedPreferences(activity);
 		switch (move.getType())
 		{
 			case STOCK: // Clicked the stock
@@ -601,15 +603,51 @@ public class GameState
 				// Update the to UI
 				if (move.getType() == Move.Type.AUTO_PLAY)
 				{
-					// Animate an auto play and wait for its completion before
-					// doing anything else. We need to keep track of how many
-					// moves are currently being animated so that we don't kick
-					// off multiple auto plays
-					pendingMoves++;
-					activity.animate(move);
+					final boolean animateAutoplay = preferences.getBoolean(
+							Preferences.ANIMATE_AUTO_PLAY_PREFERENCE_KEY,
+							activity.getResources().getBoolean(
+									R.bool.pref_animate_auto_play_default));
+					if (animateAutoplay)
+					{
+						// Animate an auto play and wait for its completion
+						// before
+						// doing anything else. We need to keep track of how
+						// many
+						// moves are currently being animated so that we don't
+						// kick
+						// off multiple auto plays
+						pendingMoves++;
+						activity.animate(move);
+					}
+					else
+					{
+						if (move.getToIndex() < 0)
+							activity.updateFoundationUI(-1 * move.getToIndex()
+									- 1);
+						else if (move.getToIndex() == 0)
+							activity.updateWasteUI();
+						else
+							activity.getLane(move.getToIndex() - 1).addCascade(
+									move.getCascade());
+						moveCompleted(true);
+					}
 				}
 				else if (move.getType() == Move.Type.UNDO)
-					activity.animate(move);
+				{
+					final boolean animateUndo = preferences.getBoolean(
+							Preferences.ANIMATE_UNDO_PREFERENCE_KEY,
+							activity.getResources().getBoolean(
+									R.bool.pref_animate_undo_default));
+					if (animateUndo)
+						activity.animate(move);
+					else if (move.getToIndex() < 0)
+						activity.updateFoundationUI(-1 * move.getToIndex() - 1);
+					else if (move.getToIndex() == 0)
+						activity.updateWasteUI();
+					else
+						activity.getLane(move.getToIndex() - 1).addCascade(
+								move.getCascade());
+				}
 				else if (move.getToIndex() < 0) // PLAYER_MOVE
 				{
 					activity.updateFoundationUI(-1 * move.getToIndex() - 1);

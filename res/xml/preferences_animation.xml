@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="@string/pref_animation_category">
+        <CheckBoxPreference
+            android:key="animate_auto_play"
+            android:defaultValue="@bool/pref_animate_auto_play_default"
+            android:title="@string/pref_animate_auto_play_title"
+            android:summary="@string/pref_animate_auto_play_summary" />
+        <CheckBoxPreference
+            android:key="animate_undo"
+            android:defaultValue="@bool/pref_animate_undo_default"
+            android:title="@string/pref_animate_undo_title"
+            android:summary="@string/pref_animate_undo_summary" />
+    </PreferenceCategory>
+</PreferenceScreen>

@@ -20,6 +20,19 @@ public class Preferences extends PreferenceActivity
 	/**
 	 * Preference Fragment showing preferences relating to game play
 	 */
+	public static class AnimationPreferenceFragment extends PreferenceFragment
+	{
+		@Override
+		public void onCreate(final Bundle savedInstanceState)
+		{
+			super.onCreate(savedInstanceState);
+			addPreferencesFromResource(R.xml.preferences_animation);
+		}
+	}
+
+	/**
+	 * Preference Fragment showing preferences relating to game play
+	 */
 	public static class GameplayPreferenceFragment extends PreferenceFragment
 			implements OnSharedPreferenceChangeListener
 	{
@@ -32,7 +45,7 @@ public class Preferences extends PreferenceActivity
 		public void onCreate(final Bundle savedInstanceState)
 		{
 			super.onCreate(savedInstanceState);
-			addPreferencesFromResource(R.xml.preferences);
+			addPreferencesFromResource(R.xml.preferences_gameplay);
 			autoplayListPreference = (ListPreference) getPreferenceScreen()
 					.findPreference(AUTO_PLAY_PREFERENCE_KEY);
 			autoplayListPreference
@@ -65,6 +78,14 @@ public class Preferences extends PreferenceActivity
 		}
 	}
 
+	/**
+	 * Animate Auto Play preference name
+	 */
+	public static final String ANIMATE_AUTO_PLAY_PREFERENCE_KEY = "animate_auto_play";
+	/**
+	 * Animate Undo preference name
+	 */
+	public static final String ANIMATE_UNDO_PREFERENCE_KEY = "animate_undo";
 	/**
 	 * Auto Flip preference name
 	 */
