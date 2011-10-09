@@ -22,10 +22,10 @@
     <string name="graphics_and_testing_by_label">Graphics and Testing by:</string>
     <string name="artist_and_tester">Andrea Lake</string>
     <string name="artist_and_tester_link">http://kamiawolf.deviantart.com</string>
-    <string name="stats">Stats</string>
-    <string name="reset">Reset All Stats</string>
-    <string name="reset_dialog_title">Reset Stats Confirmation</string>
-    <string name="reset_dialog_message">Are you sure you want to reset all stats? Note that this will start a new game, removing any progress so far.</string>
+    <string name="stats">Statistics</string>
+    <string name="reset">Reset All Statistics</string>
+    <string name="reset_dialog_title">Reset Statistics Confirmation</string>
+    <string name="reset_dialog_message">Are you sure you want to reset all statistics? Note that this will start a new game, removing any progress so far.</string>
     <string name="reset_dialog_confirm">Yes</string>
     <string name="reset_dialog_cancel">Cancel</string>
     <string name="stats_games_dealt">Games Dealt</string>
