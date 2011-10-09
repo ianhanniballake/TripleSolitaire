@@ -92,11 +92,21 @@ public class StatsDialogFragment extends DialogFragment implements
 				/ gamesDealt));
 		final TextView averageDurationView = (TextView) getDialog()
 				.findViewById(R.id.average_duration);
-		final NumberFormat integerFormat = NumberFormat.getIntegerInstance();
 		if (gamesWon == 0)
 			averageDurationView.setText(getText(R.string.stats_na));
 		else
-			averageDurationView.setText(integerFormat.format(averageDuration));
+		{
+			final int minutes = (int) (averageDuration / 60);
+			final int seconds = (int) (averageDuration % 60);
+			final StringBuilder sb = new StringBuilder();
+			sb.append(minutes);
+			sb.append(':');
+			if (seconds < 10)
+				sb.append(0);
+			sb.append(seconds);
+			averageDurationView.setText(sb);
+		}
+		final NumberFormat integerFormat = NumberFormat.getIntegerInstance();
 		final TextView averageMovesView = (TextView) getDialog().findViewById(
 				R.id.average_moves);
 		if (gamesWon == 0)
