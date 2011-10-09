@@ -49,4 +49,11 @@
     <string name="pref_animate_auto_play_summary">Whether auto play moves should be animated</string>
     <string name="pref_animate_undo_title">Animate Undo</string>
     <string name="pref_animate_undo_summary">Whether undo moves should be animated</string>
+    <string name="pref_animation_speed_category">Animation Speed</string>
+    <string name="pref_animation_speed_auto_play_default">325</string>
+    <string name="pref_animation_speed_auto_play_title">Auto Play Animation Speed</string>
+    <string name="pref_animation_speed_auto_play_dialog_title">Choose Auto Play Animation Speed</string>
+    <string name="pref_animation_speed_undo_default">100</string>
+    <string name="pref_animation_speed_undo_title">Undo Animation Speed</string>
+    <string name="pref_animation_speed_undo_dialog_title">Choose Undo Animation Speed</string>
 </resources>

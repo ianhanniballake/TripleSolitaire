@@ -8,11 +8,13 @@ import android.content.AsyncQueryHandler;
 import android.content.ClipData;
 import android.content.ContentUris;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.DragEvent;
 import android.view.Gravity;
@@ -216,14 +218,19 @@ public class TripleSolitaireActivity extends Activity
 		layout.setX(fromLoc.x);
 		layout.setY(fromLoc.y);
 		layout.setVisibility(View.VISIBLE);
-		final int animationDuration;
+		final SharedPreferences preferences = PreferenceManager
+				.getDefaultSharedPreferences(this);
+		final String animationSpeedPreference;
 		if (move.getType() == Move.Type.UNDO)
-			animationDuration = getResources().getInteger(
-					R.integer.undo_animation_duration);
+			animationSpeedPreference = preferences.getString(
+					Preferences.ANIMATE_SPEED_UNDO_PREFERENCE_KEY,
+					getString(R.string.pref_animation_speed_undo_default));
 		else
-			animationDuration = getResources().getInteger(
-					R.integer.animation_duration);
-		layout.animate().x(toLoc.x).y(toLoc.y).setDuration(animationDuration)
+			animationSpeedPreference = preferences.getString(
+					Preferences.ANIMATE_SPEED_AUTO_PLAY_PREFERENCE_KEY,
+					getString(R.string.pref_animation_speed_auto_play_default));
+		layout.animate().x(toLoc.x).y(toLoc.y)
+				.setDuration(Integer.valueOf(animationSpeedPreference))
 				.setListener(new AnimatorListenerAdapter()
 				{
 					@Override

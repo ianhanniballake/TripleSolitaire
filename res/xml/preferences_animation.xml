@@ -14,4 +14,21 @@
             android:title="@string/pref_animate_undo_title"
             android:summary="@string/pref_animate_undo_summary" />
     </PreferenceCategory>
+    <PreferenceCategory
+        android:title="@string/pref_animation_speed_category">
+        <ListPreference
+            android:key="animate_speed_auto_play"
+            android:defaultValue="@string/pref_animation_speed_auto_play_default"
+            android:title="@string/pref_animation_speed_auto_play_title"
+            android:entries="@array/pref_animate_speed_entries"
+            android:entryValues="@array/pref_animate_speed_entryvalues"
+            android:dialogTitle="@string/pref_animation_speed_auto_play_dialog_title" />
+        <ListPreference
+            android:key="animate_speed_undo"
+            android:defaultValue="@string/pref_animation_speed_undo_default"
+            android:title="@string/pref_animation_speed_undo_title"
+            android:entries="@array/pref_animate_speed_entries"
+            android:entryValues="@array/pref_animate_speed_entryvalues"
+            android:dialogTitle="@string/pref_animation_speed_undo_dialog_title" />
+    </PreferenceCategory>
 </PreferenceScreen>
