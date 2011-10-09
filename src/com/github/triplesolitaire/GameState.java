@@ -45,7 +45,7 @@ public class GameState
 	/**
 	 * Current game id as determined by the GameProvider
 	 */
-	private long gameId = 0;
+	private long gameId = -1;
 	/**
 	 * Whether a game is in progress
 	 */

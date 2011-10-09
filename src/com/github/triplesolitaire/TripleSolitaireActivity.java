@@ -498,10 +498,13 @@ public class TripleSolitaireActivity extends Activity
 	protected void onResume()
 	{
 		super.onResume();
+		final long gameId = gameState.getGameId();
+		if (gameId == -1)
+			return;
 		// Query on the gameId to ensure that the game still exists - stats may
 		// have been reset
 		final Uri gameUri = ContentUris.withAppendedId(
-				GameContract.Games.CONTENT_ID_URI_BASE, gameState.getGameId());
+				GameContract.Games.CONTENT_ID_URI_BASE, gameId);
 		new AsyncQueryHandler(getContentResolver())
 		{
 			@Override
