@@ -18,6 +18,13 @@
 		android:debuggable="true"
 		android:hardwareAccelerated="true"
 		android:name="TripleSolitaireApplication">
+        <provider
+            android:name=".provider.GameProvider"
+            android:authorities="com.github.triplesolitaire"
+            android:exported="false">
+            <grant-uri-permission
+                android:pathPattern=".*" />
+        </provider>
 		<activity
 			android:name=".TripleSolitaireActivity"
 			android:label="@string/app_name">

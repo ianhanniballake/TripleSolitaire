@@ -7,13 +7,18 @@ import java.util.LinkedList;
 import java.util.Random;
 import java.util.Stack;
 
+import android.content.AsyncQueryHandler;
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.github.triplesolitaire.Move.Type;
+import com.github.triplesolitaire.provider.GameContract;
 
 /**
  * Class to manage the game state associated with a Triple Solitaire game
@@ -38,9 +43,17 @@ public class GameState
 	 */
 	private String[] foundation;
 	/**
+	 * Current game id as determined by the GameProvider
+	 */
+	private long gameId = 0;
+	/**
 	 * Whether a game is in progress
 	 */
 	private boolean gameInProgress = false;
+	/**
+	 * Handler for asynchronous inserts/updates of games
+	 */
+	private final AsyncQueryHandler gameQueryHandler;
 	/**
 	 * Increments the game timer is there is at least one move. Posts another
 	 * copy of itself to trigger in 1 second if the game is in progress.
@@ -100,6 +113,15 @@ public class GameState
 	public GameState(final TripleSolitaireActivity activity)
 	{
 		this.activity = activity;
+		gameQueryHandler = new AsyncQueryHandler(activity.getContentResolver())
+		{
+			@Override
+			protected void onInsertComplete(final int token,
+					final Object cookie, final Uri uri)
+			{
+				gameId = ContentUris.parseId(uri);
+			}
+		};
 	}
 
 	/**
@@ -357,6 +379,12 @@ public class GameState
 				return;
 		Log.d(TAG, "Game win detected");
 		pauseGame();
+		final Uri gameUri = ContentUris.withAppendedId(
+				GameContract.Games.CONTENT_ID_URI_BASE, gameId);
+		final ContentValues values = new ContentValues();
+		values.put(GameContract.Games.COLUMN_NAME_DURATION, timeInSeconds);
+		values.put(GameContract.Games.COLUMN_NAME_MOVES, moveCount);
+		gameQueryHandler.startUpdate(0, null, gameUri, values, null, null);
 		final WinDialogFragment winDialogFragment = new WinDialogFragment(this);
 		winDialogFragment.show(activity.getFragmentManager(), "win");
 	}
@@ -371,6 +399,16 @@ public class GameState
 	public String getFoundationCard(final int foundationIndex)
 	{
 		return foundation[-1 * foundationIndex - 1];
+	}
+
+	/**
+	 * Getter for the current game id
+	 * 
+	 * @return Current game id
+	 */
+	public long getGameId()
+	{
+		return gameId;
 	}
 
 	/**
@@ -660,6 +698,8 @@ public class GameState
 			laneLayout.setStackSize(lane[laneIndex].getStack().size());
 			laneLayout.addCascade(lane[laneIndex].getCascade());
 		}
+		gameQueryHandler.startInsert(0, null, GameContract.Games.CONTENT_URI,
+				null);
 	}
 
 	/**
@@ -683,6 +723,7 @@ public class GameState
 	public void onRestoreInstanceState(final Bundle savedInstanceState)
 	{
 		// Restore the current game information
+		gameId = savedInstanceState.getLong("gameId");
 		timeInSeconds = savedInstanceState.getInt("timeInSeconds");
 		activity.updateTime(timeInSeconds);
 		moveCount = savedInstanceState.getInt("moveCount");
@@ -731,6 +772,7 @@ public class GameState
 	 */
 	public void onSaveInstanceState(final Bundle outState)
 	{
+		outState.putLong("gameId", gameId);
 		outState.putInt("timeInSeconds", timeInSeconds);
 		outState.putInt("moveCount", moveCount);
 		outState.putBooleanArray("autoplayLaneIndexLocked",

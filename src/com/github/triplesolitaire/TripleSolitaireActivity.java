@@ -4,9 +4,13 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.AsyncQueryHandler;
 import android.content.ClipData;
+import android.content.ContentUris;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Point;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -26,6 +30,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.github.triplesolitaire.Move.Type;
+import com.github.triplesolitaire.provider.GameContract;
 
 /**
  * Main class which controls the UI of the Triple Solitaire game
@@ -174,7 +179,7 @@ public class TripleSolitaireActivity extends Activity
 	/**
 	 * Game state which saves and manages the current game
 	 */
-	private final GameState gameState = new GameState(this);
+	private GameState gameState;
 	/**
 	 * Handler used to post delayed calls
 	 */
@@ -320,6 +325,7 @@ public class TripleSolitaireActivity extends Activity
 	public void onCreate(final Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
+		gameState = new GameState(this);
 		setContentView(R.layout.main);
 		// Set up the progress bar area
 		final View progressBar = getLayoutInflater().inflate(
@@ -439,6 +445,10 @@ public class TripleSolitaireActivity extends Activity
 			case R.id.new_game:
 				gameState.newGame();
 				return true;
+			case R.id.stats:
+				final StatsDialogFragment statsDialogFragment = new StatsDialogFragment();
+				statsDialogFragment.show(getFragmentManager(), "stats");
+				return true;
 			case R.id.settings:
 				startActivity(new Intent(this, Preferences.class));
 				return true;
@@ -475,6 +485,26 @@ public class TripleSolitaireActivity extends Activity
 	{
 		super.onRestoreInstanceState(savedInstanceState);
 		gameState.onRestoreInstanceState(savedInstanceState);
+	}
+
+	@Override
+	protected void onResume()
+	{
+		super.onResume();
+		// Query on the gameId to ensure that the game still exists - stats may
+		// have been reset
+		final Uri gameUri = ContentUris.withAppendedId(
+				GameContract.Games.CONTENT_ID_URI_BASE, gameState.getGameId());
+		new AsyncQueryHandler(getContentResolver())
+		{
+			@Override
+			protected void onQueryComplete(final int token,
+					final Object cookie, final Cursor cursor)
+			{
+				if (cursor.getCount() == 0)
+					gameState.newGame();
+			}
+		}.startQuery(0, null, gameUri, null, null, null, null);
 	}
 
 	/**

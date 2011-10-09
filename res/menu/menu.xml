@@ -9,6 +9,9 @@
 		android:id="@+id/new_game"
 		android:title="@string/new_game" />
     <item
+        android:id="@+id/stats"
+        android:title="@string/stats" />
+    <item
         android:id="@+id/settings"
         android:title="@string/settings" />
     <item
