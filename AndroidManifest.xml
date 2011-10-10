@@ -17,14 +17,15 @@
 		android:label="@string/app_name"
 		android:debuggable="true"
 		android:hardwareAccelerated="true"
-		android:name="TripleSolitaireApplication">
-        <provider
-            android:name=".provider.GameProvider"
-            android:authorities="com.github.triplesolitaire"
-            android:exported="false">
-            <grant-uri-permission
-                android:pathPattern=".*" />
-        </provider>
+		android:name="TripleSolitaireApplication"
+		android:backupAgent="TripleSolitaireBackupAgent">
+		<provider
+			android:name=".provider.GameProvider"
+			android:authorities="com.github.triplesolitaire"
+			android:exported="false">
+			<grant-uri-permission
+				android:pathPattern=".*" />
+		</provider>
 		<activity
 			android:name=".TripleSolitaireActivity"
 			android:label="@string/app_name">
@@ -38,5 +39,8 @@
 		<activity
 			android:name=".Preferences"
 			android:label="@string/settings" />
+		<meta-data
+			android:name="com.google.android.backup.api_key"
+			android:value="AEdPqrEAAAAIWFaQFsEUFijeNdxXu-uN6_FwEQJqgAWDbeg_bw" />
 	</application>
 </manifest>

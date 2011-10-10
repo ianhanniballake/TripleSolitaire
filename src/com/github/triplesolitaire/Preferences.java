@@ -2,6 +2,7 @@ package com.github.triplesolitaire;
 
 import java.util.List;
 
+import android.app.backup.BackupManager;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
@@ -76,6 +77,7 @@ public class Preferences extends PreferenceActivity
 			else if (key.equals(ANIMATE_SPEED_UNDO_PREFERENCE_KEY))
 				animateSpeedUndoListPreference
 						.setSummary(animateSpeedUndoListPreference.getEntry());
+			new BackupManager(getActivity()).dataChanged();
 		}
 	}
 
@@ -124,6 +126,7 @@ public class Preferences extends PreferenceActivity
 			if (key.equals(AUTO_PLAY_PREFERENCE_KEY))
 				autoplayListPreference.setSummary(autoplayListPreference
 						.getEntry());
+			new BackupManager(getActivity()).dataChanged();
 		}
 	}
 
