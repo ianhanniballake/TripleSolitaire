@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -180,5 +181,25 @@ public class Preferences extends PreferenceActivity
 			});
 			setListFooter(resetStatsButton);
 		}
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(final MenuItem item)
+	{
+		switch (item.getItemId())
+		{
+			case android.R.id.home:
+				finish();
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
+		}
+	}
+
+	@Override
+	protected void onStart()
+	{
+		super.onStart();
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 	}
 }
