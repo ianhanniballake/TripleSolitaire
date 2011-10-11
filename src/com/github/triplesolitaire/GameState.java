@@ -68,13 +68,25 @@ public class GameState
 			timeInSeconds++;
 			activity.updateTime(timeInSeconds);
 			if (gameInProgress)
-				timerHandler.postDelayed(this, 1000);
+				postHandler.postDelayed(this, 1000);
 		}
 	};
 	/**
 	 * Data (stack and cascade information) for each lane
 	 */
 	private LaneData[] lane;
+	/**
+	 * To prevent StackOverflow when autoplay animations are off, this Runnable
+	 * can be used to stagger autoplay calls
+	 */
+	private final Runnable moveCompleter = new Runnable()
+	{
+		@Override
+		public void run()
+		{
+			moveCompleted(true);
+		}
+	};
 	/**
 	 * Number of player moves in the current game
 	 */
@@ -88,6 +100,10 @@ public class GameState
 	 */
 	private int pendingMoves = 0;
 	/**
+	 * Handler for running the game timer and move completer
+	 */
+	private final Handler postHandler = new Handler();
+	/**
 	 * Represents the cards in the stock
 	 */
 	private Stack<String> stock;
@@ -95,10 +111,6 @@ public class GameState
 	 * How much time has elapsed in the current game
 	 */
 	private int timeInSeconds = 0;
-	/**
-	 * Handler for running the game timer
-	 */
-	private final Handler timerHandler = new Handler();
 	/**
 	 * Represents the cards in the waste
 	 */
@@ -629,7 +641,7 @@ public class GameState
 						else
 							activity.getLane(move.getToIndex() - 1).addCascade(
 									move.getCascade());
-						moveCompleted(true);
+						postHandler.post(moveCompleter);
 					}
 				}
 				else if (move.getType() == Move.Type.UNDO)
@@ -837,7 +849,7 @@ public class GameState
 	public void pauseGame()
 	{
 		gameInProgress = false;
-		timerHandler.removeCallbacks(gameTimerIncrement);
+		postHandler.removeCallbacks(gameTimerIncrement);
 	}
 
 	/**
@@ -865,8 +877,8 @@ public class GameState
 		gameInProgress = moveCount > 0;
 		if (gameInProgress)
 		{
-			timerHandler.removeCallbacks(gameTimerIncrement);
-			timerHandler.postDelayed(gameTimerIncrement, 1000);
+			postHandler.removeCallbacks(gameTimerIncrement);
+			postHandler.postDelayed(gameTimerIncrement, 1000);
 		}
 	}
 
