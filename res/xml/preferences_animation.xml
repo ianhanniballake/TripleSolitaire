@@ -18,6 +18,7 @@
         android:title="@string/pref_animation_speed_category">
         <ListPreference
             android:key="animate_speed_auto_play"
+            android:dependency="animate_auto_play"
             android:defaultValue="@string/pref_animation_speed_auto_play_default"
             android:title="@string/pref_animation_speed_auto_play_title"
             android:entries="@array/pref_animate_speed_entries"
@@ -25,6 +26,7 @@
             android:dialogTitle="@string/pref_animation_speed_auto_play_dialog_title" />
         <ListPreference
             android:key="animate_speed_undo"
+            android:dependency="animate_undo"
             android:defaultValue="@string/pref_animation_speed_undo_default"
             android:title="@string/pref_animation_speed_undo_title"
             android:entries="@array/pref_animate_speed_entries"
