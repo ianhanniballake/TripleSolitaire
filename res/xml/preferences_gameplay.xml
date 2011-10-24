@@ -1,19 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen
-    xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory
-        android:title="@string/pref_auto_play_category">
-        <ListPreference
-            android:key="auto_play"
-            android:defaultValue="@string/pref_auto_play_default"
-            android:title="@string/pref_auto_play_title"
-            android:entries="@array/pref_auto_play_entries"
-            android:entryValues="@array/pref_auto_play_entryvalues"
-            android:dialogTitle="@string/pref_auto_play_dialog_title" />
-        <CheckBoxPreference
-            android:key="auto_flip"
-            android:defaultValue="@bool/pref_auto_flip_default"
-            android:title="@string/pref_auto_flip_title"
-            android:summary="@string/pref_auto_flip_summary" />
-    </PreferenceCategory>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+	<PreferenceCategory android:title="@string/pref_auto_play_category" >
+		<ListPreference
+			android:defaultValue="@string/pref_auto_play_default"
+			android:dialogTitle="@string/pref_auto_play_dialog_title"
+			android:entries="@array/pref_auto_play_entries"
+			android:entryValues="@array/pref_auto_play_entryvalues"
+			android:key="auto_play"
+			android:title="@string/pref_auto_play_title" />
+		<CheckBoxPreference
+			android:defaultValue="@bool/pref_auto_flip_default"
+			android:key="auto_flip"
+			android:summary="@string/pref_auto_flip_summary"
+			android:title="@string/pref_auto_flip_title" />
+	</PreferenceCategory>
 </PreferenceScreen>

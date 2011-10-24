@@ -1,36 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen
-    xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory
-        android:title="@string/pref_animation_category">
-        <CheckBoxPreference
-            android:key="animate_auto_play"
-            android:defaultValue="@bool/pref_animate_auto_play_default"
-            android:title="@string/pref_animate_auto_play_title"
-            android:summary="@string/pref_animate_auto_play_summary" />
-        <CheckBoxPreference
-            android:key="animate_undo"
-            android:defaultValue="@bool/pref_animate_undo_default"
-            android:title="@string/pref_animate_undo_title"
-            android:summary="@string/pref_animate_undo_summary" />
-    </PreferenceCategory>
-    <PreferenceCategory
-        android:title="@string/pref_animation_speed_category">
-        <ListPreference
-            android:key="animate_speed_auto_play"
-            android:dependency="animate_auto_play"
-            android:defaultValue="@string/pref_animation_speed_auto_play_default"
-            android:title="@string/pref_animation_speed_auto_play_title"
-            android:entries="@array/pref_animate_speed_entries"
-            android:entryValues="@array/pref_animate_speed_entryvalues"
-            android:dialogTitle="@string/pref_animation_speed_auto_play_dialog_title" />
-        <ListPreference
-            android:key="animate_speed_undo"
-            android:dependency="animate_undo"
-            android:defaultValue="@string/pref_animation_speed_undo_default"
-            android:title="@string/pref_animation_speed_undo_title"
-            android:entries="@array/pref_animate_speed_entries"
-            android:entryValues="@array/pref_animate_speed_entryvalues"
-            android:dialogTitle="@string/pref_animation_speed_undo_dialog_title" />
-    </PreferenceCategory>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+	<PreferenceCategory android:title="@string/pref_animation_category" >
+		<CheckBoxPreference
+			android:defaultValue="@bool/pref_animate_auto_play_default"
+			android:key="animate_auto_play"
+			android:summary="@string/pref_animate_auto_play_summary"
+			android:title="@string/pref_animate_auto_play_title" />
+		<CheckBoxPreference
+			android:defaultValue="@bool/pref_animate_undo_default"
+			android:key="animate_undo"
+			android:summary="@string/pref_animate_undo_summary"
+			android:title="@string/pref_animate_undo_title" />
+	</PreferenceCategory>
+	<PreferenceCategory android:title="@string/pref_animation_speed_category" >
+		<ListPreference
+			android:defaultValue="@string/pref_animation_speed_auto_play_default"
+			android:dependency="animate_auto_play"
+			android:dialogTitle="@string/pref_animation_speed_auto_play_dialog_title"
+			android:entries="@array/pref_animate_speed_entries"
+			android:entryValues="@array/pref_animate_speed_entryvalues"
+			android:key="animate_speed_auto_play"
+			android:title="@string/pref_animation_speed_auto_play_title" />
+		<ListPreference
+			android:defaultValue="@string/pref_animation_speed_undo_default"
+			android:dependency="animate_undo"
+			android:dialogTitle="@string/pref_animation_speed_undo_dialog_title"
+			android:entries="@array/pref_animate_speed_entries"
+			android:entryValues="@array/pref_animate_speed_entryvalues"
+			android:key="animate_speed_undo"
+			android:title="@string/pref_animation_speed_undo_title" />
+	</PreferenceCategory>
 </PreferenceScreen>

@@ -1,44 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-	xmlns:android="http://schemas.android.com/apk/res/android"
-	package="com.github.triplesolitaire"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	android:installLocation="auto"
-	android:versionName="1.1.1"
-	android:versionCode="1244111">
-	<uses-sdk
-		android:minSdkVersion="12" />
+	package="com.github.triplesolitaire"
+	android:versionCode="1244111"
+	android:versionName="1.1.1" >
+	<uses-sdk android:minSdkVersion="12" />
 	<supports-screens
-		android:smallScreens="false"
-		android:normalScreens="false"
 		android:largeScreens="false"
+		android:normalScreens="false"
+		android:smallScreens="false"
 		android:xlargeScreens="true" />
 	<application
-		android:icon="@drawable/icon"
-		android:label="@string/app_name"
+		android:backupAgent="TripleSolitaireBackupAgent"
 		android:debuggable="true"
 		android:hardwareAccelerated="true"
-		android:name="TripleSolitaireApplication"
-		android:backupAgent="TripleSolitaireBackupAgent">
+		android:icon="@drawable/icon"
+		android:label="@string/app_name"
+		android:name="TripleSolitaireApplication" >
 		<provider
-			android:name=".provider.GameProvider"
 			android:authorities="com.github.triplesolitaire"
-			android:exported="false">
-			<grant-uri-permission
-				android:pathPattern=".*" />
+			android:exported="false"
+			android:name=".provider.GameProvider" >
+			<grant-uri-permission android:pathPattern=".*" />
 		</provider>
 		<activity
-			android:name=".TripleSolitaireActivity"
-			android:label="@string/app_name">
-			<intent-filter>
-				<action
-					android:name="android.intent.action.MAIN" />
-				<category
-					android:name="android.intent.category.LAUNCHER" />
+			android:label="@string/app_name"
+			android:name=".TripleSolitaireActivity" >
+			<intent-filter >
+				<action android:name="android.intent.action.MAIN" />
+				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
 		<activity
-			android:name=".Preferences"
-			android:label="@string/settings" />
+			android:label="@string/settings"
+			android:name=".Preferences" />
 		<meta-data
 			android:name="com.google.android.backup.api_key"
 			android:value="AEdPqrEAAAAIWFaQFsEUFijeNdxXu-uN6_FwEQJqgAWDbeg_bw" />
