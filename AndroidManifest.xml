@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	android:installLocation="auto"
 	package="com.github.triplesolitaire"
-	android:versionCode="1244111"
-	android:versionName="1.1.1" >
+	android:versionCode="1244120"
+	android:versionName="1.2" >
 	<uses-sdk android:minSdkVersion="12" />
 	<supports-screens
 		android:largeScreens="false"
