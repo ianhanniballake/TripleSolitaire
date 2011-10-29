@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Preference-Headers xmlns:android="http://schemas.android.com/apk/res/android">
-	<Header
+<preference-headers xmlns:android="http://schemas.android.com/apk/res/android">
+	<header
 		android:fragment="com.github.triplesolitaire.Preferences$GameplayPreferenceFragment"
         android:summary="@string/pref_game_play_summary"
 		android:title="@string/pref_game_play_title" />
-	<Header
+	<header
 		android:fragment="com.github.triplesolitaire.Preferences$AnimationPreferenceFragment"
         android:summary="@string/pref_animation_summary"
 		android:title="@string/pref_animation_title" />
-</Preference-Headers>
+</preference-headers>
