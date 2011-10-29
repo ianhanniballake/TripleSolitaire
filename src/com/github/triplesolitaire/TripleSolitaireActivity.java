@@ -294,6 +294,25 @@ public class TripleSolitaireActivity extends Activity
 	}
 
 	/**
+	 * Gets a string representation (MMM:SS) of the current game time
+	 * 
+	 * @return Current formatted game time
+	 */
+	public CharSequence getGameTime()
+	{
+		final int timeInSeconds = gameState.getTimeInSeconds();
+		final int minutes = timeInSeconds / 60;
+		final int seconds = timeInSeconds % 60;
+		final StringBuilder sb = new StringBuilder();
+		sb.append(minutes);
+		sb.append(':');
+		if (seconds < 10)
+			sb.append(0);
+		sb.append(seconds);
+		return sb;
+	}
+
+	/**
 	 * Gets the Lane associated with the given index
 	 * 
 	 * @param laneIndex
@@ -304,6 +323,16 @@ public class TripleSolitaireActivity extends Activity
 	{
 		return (Lane) findViewById(getResources().getIdentifier(
 				"lane" + (laneIndex + 1), "id", getPackageName()));
+	}
+
+	/**
+	 * Gets the current move count
+	 * 
+	 * @return Current move count
+	 */
+	public int getMoveCount()
+	{
+		return gameState.getMoveCount();
 	}
 
 	/**
@@ -320,6 +349,14 @@ public class TripleSolitaireActivity extends Activity
 		final float y = waste.getY() + waste.getPaddingTop()
 				+ waste1View.getY() + waste1View.getPaddingTop();
 		return new Point((int) x, (int) y);
+	}
+
+	/**
+	 * Starts a new game, resetting the game state and UI to match
+	 */
+	public void newGame()
+	{
+		gameState.newGame();
 	}
 
 	/**
@@ -490,8 +527,8 @@ public class TripleSolitaireActivity extends Activity
 	@Override
 	public void onRestoreInstanceState(final Bundle savedInstanceState)
 	{
-		super.onRestoreInstanceState(savedInstanceState);
 		gameState.onRestoreInstanceState(savedInstanceState);
+		super.onRestoreInstanceState(savedInstanceState);
 	}
 
 	@Override
@@ -573,15 +610,12 @@ public class TripleSolitaireActivity extends Activity
 
 	/**
 	 * Updates the move count UI
-	 * 
-	 * @param moveCount
-	 *            New move count
 	 */
-	public void updateMoveCount(final int moveCount)
+	public void updateMoveCount()
 	{
 		final TextView moveCountView = (TextView) getActionBar()
 				.getCustomView().findViewById(R.id.move_count);
-		moveCountView.setText(Integer.toString(moveCount));
+		moveCountView.setText(Integer.toString(getMoveCount()));
 	}
 
 	/**
@@ -598,23 +632,12 @@ public class TripleSolitaireActivity extends Activity
 
 	/**
 	 * Updates the current game time UI
-	 * 
-	 * @param timeInSeconds
-	 *            New time (in seconds)
 	 */
-	public void updateTime(final int timeInSeconds)
+	public void updateTime()
 	{
-		final int minutes = timeInSeconds / 60;
-		final int seconds = timeInSeconds % 60;
 		final TextView timeView = (TextView) getActionBar().getCustomView()
 				.findViewById(R.id.time);
-		final StringBuilder sb = new StringBuilder();
-		sb.append(minutes);
-		sb.append(':');
-		if (seconds < 10)
-			sb.append(0);
-		sb.append(seconds);
-		timeView.setText(sb);
+		timeView.setText(getGameTime());
 	}
 
 	/**

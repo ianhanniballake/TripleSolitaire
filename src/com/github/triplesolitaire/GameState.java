@@ -66,7 +66,7 @@ public class GameState
 			if (moveCount == 0)
 				return;
 			timeInSeconds++;
-			activity.updateTime(timeInSeconds);
+			activity.updateTime();
 			if (gameInProgress)
 				postHandler.postDelayed(this, 1000);
 		}
@@ -397,7 +397,7 @@ public class GameState
 		values.put(GameContract.Games.COLUMN_NAME_DURATION, timeInSeconds);
 		values.put(GameContract.Games.COLUMN_NAME_MOVES, moveCount);
 		gameQueryHandler.startUpdate(0, null, gameUri, values, null, null);
-		final WinDialogFragment winDialogFragment = new WinDialogFragment(this);
+		final WinDialogFragment winDialogFragment = new WinDialogFragment();
 		winDialogFragment.show(activity.getFragmentManager(), "win");
 	}
 
@@ -421,6 +421,16 @@ public class GameState
 	public long getGameId()
 	{
 		return gameId;
+	}
+
+	/**
+	 * Getter for the current move count
+	 * 
+	 * @return Current move count
+	 */
+	public int getMoveCount()
+	{
+		return moveCount;
 	}
 
 	/**
@@ -454,6 +464,16 @@ public class GameState
 			if (Character.isDigit(card.charAt(firstNumber)))
 				break;
 		return card.substring(0, firstNumber);
+	}
+
+	/**
+	 * Getter for the current game time (in seconds)
+	 * 
+	 * @return Current game time (in seconds)
+	 */
+	public int getTimeInSeconds()
+	{
+		return timeInSeconds;
 	}
 
 	/**
@@ -694,7 +714,8 @@ public class GameState
 	 */
 	private void moveCompleted(final boolean resetAutoplayLaneIndexLocked)
 	{
-		activity.updateMoveCount(++moveCount);
+		moveCount++;
+		activity.updateMoveCount();
 		if (moveCount == 1)
 		{
 			gameQueryHandler.startInsert(0, null,
@@ -723,9 +744,9 @@ public class GameState
 		final Random random = new Random();
 		random.setSeed(random.nextLong());
 		timeInSeconds = 0;
-		activity.updateTime(timeInSeconds);
+		activity.updateTime();
 		moveCount = 0;
-		activity.updateMoveCount(moveCount);
+		activity.updateMoveCount();
 		for (int h = 0; h < 13; h++)
 			autoplayLaneIndexLocked[h] = false;
 		moves = new Stack<Move>();
@@ -777,9 +798,9 @@ public class GameState
 		// Restore the current game information
 		gameId = savedInstanceState.getLong("gameId");
 		timeInSeconds = savedInstanceState.getInt("timeInSeconds");
-		activity.updateTime(timeInSeconds);
+		activity.updateTime();
 		moveCount = savedInstanceState.getInt("moveCount");
-		activity.updateMoveCount(moveCount);
+		activity.updateMoveCount();
 		autoplayLaneIndexLocked = savedInstanceState
 				.getBooleanArray("autoplayLaneIndexLocked");
 		final ArrayList<String> arrayMoves = savedInstanceState

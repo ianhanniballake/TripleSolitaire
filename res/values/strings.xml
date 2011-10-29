@@ -5,9 +5,7 @@
 	<string name="move_count">Moves:</string>
 	<string name="undo">Undo</string>
 	<string name="new_game">New Game</string>
-	<string name="win_dialog_1">You won in</string>
-	<string name="win_dialog_2">and</string>
-	<string name="win_dialog_3">moves!</string>
+	<string name="win_dialog">You won in %1$s and %2$d moves!</string>
 	<string name="exit">Exit</string>
 	<string name="close">Close</string>
 	<string name="settings">Settings</string>

@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.widget.TextView;
 
 /**
  * Dialog to show when a user wins the game
@@ -13,36 +12,31 @@ import android.widget.TextView;
 public class WinDialogFragment extends DialogFragment
 {
 	/**
-	 * Game State used for starting a new game
+	 * Key for saving and restoring the cached message from the saved instance
+	 * state bundle
 	 */
-	private final GameState gameState;
-
+	private final static String MESSAGE_KEY = "message";
 	/**
-	 * Creates a WinDialog from the given game state
-	 * 
-	 * @param gameState
-	 *            Game State for starting a new game
+	 * Cached message to restore on screen rotation or other configuration
+	 * changes
 	 */
-	public WinDialogFragment(final GameState gameState)
-	{
-		this.gameState = gameState;
-	}
+	private String cachedMessage = null;
 
 	@Override
 	public Dialog onCreateDialog(final Bundle savedInstanceState)
 	{
-		final TextView timeView = (TextView) getActivity().getActionBar()
-				.getCustomView().findViewById(R.id.time);
-		final CharSequence time = timeView.getText();
-		final TextView moveCountView = (TextView) getActivity().getActionBar()
-				.getCustomView().findViewById(R.id.move_count);
-		final CharSequence moveCount = moveCountView.getText();
-		final String message = getString(R.string.win_dialog_1) + " " + time
-				+ " " + getString(R.string.win_dialog_2) + " " + moveCount
-				+ " " + getString(R.string.win_dialog_3);
-		final AlertDialog.Builder builder = new AlertDialog.Builder(
-				getActivity());
-		builder.setMessage(message)
+		final TripleSolitaireActivity activity = (TripleSolitaireActivity) getActivity();
+		if (savedInstanceState != null)
+			cachedMessage = savedInstanceState.getString(MESSAGE_KEY, null);
+		if (cachedMessage == null)
+		{
+			final String messageFormat = getString(R.string.win_dialog);
+			final CharSequence time = activity.getGameTime();
+			final int moveCount = activity.getMoveCount();
+			cachedMessage = String.format(messageFormat, time, moveCount);
+		}
+		final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+		builder.setMessage(cachedMessage)
 				.setCancelable(false)
 				.setPositiveButton(getString(R.string.new_game),
 						new DialogInterface.OnClickListener()
@@ -52,7 +46,7 @@ public class WinDialogFragment extends DialogFragment
 									final int dialogId)
 							{
 								dialog.dismiss();
-								gameState.newGame();
+								activity.newGame();
 							}
 						})
 				.setNegativeButton(getString(R.string.exit),
@@ -62,9 +56,16 @@ public class WinDialogFragment extends DialogFragment
 							public void onClick(final DialogInterface dialog,
 									final int dialogId)
 							{
-								getActivity().finish();
+								activity.finish();
 							}
 						});
 		return builder.create();
+	}
+
+	@Override
+	public void onSaveInstanceState(final Bundle outState)
+	{
+		super.onSaveInstanceState(outState);
+		outState.putString(MESSAGE_KEY, cachedMessage);
 	}
 }
