@@ -696,7 +696,11 @@ public class GameState
 	{
 		activity.updateMoveCount(++moveCount);
 		if (moveCount == 1)
+		{
+			gameQueryHandler.startInsert(0, null,
+					GameContract.Games.CONTENT_URI, null);
 			resumeGame();
+		}
 		if (resetAutoplayLaneIndexLocked)
 			for (int laneIndex = 0; laneIndex < 13; laneIndex++)
 				autoplayLaneIndexLocked[laneIndex] = false;
@@ -748,8 +752,6 @@ public class GameState
 			laneLayout.setStackSize(lane[laneIndex].getStack().size());
 			laneLayout.addCascade(lane[laneIndex].getCascade());
 		}
-		gameQueryHandler.startInsert(0, null, GameContract.Games.CONTENT_URI,
-				null);
 	}
 
 	/**

@@ -28,7 +28,7 @@
 	<string name="reset_dialog_message">Are you sure you want to reset all statistics? Note that this will start a new game, removing any progress so far.</string>
 	<string name="reset_dialog_confirm">Yes</string>
 	<string name="reset_dialog_cancel">Cancel</string>
-	<string name="stats_games_dealt">Games Dealt</string>
+	<string name="stats_games_played">Games Played</string>
 	<string name="stats_games_won">Games Won</string>
 	<string name="stats_win_percentage">Win Percentage</string>
 	<string name="stats_average_duration">Average Time Per Game</string>

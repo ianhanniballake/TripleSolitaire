@@ -58,7 +58,7 @@ public class StatsDialogFragment extends DialogFragment implements
 	@Override
 	public void onLoadFinished(final Loader<Cursor> loader, final Cursor data)
 	{
-		final int gamesDealt = data.getCount();
+		final int gamesPlayed = data.getCount();
 		int gamesWon = 0;
 		double averageDuration = 0;
 		double averageMoves = 0;
@@ -78,18 +78,24 @@ public class StatsDialogFragment extends DialogFragment implements
 					/ (gamesWon + 1);
 			gamesWon++;
 		}
-		final TextView gamesDealtView = (TextView) getDialog().findViewById(
-				R.id.games_dealt);
-		gamesDealtView.setText(Integer.toString(gamesDealt));
+		final TextView gamesPlayedView = (TextView) getDialog().findViewById(
+				R.id.games_played);
+		gamesPlayedView.setText(Integer.toString(gamesPlayed));
 		final TextView gamesWonView = (TextView) getDialog().findViewById(
 				R.id.games_won);
 		gamesWonView.setText(Integer.toString(gamesWon));
 		final TextView winPercentageView = (TextView) getDialog().findViewById(
 				R.id.win_percentage);
-		final NumberFormat percentFormat = NumberFormat.getPercentInstance();
-		percentFormat.setMaximumFractionDigits(1);
-		winPercentageView.setText(percentFormat.format((double) gamesWon
-				/ gamesDealt));
+		if (gamesPlayed == 0)
+			winPercentageView.setText(R.string.stats_na);
+		else
+		{
+			final NumberFormat percentFormat = NumberFormat
+					.getPercentInstance();
+			percentFormat.setMaximumFractionDigits(1);
+			winPercentageView.setText(percentFormat.format((double) gamesWon
+					/ gamesPlayed));
+		}
 		final TextView averageDurationView = (TextView) getDialog()
 				.findViewById(R.id.average_duration);
 		if (gamesWon == 0)

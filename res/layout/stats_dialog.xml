@@ -4,37 +4,37 @@
 	android:layout_height="fill_parent"
 	android:padding="10dp" >
 	<TextView
-		android:id="@+id/games_dealt_label"
+		android:id="@+id/games_played_label"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_alignParentLeft="true"
 		android:layout_alignParentTop="true"
-		android:text="@string/stats_games_dealt" />
+		android:text="@string/stats_games_played" />
 	<TextView
-		android:id="@+id/games_dealt_separator"
+		android:id="@+id/games_played_separator"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:layout_toRightOf="@id/games_dealt_label"
+		android:layout_toRightOf="@id/games_played_label"
 		android:text="@string/separator" />
 	<TextView
-		android:id="@+id/games_dealt"
+		android:id="@+id/games_played"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:layout_toRightOf="@id/games_dealt_separator"
+		android:layout_toRightOf="@id/games_played_separator"
 		android:paddingLeft="5dp" />
 	<TextView
 		android:id="@+id/games_won_label"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_alignParentLeft="true"
-		android:layout_below="@id/games_dealt_label"
+		android:layout_below="@id/games_played_label"
 		android:paddingTop="20dp"
 		android:text="@string/stats_games_won" />
 	<TextView
 		android:id="@+id/games_won_separator"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:layout_below="@id/games_dealt_label"
+		android:layout_below="@id/games_played_label"
 		android:layout_toRightOf="@id/games_won_label"
 		android:paddingTop="20dp"
 		android:text="@string/separator" />
@@ -42,7 +42,7 @@
 		android:id="@+id/games_won"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:layout_below="@id/games_dealt_label"
+		android:layout_below="@id/games_played_label"
 		android:layout_toRightOf="@id/games_won_separator"
 		android:paddingLeft="5dp"
 		android:paddingTop="20dp" />
