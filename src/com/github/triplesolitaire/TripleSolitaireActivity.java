@@ -12,6 +12,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Point;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -229,26 +230,37 @@ public class TripleSolitaireActivity extends Activity
 			animationSpeedPreference = preferences.getString(
 					Preferences.ANIMATE_SPEED_AUTO_PLAY_PREFERENCE_KEY,
 					getString(R.string.pref_animation_speed_auto_play_default));
-		layout.animate().x(toLoc.x).y(toLoc.y)
-				.setDuration(Integer.valueOf(animationSpeedPreference))
-				.setListener(new AnimatorListenerAdapter()
-				{
-					@Override
-					public void onAnimationEnd(final Animator animation)
+		try
+		{
+			layout.animate().x(toLoc.x).y(toLoc.y)
+					.setDuration(Integer.valueOf(animationSpeedPreference))
+					.setListener(new AnimatorListenerAdapter()
 					{
-						if (move.getToIndex() < 0)
-							updateFoundationUI(-1 * move.getToIndex() - 1);
-						else if (move.getToIndex() == 0)
-							updateWasteUI();
-						else
-							getLane(move.getToIndex() - 1).addCascade(
-									move.getCascade());
-						layout.removeAllViews();
-						layout.setVisibility(View.GONE);
-						if (move.getType() != Move.Type.UNDO)
-							gameState.animationCompleted();
-					}
-				});
+						@Override
+						public void onAnimationEnd(final Animator animation)
+						{
+							if (move.getToIndex() < 0)
+								updateFoundationUI(-1 * move.getToIndex() - 1);
+							else if (move.getToIndex() == 0)
+								updateWasteUI();
+							else
+								getLane(move.getToIndex() - 1).addCascade(
+										move.getCascade());
+							layout.removeAllViews();
+							layout.setVisibility(View.GONE);
+							if (move.getType() != Move.Type.UNDO)
+								gameState.animationCompleted();
+						}
+					});
+		} catch (final NullPointerException e)
+		{
+			// This can occur if the activity is stopped (via screen rotation or
+			// other events) on devices before Android 4.0. We handle all state
+			// change before the animation, so it is just UI updates that need
+			// to be done at this point. As this can only occur if the activity
+			// is stopped, the UI will be repainted correctly when the activity
+			// resumes, resolving us from any responsibility at this point
+		}
 	}
 
 	/**
@@ -506,6 +518,17 @@ public class TripleSolitaireActivity extends Activity
 		}
 	}
 
+	@Override
+	protected void onPause()
+	{
+		super.onPause();
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+		{
+			final FrameLayout layout = (FrameLayout) findViewById(R.id.animateLayout);
+			layout.animate().cancel();
+		}
+	}
+
 	/**
 	 * Method called every time the options menu is invalidated/repainted.
 	 * Enables/disables the undo button
@@ -564,6 +587,7 @@ public class TripleSolitaireActivity extends Activity
 	{
 		super.onSaveInstanceState(outState);
 		gameState.onSaveInstanceState(outState);
+		Log.d(TAG, "onSaveInstanceState");
 	}
 
 	/**

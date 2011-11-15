@@ -84,7 +84,7 @@ public class GameState
 		@Override
 		public void run()
 		{
-			moveCompleted(true);
+			moveCompleted();
 		}
 	};
 	/**
@@ -241,7 +241,7 @@ public class GameState
 	public void animationCompleted()
 	{
 		pendingMoves--;
-		moveCompleted(true);
+		moveCompleted();
 	}
 
 	/**
@@ -556,7 +556,8 @@ public class GameState
 				}
 				activity.updateWasteUI();
 				activity.updateStockUI();
-				moveCompleted(true);
+				moveStarted(true);
+				moveCompleted();
 				break;
 			case UNDO_STOCK: // Undo'ing a stock click
 				if (waste.isEmpty())
@@ -635,6 +636,7 @@ public class GameState
 				// Update the to UI
 				if (move.getType() == Move.Type.AUTO_PLAY)
 				{
+					moveStarted(true);
 					final boolean animateAutoplay = preferences.getBoolean(
 							Preferences.ANIMATE_AUTO_PLAY_PREFERENCE_KEY,
 							activity.getResources().getBoolean(
@@ -642,12 +644,9 @@ public class GameState
 					if (animateAutoplay)
 					{
 						// Animate an auto play and wait for its completion
-						// before
-						// doing anything else. We need to keep track of how
-						// many
-						// moves are currently being animated so that we don't
-						// kick
-						// off multiple auto plays
+						// before doing anything else. We need to keep track of
+						// how many moves are currently being animated so that
+						// we don't kick off multiple auto plays
 						pendingMoves++;
 						activity.animate(move);
 					}
@@ -683,12 +682,14 @@ public class GameState
 				else if (move.getToIndex() < 0) // PLAYER_MOVE
 				{
 					activity.updateFoundationUI(-1 * move.getToIndex() - 1);
-					moveCompleted(true);
+					moveStarted(true);
+					moveCompleted();
 				}
 				else if (move.getToIndex() == 0) // PLAYER_MOVE
 				{
 					activity.updateWasteUI();
-					moveCompleted(true);
+					moveStarted(true);
+					moveCompleted();
 				}
 				else
 				// PLAYER_MOVE, move.getToIndex > 0
@@ -697,22 +698,32 @@ public class GameState
 						autoplayLaneIndexLocked[move.getToIndex() - 1] = true;
 					activity.getLane(move.getToIndex() - 1).addCascade(
 							move.getCascade());
-					moveCompleted(move.getFromIndex() >= 0);
+					moveStarted(move.getFromIndex() >= 0);
+					moveCompleted();
 				}
 				break;
 		}
 	}
 
 	/**
-	 * Signals completion of a move, updating the move count, starting the game
-	 * timer, resetting the auto play lane locks if requested, checking for
-	 * wins, and starting auto play if there are no other pending animations
-	 * (which will eventually call this method).
+	 * Signals completion of a move, starting auto play if there are no other
+	 * pending animations (which will eventually call this method).
+	 */
+	private void moveCompleted()
+	{
+		checkForWin();
+		if (pendingMoves == 0)
+			autoPlay();
+	}
+
+	/**
+	 * Signals start of a move, updating the move count, starting the game
+	 * timer, and resetting the auto play lane locks if requested.
 	 * 
 	 * @param resetAutoplayLaneIndexLocked
 	 *            Whether to reset the auto play lane locks
 	 */
-	private void moveCompleted(final boolean resetAutoplayLaneIndexLocked)
+	private void moveStarted(final boolean resetAutoplayLaneIndexLocked)
 	{
 		moveCount++;
 		activity.updateMoveCount();
@@ -725,9 +736,6 @@ public class GameState
 		if (resetAutoplayLaneIndexLocked)
 			for (int laneIndex = 0; laneIndex < 13; laneIndex++)
 				autoplayLaneIndexLocked[laneIndex] = false;
-		checkForWin();
-		if (pendingMoves == 0)
-			autoPlay();
 	}
 
 	/**
@@ -835,6 +843,7 @@ public class GameState
 			laneLayout.setStackSize(lane[laneIndex].getStack().size());
 			laneLayout.addCascade(lane[laneIndex].getCascade());
 		}
+		checkForWin();
 	}
 
 	/**
