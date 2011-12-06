@@ -29,6 +29,87 @@ public class GameState
 	 * Logging tag
 	 */
 	private static final String TAG = "TripleSolitaireActivity";
+
+	/**
+	 * Whether the empty lane should accept a dropped card/cascade
+	 * 
+	 * @param laneIndex
+	 *            One-based index (1 through 13) of the lane drop target
+	 * @param topNewCard
+	 *            Top card of the cascade/the card to be dropped
+	 * @return Whether the lane should accept the drop
+	 */
+	public static boolean acceptLaneDrop(final int laneIndex,
+			final String topNewCard)
+	{
+		final boolean acceptDrop = topNewCard.endsWith("s13");
+		if (acceptDrop)
+			Log.d(GameState.TAG, "Drag -> " + laneIndex
+					+ ": Acceptable drag of " + topNewCard + " onto empty lane");
+		return acceptDrop;
+	}
+
+	/**
+	 * Parses a given card to return the card number (from ace at 1 to king at
+	 * 13)
+	 * 
+	 * @param card
+	 *            Card to get the number from
+	 * @return The number of the card, ranging from ace at 1 to king at 13
+	 */
+	private static int getNumber(final String card)
+	{
+		int firstNumber;
+		for (firstNumber = 0; firstNumber < card.length(); firstNumber++)
+			if (Character.isDigit(card.charAt(firstNumber)))
+				break;
+		return Integer.parseInt(card.substring(firstNumber));
+	}
+
+	/**
+	 * Parses a given card to return its suit
+	 * 
+	 * @param card
+	 *            Card to get the suit from
+	 * @return The suit of the card
+	 */
+	private static String getSuit(final String card)
+	{
+		int firstNumber;
+		for (firstNumber = 0; firstNumber < card.length(); firstNumber++)
+			if (Character.isDigit(card.charAt(firstNumber)))
+				break;
+		return card.substring(0, firstNumber);
+	}
+
+	/**
+	 * Gets the next card (sequentially higher) than the given card
+	 * 
+	 * @param card
+	 *            Card to 'increment'
+	 * @return A card of the same suit and one number higher
+	 */
+	private static String nextInSuit(final String card)
+	{
+		return GameState.getSuit(card) + (GameState.getNumber(card) + 1);
+	}
+
+	/**
+	 * Returns the previous (one number less) card in the same suit as the given
+	 * card
+	 * 
+	 * @param card
+	 *            Card to 'decrement'
+	 * @return A card one number less and in the same suit as the given card, or
+	 *         null if the card was an Ace (number=1)
+	 */
+	private static String prevInSuit(final String card)
+	{
+		if (card.endsWith("s1"))
+			return null;
+		return GameState.getSuit(card) + (GameState.getNumber(card) - 1);
+	}
+
 	/**
 	 * Activity to issue UI update callbacks
 	 */
@@ -149,10 +230,10 @@ public class GameState
 			final String bottomNewCard)
 	{
 		final String cascadeCard = lane[laneIndex - 1].getCascade().getLast();
-		final String cascadeSuit = getSuit(cascadeCard);
-		final int cascadeNum = getNumber(cascadeCard);
-		final String bottomNewCardSuit = getSuit(bottomNewCard);
-		final int bottomNewCardNum = getNumber(bottomNewCard);
+		final String cascadeSuit = GameState.getSuit(cascadeCard);
+		final int cascadeNum = GameState.getNumber(cascadeCard);
+		final String bottomNewCardSuit = GameState.getSuit(bottomNewCard);
+		final int bottomNewCardNum = GameState.getNumber(bottomNewCard);
 		boolean acceptDrop = false;
 		final boolean cascadeCardIsBlack = cascadeSuit.equals("clubs")
 				|| cascadeSuit.equals("spades");
@@ -164,8 +245,9 @@ public class GameState
 			acceptDrop = cascadeCardIsBlack && !bottomNewCardIsBlack
 					|| !cascadeCardIsBlack && bottomNewCardIsBlack;
 		if (acceptDrop)
-			Log.d(TAG, "Drag -> " + laneIndex + ": Acceptable drag of "
-					+ bottomNewCard + " onto " + cascadeCard);
+			Log.d(GameState.TAG, "Drag -> " + laneIndex
+					+ ": Acceptable drag of " + bottomNewCard + " onto "
+					+ cascadeCard);
 		return acceptDrop;
 	}
 
@@ -192,32 +274,16 @@ public class GameState
 		if (existingFoundationCard == null)
 			acceptDrop = newCard.endsWith("s1");
 		else
-			acceptDrop = newCard.equals(nextInSuit(existingFoundationCard));
+			acceptDrop = newCard.equals(GameState
+					.nextInSuit(existingFoundationCard));
 		if (acceptDrop)
 		{
 			final String foundationDisplayCard = existingFoundationCard == null ? "empty foundation"
 					: existingFoundationCard;
-			Log.d(TAG, "Drag -> " + foundationIndex + ": Acceptable drag of "
-					+ newCard + " onto " + foundationDisplayCard);
+			Log.d(GameState.TAG, "Drag -> " + foundationIndex
+					+ ": Acceptable drag of " + newCard + " onto "
+					+ foundationDisplayCard);
 		}
-		return acceptDrop;
-	}
-
-	/**
-	 * Whether the empty lane should accept a dropped card/cascade
-	 * 
-	 * @param laneIndex
-	 *            One-based index (1 through 13) of the lane drop target
-	 * @param topNewCard
-	 *            Top card of the cascade/the card to be dropped
-	 * @return Whether the lane should accept the drop
-	 */
-	public boolean acceptLaneDrop(final int laneIndex, final String topNewCard)
-	{
-		final boolean acceptDrop = topNewCard.endsWith("s13");
-		if (acceptDrop)
-			Log.d(TAG, "Drag -> " + laneIndex + ": Acceptable drag of "
-					+ topNewCard + " onto empty lane");
 		return acceptDrop;
 	}
 
@@ -389,7 +455,7 @@ public class GameState
 			if (foundation[foundationIndex] == null
 					|| !foundation[foundationIndex].endsWith("s13"))
 				return;
-		Log.d(TAG, "Game win detected");
+		Log.d(GameState.TAG, "Game win detected");
 		pauseGame();
 		final Uri gameUri = ContentUris.withAppendedId(
 				GameContract.Games.CONTENT_ID_URI_BASE, gameId);
@@ -431,39 +497,6 @@ public class GameState
 	public int getMoveCount()
 	{
 		return moveCount;
-	}
-
-	/**
-	 * Parses a given card to return the card number (from ace at 1 to king at
-	 * 13)
-	 * 
-	 * @param card
-	 *            Card to get the number from
-	 * @return The number of the card, ranging from ace at 1 to king at 13
-	 */
-	private int getNumber(final String card)
-	{
-		int firstNumber;
-		for (firstNumber = 0; firstNumber < card.length(); firstNumber++)
-			if (Character.isDigit(card.charAt(firstNumber)))
-				break;
-		return Integer.parseInt(card.substring(firstNumber));
-	}
-
-	/**
-	 * Parses a given card to return its suit
-	 * 
-	 * @param card
-	 *            Card to get the suit from
-	 * @return The suit of the card
-	 */
-	private String getSuit(final String card)
-	{
-		int firstNumber;
-		for (firstNumber = 0; firstNumber < card.length(); firstNumber++)
-			if (Character.isDigit(card.charAt(firstNumber)))
-				break;
-		return card.substring(0, firstNumber);
 	}
 
 	/**
@@ -525,7 +558,7 @@ public class GameState
 	 */
 	public void move(final Move move)
 	{
-		Log.d(TAG, move.toString());
+		Log.d(GameState.TAG, move.toString());
 		final SharedPreferences preferences = PreferenceManager
 				.getDefaultSharedPreferences(activity);
 		switch (move.getType())
@@ -606,8 +639,8 @@ public class GameState
 			case PLAYER_MOVE: // Player dragged move
 				// Update game state at from location
 				if (move.getFromIndex() < 0)
-					foundation[-1 * move.getFromIndex() - 1] = prevInSuit(move
-							.getCard());
+					foundation[-1 * move.getFromIndex() - 1] = GameState
+							.prevInSuit(move.getCard());
 				else if (move.getFromIndex() == 0)
 					waste.removeFirst();
 				else
@@ -784,18 +817,6 @@ public class GameState
 	}
 
 	/**
-	 * Gets the next card (sequentially higher) than the given card
-	 * 
-	 * @param card
-	 *            Card to 'increment'
-	 * @return A card of the same suit and one number higher
-	 */
-	private String nextInSuit(final String card)
-	{
-		return getSuit(card) + (getNumber(card) + 1);
-	}
-
-	/**
 	 * Restores the game state from a Bundle and updates the UI to match
 	 * 
 	 * @param savedInstanceState
@@ -882,22 +903,6 @@ public class GameState
 	{
 		gameInProgress = false;
 		postHandler.removeCallbacks(gameTimerIncrement);
-	}
-
-	/**
-	 * Returns the previous (one number less) card in the same suit as the given
-	 * card
-	 * 
-	 * @param card
-	 *            Card to 'decrement'
-	 * @return A card one number less and in the same suit as the given card, or
-	 *         null if the card was an Ace (number=1)
-	 */
-	private String prevInSuit(final String card)
-	{
-		if (card.endsWith("s1"))
-			return null;
-		return getSuit(card) + (getNumber(card) - 1);
 	}
 
 	/**

@@ -242,14 +242,14 @@ public class Lane extends RelativeLayout implements OnDragListener
 			String card = event.getClipDescription().getLabel().toString();
 			if (isMyCascade)
 			{
-				Log.d(TAG, "Drag " + laneId + ": Started of " + card);
+				Log.d(Lane.TAG, "Drag " + laneId + ": Started of " + card);
 				return true;
 			}
 			// Take off MULTI prefix - we accept all cascades based on the
 			// bottom card alone
 			if (card.startsWith("MULTI"))
 				card = card.substring(5, card.indexOf(';'));
-			return cascadeSize == 0 ? gameState.acceptLaneDrop(laneId, card)
+			return cascadeSize == 0 ? GameState.acceptLaneDrop(laneId, card)
 					: gameState.acceptCascadeDrop(laneId, card);
 		}
 		else if (event.getAction() == DragEvent.ACTION_DROP && !isMyCascade)

@@ -30,6 +30,7 @@ public class ResetDialogFragment extends android.app.DialogFragment
 								new AsyncQueryHandler(getActivity()
 										.getContentResolver())
 								{
+									// No call backs needed
 								}.startDelete(0, 0,
 										GameContract.Games.CONTENT_URI, null,
 										null);

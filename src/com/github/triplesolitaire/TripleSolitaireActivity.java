@@ -111,7 +111,8 @@ public class TripleSolitaireActivity extends Activity
 						.getFoundationCard(foundationIndex);
 				if (isMyFoundation)
 				{
-					Log.d(TAG, "Drag " + foundationIndex + ": Started of "
+					Log.d(TripleSolitaireActivity.TAG, "Drag "
+							+ foundationIndex + ": Started of "
 							+ foundationCard);
 					return false;
 				}
@@ -378,7 +379,7 @@ public class TripleSolitaireActivity extends Activity
 	 * @see android.app.Activity#onCreate(android.os.Bundle)
 	 */
 	@Override
-	public void onCreate(final Bundle savedInstanceState)
+	protected void onCreate(final Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		gameState = new GameState(this);
@@ -429,7 +430,8 @@ public class TripleSolitaireActivity extends Activity
 				{
 					final String card = event.getClipDescription().getLabel()
 							.toString();
-					Log.d(TAG, "Drag W: Started of " + card);
+					Log.d(TripleSolitaireActivity.TAG, "Drag W: Started of "
+							+ card);
 					return true;
 				}
 				else if (event.getAction() == DragEvent.ACTION_DRAG_ENDED
@@ -548,7 +550,7 @@ public class TripleSolitaireActivity extends Activity
 	 * @see android.app.Activity#onRestoreInstanceState(android.os.Bundle)
 	 */
 	@Override
-	public void onRestoreInstanceState(final Bundle savedInstanceState)
+	protected void onRestoreInstanceState(final Bundle savedInstanceState)
 	{
 		gameState.onRestoreInstanceState(savedInstanceState);
 		super.onRestoreInstanceState(savedInstanceState);
@@ -583,11 +585,11 @@ public class TripleSolitaireActivity extends Activity
 	 * @see android.app.Activity#onSaveInstanceState(android.os.Bundle)
 	 */
 	@Override
-	public void onSaveInstanceState(final Bundle outState)
+	protected void onSaveInstanceState(final Bundle outState)
 	{
 		super.onSaveInstanceState(outState);
 		gameState.onSaveInstanceState(outState);
-		Log.d(TAG, "onSaveInstanceState");
+		Log.d(TripleSolitaireActivity.TAG, "onSaveInstanceState");
 	}
 
 	/**
