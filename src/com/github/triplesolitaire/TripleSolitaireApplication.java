@@ -2,7 +2,6 @@ package com.github.triplesolitaire;
 
 import android.app.Application;
 import android.content.SharedPreferences;
-import android.content.pm.ApplicationInfo;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
 
@@ -19,9 +18,8 @@ public class TripleSolitaireApplication extends Application
 	@Override
 	public void onCreate()
 	{
-		final ApplicationInfo appInfo = getApplicationContext()
-				.getApplicationInfo();
-		if ((appInfo.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0)
+		getApplicationContext().getApplicationInfo();
+		if (BuildConfig.DEBUG)
 			StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
 					.detectDiskReads().detectDiskWrites().detectNetwork()
 					.penaltyLog().penaltyFlashScreen().build());

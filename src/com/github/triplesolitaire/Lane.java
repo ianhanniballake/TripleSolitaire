@@ -242,7 +242,8 @@ public class Lane extends RelativeLayout implements OnDragListener
 			String card = event.getClipDescription().getLabel().toString();
 			if (isMyCascade)
 			{
-				Log.d(Lane.TAG, "Drag " + laneId + ": Started of " + card);
+				if (BuildConfig.DEBUG)
+					Log.d(Lane.TAG, "Drag " + laneId + ": Started of " + card);
 				return true;
 			}
 			// Take off MULTI prefix - we accept all cascades based on the

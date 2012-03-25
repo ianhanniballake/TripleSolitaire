@@ -43,7 +43,7 @@ public class GameState
 			final String topNewCard)
 	{
 		final boolean acceptDrop = topNewCard.endsWith("s13");
-		if (acceptDrop)
+		if (acceptDrop && BuildConfig.DEBUG)
 			Log.d(GameState.TAG, "Drag -> " + laneIndex
 					+ ": Acceptable drag of " + topNewCard + " onto empty lane");
 		return acceptDrop;
@@ -244,7 +244,7 @@ public class GameState
 		else
 			acceptDrop = cascadeCardIsBlack && !bottomNewCardIsBlack
 					|| !cascadeCardIsBlack && bottomNewCardIsBlack;
-		if (acceptDrop)
+		if (acceptDrop && BuildConfig.DEBUG)
 			Log.d(GameState.TAG, "Drag -> " + laneIndex
 					+ ": Acceptable drag of " + bottomNewCard + " onto "
 					+ cascadeCard);
@@ -276,7 +276,7 @@ public class GameState
 		else
 			acceptDrop = newCard.equals(GameState
 					.nextInSuit(existingFoundationCard));
-		if (acceptDrop)
+		if (acceptDrop && BuildConfig.DEBUG)
 		{
 			final String foundationDisplayCard = existingFoundationCard == null ? "empty foundation"
 					: existingFoundationCard;
@@ -455,7 +455,8 @@ public class GameState
 			if (foundation[foundationIndex] == null
 					|| !foundation[foundationIndex].endsWith("s13"))
 				return;
-		Log.d(GameState.TAG, "Game win detected");
+		if (BuildConfig.DEBUG)
+			Log.d(GameState.TAG, "Game win detected");
 		pauseGame();
 		final Uri gameUri = ContentUris.withAppendedId(
 				GameContract.Games.CONTENT_ID_URI_BASE, gameId);
@@ -558,7 +559,8 @@ public class GameState
 	 */
 	public void move(final Move move)
 	{
-		Log.d(GameState.TAG, move.toString());
+		if (BuildConfig.DEBUG)
+			Log.d(GameState.TAG, move.toString());
 		final SharedPreferences preferences = PreferenceManager
 				.getDefaultSharedPreferences(activity);
 		switch (move.getType())

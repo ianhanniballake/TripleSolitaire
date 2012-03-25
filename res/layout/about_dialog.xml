@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:id="@+id/about_dialog_root"
 	android:layout_width="fill_parent"
 	android:layout_height="fill_parent"
 	android:padding="10dp" >
+
 	<TextView
 		android:id="@+id/description"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:text="@string/description" />
+
 	<TextView
 		android:id="@+id/project"
 		android:layout_width="wrap_content"
@@ -16,8 +17,8 @@
 		android:layout_below="@id/description"
 		android:paddingTop="10dp"
 		android:text="@string/project" />
+
 	<TextView
-		android:id="@+id/project_link"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_below="@id/description"
@@ -26,6 +27,7 @@
 		android:paddingLeft="5dp"
 		android:paddingTop="10dp"
 		android:text="@string/project_link" />
+
 	<TextView
 		android:id="@+id/created_by_label"
 		android:layout_width="wrap_content"
@@ -33,6 +35,7 @@
 		android:layout_below="@id/project"
 		android:paddingTop="20dp"
 		android:text="@string/created_by_label" />
+
 	<TextView
 		android:id="@+id/creator"
 		android:layout_width="wrap_content"
@@ -41,6 +44,7 @@
 		android:layout_below="@id/created_by_label"
 		android:paddingLeft="15dp"
 		android:text="@string/creator" />
+
 	<TextView
 		android:id="@+id/creator_separator"
 		android:layout_width="wrap_content"
@@ -48,8 +52,8 @@
 		android:layout_below="@id/created_by_label"
 		android:layout_toRightOf="@id/creator"
 		android:text="@string/separator" />
+
 	<TextView
-		android:id="@+id/creator_link"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_below="@id/created_by_label"
@@ -57,12 +61,14 @@
 		android:autoLink="web"
 		android:paddingLeft="5dp"
 		android:text="@string/creator_link" />
+
 	<TextView
 		android:id="@+id/graphics_and_testing_by_label"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_below="@id/creator"
 		android:text="@string/graphics_and_testing_by_label" />
+
 	<TextView
 		android:id="@+id/artist_and_tester"
 		android:layout_width="wrap_content"
@@ -71,6 +77,7 @@
 		android:layout_below="@id/graphics_and_testing_by_label"
 		android:paddingLeft="15dp"
 		android:text="@string/artist_and_tester" />
+
 	<TextView
 		android:id="@+id/artist_and_tester_separator"
 		android:layout_width="wrap_content"
@@ -78,8 +85,8 @@
 		android:layout_below="@id/graphics_and_testing_by_label"
 		android:layout_toRightOf="@id/artist_and_tester"
 		android:text="@string/separator" />
+
 	<TextView
-		android:id="@+id/artist_and_tester_link"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_below="@id/graphics_and_testing_by_label"
@@ -87,4 +94,5 @@
 		android:autoLink="web"
 		android:paddingLeft="5dp"
 		android:text="@string/artist_and_tester_link" />
+
 </RelativeLayout>

@@ -18,6 +18,8 @@ import android.provider.BaseColumns;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.github.triplesolitaire.BuildConfig;
+
 /**
  * Provides access to a database of games.
  */
@@ -36,7 +38,8 @@ public class GameProvider extends ContentProvider
 		 */
 		DatabaseHelper(final Context context)
 		{
-			super(context, DATABASE_NAME, null, DATABASE_VERSION);
+			super(context, GameProvider.DATABASE_NAME, null,
+					GameProvider.DATABASE_VERSION);
 		}
 
 		/**
@@ -46,8 +49,9 @@ public class GameProvider extends ContentProvider
 		@Override
 		public void onCreate(final SQLiteDatabase db)
 		{
-			Log.d(TAG, "Creating the " + GameContract.Games.TABLE_NAME
-					+ " table");
+			if (BuildConfig.DEBUG)
+				Log.d(GameProvider.TAG, "Creating the "
+						+ GameContract.Games.TABLE_NAME + " table");
 			db.execSQL("CREATE TABLE " + GameContract.Games.TABLE_NAME + " ("
 					+ BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
 					+ GameContract.Games.COLUMN_NAME_START_TIME + " INTEGER,"
@@ -65,8 +69,9 @@ public class GameProvider extends ContentProvider
 		public void onUpgrade(final SQLiteDatabase db, final int oldVersion,
 				final int newVersion)
 		{
-			Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
-					+ newVersion + ", which will destroy all old data");
+			Log.w(GameProvider.TAG, "Upgrading database from version "
+					+ oldVersion + " to " + newVersion
+					+ ", which will destroy all old data");
 			db.execSQL("DROP TABLE IF EXISTS " + GameContract.Games.TABLE_NAME);
 			onCreate(db);
 		}
@@ -95,7 +100,7 @@ public class GameProvider extends ContentProvider
 	/**
 	 * A UriMatcher instance
 	 */
-	private static final UriMatcher uriMatcher = buildUriMatcher();
+	private static final UriMatcher uriMatcher = GameProvider.buildUriMatcher();
 
 	/**
 	 * Creates and initializes a column project for all columns
@@ -124,16 +129,17 @@ public class GameProvider extends ContentProvider
 	{
 		final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
 		matcher.addURI(GameContract.AUTHORITY, GameContract.Games.TABLE_NAME,
-				GAMES);
+				GameProvider.GAMES);
 		matcher.addURI(GameContract.AUTHORITY, GameContract.Games.TABLE_NAME
-				+ "/#", GAME_ID);
+				+ "/#", GameProvider.GAME_ID);
 		return matcher;
 	}
 
 	/**
 	 * An identity all column projection mapping
 	 */
-	final HashMap<String, String> allColumnProjectionMap = buildAllColumnProjectionMap();
+	final HashMap<String, String> allColumnProjectionMap = GameProvider
+			.buildAllColumnProjectionMap();
 	/**
 	 * Handle to a new DatabaseHelper.
 	 */
@@ -147,7 +153,7 @@ public class GameProvider extends ContentProvider
 		final SQLiteDatabase db = databaseHelper.getWritableDatabase();
 		int count;
 		// Does the delete based on the incoming URI pattern.
-		switch (uriMatcher.match(uri))
+		switch (GameProvider.uriMatcher.match(uri))
 		{
 			case GAMES:
 				// If the incoming pattern matches the general pattern for
@@ -179,7 +185,7 @@ public class GameProvider extends ContentProvider
 		/**
 		 * Chooses the MIME type based on the incoming URI pattern
 		 */
-		switch (uriMatcher.match(uri))
+		switch (GameProvider.uriMatcher.match(uri))
 		{
 			case GAMES:
 				// If the pattern is for games, returns the general content
@@ -199,7 +205,7 @@ public class GameProvider extends ContentProvider
 	{
 		// Validates the incoming URI. Only the full provider URI is allowed for
 		// inserts.
-		if (uriMatcher.match(uri) != GAMES)
+		if (GameProvider.uriMatcher.match(uri) != GameProvider.GAMES)
 			throw new IllegalArgumentException("Unknown URI " + uri);
 		ContentValues values;
 		if (initialValues != null)
@@ -251,7 +257,7 @@ public class GameProvider extends ContentProvider
 		String finalSortOrder = sortOrder;
 		if (TextUtils.isEmpty(sortOrder))
 			finalSortOrder = GameContract.Games.DEFAULT_SORT_ORDER;
-		switch (uriMatcher.match(uri))
+		switch (GameProvider.uriMatcher.match(uri))
 		{
 			case GAMES:
 				break;
@@ -277,7 +283,7 @@ public class GameProvider extends ContentProvider
 	{
 		final SQLiteDatabase db = databaseHelper.getWritableDatabase();
 		int count = 0;
-		switch (uriMatcher.match(uri))
+		switch (GameProvider.uriMatcher.match(uri))
 		{
 			case GAMES:
 				// If the incoming URI matches the general games pattern,

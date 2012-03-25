@@ -3,19 +3,21 @@
 	android:layout_width="wrap_content"
 	android:layout_height="fill_parent"
 	android:orientation="horizontal" >
+
 	<TextView
-		android:id="@+id/time_label"
 		style="@android:style/TextAppearance.Medium"
 		android:layout_width="wrap_content"
 		android:layout_height="fill_parent"
 		android:layout_marginLeft="20dp"
 		android:text="@string/time" />
+
 	<TextView
 		android:id="@+id/time"
 		style="@android:style/TextAppearance.Medium"
 		android:layout_width="wrap_content"
 		android:layout_height="fill_parent"
 		android:layout_marginLeft="5dp" />
+
 	<TextView
 		android:id="@+id/move_count_label"
 		style="@android:style/TextAppearance.Medium"
@@ -23,10 +25,12 @@
 		android:layout_height="fill_parent"
 		android:layout_marginLeft="20dp"
 		android:text="@string/move_count" />
+
 	<TextView
 		android:id="@+id/move_count"
 		style="@android:style/TextAppearance.Medium"
 		android:layout_width="wrap_content"
 		android:layout_height="fill_parent"
 		android:layout_marginLeft="5dp" />
+
 </LinearLayout>

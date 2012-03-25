@@ -2,6 +2,7 @@ package com.github.triplesolitaire;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.AsyncQueryHandler;
@@ -111,9 +112,10 @@ public class TripleSolitaireActivity extends Activity
 						.getFoundationCard(foundationIndex);
 				if (isMyFoundation)
 				{
-					Log.d(TripleSolitaireActivity.TAG, "Drag "
-							+ foundationIndex + ": Started of "
-							+ foundationCard);
+					if (BuildConfig.DEBUG)
+						Log.d(TripleSolitaireActivity.TAG, "Drag "
+								+ foundationIndex + ": Started of "
+								+ foundationCard);
 					return false;
 				}
 				final String card = event.getClipDescription().getLabel()
@@ -262,6 +264,16 @@ public class TripleSolitaireActivity extends Activity
 			// is stopped, the UI will be repainted correctly when the activity
 			// resumes, resolving us from any responsibility at this point
 		}
+	}
+
+	/**
+	 * Cancel any running animation
+	 */
+	@TargetApi(14)
+	private void cancelAnimation()
+	{
+		final FrameLayout layout = (FrameLayout) findViewById(R.id.animateLayout);
+		layout.animate().cancel();
 	}
 
 	/**
@@ -428,10 +440,13 @@ public class TripleSolitaireActivity extends Activity
 				if (event.getAction() == DragEvent.ACTION_DRAG_STARTED
 						&& fromMe)
 				{
-					final String card = event.getClipDescription().getLabel()
-							.toString();
-					Log.d(TripleSolitaireActivity.TAG, "Drag W: Started of "
-							+ card);
+					if (BuildConfig.DEBUG)
+					{
+						final String card = event.getClipDescription()
+								.getLabel().toString();
+						Log.d(TripleSolitaireActivity.TAG,
+								"Drag W: Started of " + card);
+					}
 					return true;
 				}
 				else if (event.getAction() == DragEvent.ACTION_DRAG_ENDED
@@ -525,10 +540,7 @@ public class TripleSolitaireActivity extends Activity
 	{
 		super.onPause();
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-		{
-			final FrameLayout layout = (FrameLayout) findViewById(R.id.animateLayout);
-			layout.animate().cancel();
-		}
+			cancelAnimation();
 	}
 
 	/**
@@ -589,7 +601,8 @@ public class TripleSolitaireActivity extends Activity
 	{
 		super.onSaveInstanceState(outState);
 		gameState.onSaveInstanceState(outState);
-		Log.d(TripleSolitaireActivity.TAG, "onSaveInstanceState");
+		if (BuildConfig.DEBUG)
+			Log.d(TripleSolitaireActivity.TAG, "onSaveInstanceState");
 	}
 
 	/**
