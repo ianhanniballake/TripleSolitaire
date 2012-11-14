@@ -7,7 +7,7 @@
 
 	<uses-sdk
 		android:minSdkVersion="12"
-		android:targetSdkVersion="15" />
+		android:targetSdkVersion="17" />
 
 	<supports-screens
 		android:largeScreens="false"
@@ -20,7 +20,8 @@
 		android:backupAgent="TripleSolitaireBackupAgent"
 		android:hardwareAccelerated="true"
 		android:icon="@drawable/icon"
-		android:label="@string/app_name" >
+		android:label="@string/app_name"
+		android:allowBackup="true" >
 		<provider
 			android:name=".provider.GameProvider"
 			android:authorities="com.github.triplesolitaire"
