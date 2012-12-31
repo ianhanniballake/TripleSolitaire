@@ -1,5 +1,6 @@
 package com.github.triplesolitaire;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.widget.ImageView;
 
@@ -7,6 +8,7 @@ import android.widget.ImageView;
  * Image View specifically for Cards. Auto sets the width and height to the
  * appropriate values
  */
+@SuppressLint("ViewConstructor")
 public class Card extends ImageView
 {
 	/**

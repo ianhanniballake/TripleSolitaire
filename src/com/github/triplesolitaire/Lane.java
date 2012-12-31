@@ -70,15 +70,15 @@ public class Lane extends RelativeLayout implements OnDragListener
 	/**
 	 * Current size of the cascade
 	 */
-	private int cascadeSize;
+	int cascadeSize;
 	/**
 	 * Callback to the game state
 	 */
-	private GameState gameState;
+	GameState gameState;
 	/**
 	 * The One based index of this lane
 	 */
-	private int laneId;
+	int laneId;
 	/**
 	 * Callback for the card flip click events
 	 */

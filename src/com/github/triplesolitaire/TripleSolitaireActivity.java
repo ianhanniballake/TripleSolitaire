@@ -185,11 +185,11 @@ public class TripleSolitaireActivity extends Activity
 	/**
 	 * Game state which saves and manages the current game
 	 */
-	private GameState gameState;
+	GameState gameState;
 	/**
 	 * Handler used to post delayed calls
 	 */
-	private final Handler handler = new Handler();
+	final Handler handler = new Handler();
 
 	/**
 	 * Animates the given move by creating a copy of the source view and

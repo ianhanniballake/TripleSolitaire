@@ -113,7 +113,7 @@ public class GameState
 	/**
 	 * Activity to issue UI update callbacks
 	 */
-	private final TripleSolitaireActivity activity;
+	final TripleSolitaireActivity activity;
 	/**
 	 * Whether a lane should be excluded from autoplay (i.e., if the user just
 	 * dragged a card from the foundation to that column
@@ -126,11 +126,11 @@ public class GameState
 	/**
 	 * Current game id as determined by the GameProvider
 	 */
-	private long gameId = -1;
+	long gameId = -1;
 	/**
 	 * Whether a game is in progress
 	 */
-	private boolean gameInProgress = false;
+	boolean gameInProgress = false;
 	/**
 	 * Handler for asynchronous inserts/updates of games
 	 */
@@ -171,7 +171,7 @@ public class GameState
 	/**
 	 * Number of player moves in the current game
 	 */
-	private int moveCount = 0;
+	int moveCount = 0;
 	/**
 	 * A list of all undoable moves
 	 */
@@ -183,7 +183,7 @@ public class GameState
 	/**
 	 * Handler for running the game timer and move completer
 	 */
-	private final Handler postHandler = new Handler();
+	final Handler postHandler = new Handler();
 	/**
 	 * Represents the cards in the stock
 	 */
@@ -191,7 +191,7 @@ public class GameState
 	/**
 	 * How much time has elapsed in the current game
 	 */
-	private int timeInSeconds = 0;
+	int timeInSeconds = 0;
 	/**
 	 * Represents the cards in the waste
 	 */
@@ -737,6 +737,8 @@ public class GameState
 					moveCompleted();
 				}
 				break;
+			default:
+				break;
 		}
 	}
 
@@ -744,7 +746,7 @@ public class GameState
 	 * Signals completion of a move, starting auto play if there are no other
 	 * pending animations (which will eventually call this method).
 	 */
-	private void moveCompleted()
+	void moveCompleted()
 	{
 		checkForWin();
 		if (pendingMoves == 0)
