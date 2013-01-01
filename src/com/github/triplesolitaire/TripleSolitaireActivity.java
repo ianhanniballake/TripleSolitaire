@@ -5,9 +5,12 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.AsyncQueryHandler;
 import android.content.ClipData;
 import android.content.ContentUris;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -382,6 +385,36 @@ public class TripleSolitaireActivity extends Activity
 	public void newGame()
 	{
 		gameState.newGame();
+	}
+
+	@Override
+	public void onBackPressed()
+	{
+		final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this)
+				.setIcon(android.R.drawable.ic_dialog_alert)
+				.setTitle(R.string.quit_title)
+				.setMessage(R.string.quit_message)
+				.setPositiveButton(R.string.quit_positive,
+						new DialogInterface.OnClickListener()
+						{
+							@SuppressWarnings("synthetic-access")
+							@Override
+							public void onClick(final DialogInterface dialog,
+									final int which)
+							{
+								TripleSolitaireActivity.super.onBackPressed();
+							}
+						}).setNegativeButton(R.string.quit_negative, null);
+		dialogBuilder.setOnCancelListener(new OnCancelListener()
+		{
+			@SuppressWarnings("synthetic-access")
+			@Override
+			public void onCancel(final DialogInterface dialog)
+			{
+				TripleSolitaireActivity.super.onBackPressed();
+			}
+		});
+		dialogBuilder.show();
 	}
 
 	/**

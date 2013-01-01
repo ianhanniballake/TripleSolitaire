@@ -8,6 +8,10 @@
 	<string name="win_dialog">You won in %1$s and %2$d moves!</string>
 	<string name="exit">Exit</string>
 	<string name="close">Close</string>
+	<string name="quit_title">Quit Triple Solitaire?</string>
+	<string name="quit_message">You will lose all progress when you quit. Use the Home button to temporarily save your progress.</string>
+	<string name="quit_positive">Quit</string>
+	<string name="quit_negative">Cancel</string>
 	<string name="settings">Settings</string>
 	<string name="about">About</string>
 	<string name="description">Three deck variation of the classic three turn Solitaire, built specifically for tablets.</string>
