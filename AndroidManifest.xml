@@ -10,10 +10,11 @@
         android:targetSdkVersion="17" />
 
     <supports-screens
-        android:largeScreens="false"
+        android:largeScreens="true"
         android:normalScreens="false"
         android:smallScreens="false"
-        android:xlargeScreens="true" />
+        android:xlargeScreens="true"
+        android:requiresSmallestWidthDp="600" />
 
     <application
         android:name="TripleSolitaireApplication"

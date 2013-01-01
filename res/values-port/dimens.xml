@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<dimen name="between_card_dim">5dp</dimen>
-	<dimen name="card_width_dim">43dp</dimen>
-	<dimen name="card_height_dim">67dp</dimen>
+	<dimen name="card_width_dim">30dp</dimen>
+	<dimen name="card_height_dim">47dp</dimen>
 	<dimen name="card_horz_overlap_dim">8dp</dimen>
-	<dimen name="card_vert_overlap_dim">13dp</dimen>
+	<dimen name="card_vert_overlap_dim">12dp</dimen>
 </resources>
