@@ -377,6 +377,8 @@ public class GameState
 	 */
 	private void autoPlay()
 	{
+		if (!gameInProgress)
+			return;
 		final SharedPreferences preferences = PreferenceManager
 				.getDefaultSharedPreferences(activity);
 		final boolean autoFlip = preferences.getBoolean(
