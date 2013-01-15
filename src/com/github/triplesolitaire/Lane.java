@@ -13,8 +13,7 @@ import android.view.View.OnDragListener;
 import android.widget.RelativeLayout;
 
 /**
- * Layout to support drawing and managing a lane, including the stack and
- * cascade
+ * Layout to support drawing and managing a lane, including the stack and cascade
  */
 public class Lane extends RelativeLayout implements OnDragListener
 {
@@ -24,8 +23,8 @@ public class Lane extends RelativeLayout implements OnDragListener
 	private class OnStartDragListener implements OnTouchListener
 	{
 		/**
-		 * Zero based index of the card in the cascade, where the 0th card is
-		 * closest to the stack (i.e., under all the rest of the cascade)
+		 * Zero based index of the card in the cascade, where the 0th card is closest to the stack (i.e., under all the
+		 * rest of the cascade)
 		 */
 		private final int cascadeIndex;
 
@@ -33,8 +32,7 @@ public class Lane extends RelativeLayout implements OnDragListener
 		 * Creates a new listener for the given index
 		 * 
 		 * @param cascadeIndex
-		 *            Zero based index of the cascade card where 0 is the card
-		 *            under the rest of the cascade
+		 *            Zero based index of the cascade card where 0 is the card under the rest of the cascade
 		 */
 		public OnStartDragListener(final int cascadeIndex)
 		{
@@ -42,24 +40,19 @@ public class Lane extends RelativeLayout implements OnDragListener
 		}
 
 		/**
-		 * Responds to ACTION_DOWN events to start drags of the cascade of the
-		 * given card and all cards covering it
+		 * Responds to ACTION_DOWN events to start drags of the cascade of the given card and all cards covering it
 		 * 
-		 * @see android.view.View.OnTouchListener#onTouch(android.view.View,
-		 *      android.view.MotionEvent)
+		 * @see android.view.View.OnTouchListener#onTouch(android.view.View, android.view.MotionEvent)
 		 */
 		@Override
 		public boolean onTouch(final View v, final MotionEvent event)
 		{
 			if (event.getAction() != MotionEvent.ACTION_DOWN)
 				return false;
-			final String cascadeData = gameState.buildCascadeString(laneId,
-					cascadeSize - cascadeIndex);
-			final ClipData dragData = ClipData.newPlainText(
-					(cascadeIndex + 1 != cascadeSize ? "MULTI" : "")
-							+ cascadeData, cascadeData);
-			return v.startDrag(dragData, new View.DragShadowBuilder(v), laneId,
-					0);
+			final String cascadeData = gameState.buildCascadeString(laneId, cascadeSize - cascadeIndex);
+			final ClipData dragData = ClipData.newPlainText((cascadeIndex + 1 != cascadeSize ? "MULTI" : "")
+					+ cascadeData, cascadeData);
+			return v.startDrag(dragData, new View.DragShadowBuilder(v), laneId, 0);
 		}
 	}
 
@@ -106,33 +99,29 @@ public class Lane extends RelativeLayout implements OnDragListener
 	}
 
 	/**
-	 * Adds a new set of cards to the cascade. Creates the new card Views and
-	 * ensures that the appropriate listeners are set.
+	 * Adds a new set of cards to the cascade. Creates the new card Views and ensures that the appropriate listeners are
+	 * set.
 	 * 
 	 * @param cascadeToAdd
 	 *            List of cards to add to the cascade
 	 */
 	public void addCascade(final List<String> cascadeToAdd)
 	{
-		final int card_vert_overlap_dim = getResources().getDimensionPixelSize(
-				R.dimen.card_vert_overlap_dim);
+		final int card_vert_overlap_dim = getResources().getDimensionPixelSize(R.dimen.card_vert_overlap_dim);
 		// Create the cascade
 		for (int h = 0; h < cascadeToAdd.size(); h++)
 		{
 			final int cascadeId = h + cascadeSize + stackSize + 1;
-			final Card cascadeCard = new Card(getContext(), getResources()
-					.getIdentifier(cascadeToAdd.get(h), "drawable",
-							getContext().getPackageName()));
+			final Card cascadeCard = new Card(getContext(), getResources().getIdentifier(cascadeToAdd.get(h),
+					"drawable", getContext().getPackageName()));
 			cascadeCard.setId(cascadeId);
 			final RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
-					android.view.ViewGroup.LayoutParams.WRAP_CONTENT,
-					android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
+					android.view.ViewGroup.LayoutParams.WRAP_CONTENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
 			lp.addRule(RelativeLayout.ALIGN_TOP, cascadeId - 1);
 			lp.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
 			if (stackSize + cascadeSize + h != 0)
 				lp.setMargins(0, card_vert_overlap_dim, 0, 0);
-			cascadeCard.setOnTouchListener(new OnStartDragListener(h
-					+ cascadeSize));
+			cascadeCard.setOnTouchListener(new OnStartDragListener(h + cascadeSize));
 			addView(cascadeCard, lp);
 		}
 		if (cascadeSize == 0 && !cascadeToAdd.isEmpty())
@@ -152,8 +141,7 @@ public class Lane extends RelativeLayout implements OnDragListener
 			}
 		if (cascadeSize > 0)
 		{
-			final Card oldTopCascade = (Card) findViewById(stackSize
-					+ cascadeSize);
+			final Card oldTopCascade = (Card) findViewById(stackSize + cascadeSize);
 			oldTopCascade.setOnDragListener(null);
 		}
 		if (!cascadeToAdd.isEmpty())
@@ -195,8 +183,7 @@ public class Lane extends RelativeLayout implements OnDragListener
 	}
 
 	/**
-	 * Flips over the top card, replacing the card back image with the given
-	 * card
+	 * Flips over the top card, replacing the card back image with the given card
 	 * 
 	 * @param card
 	 *            The card to show as the newly flipped over card
@@ -204,8 +191,7 @@ public class Lane extends RelativeLayout implements OnDragListener
 	public void flipOverTopStack(final String card)
 	{
 		final Card toFlip = (Card) findViewById(stackSize);
-		toFlip.setBackgroundResource(getResources().getIdentifier(card,
-				"drawable", getContext().getPackageName()));
+		toFlip.setBackgroundResource(getResources().getIdentifier(card, "drawable", getContext().getPackageName()));
 		toFlip.invalidate();
 		toFlip.setOnClickListener(null);
 		toFlip.setOnDragListener(this);
@@ -215,8 +201,7 @@ public class Lane extends RelativeLayout implements OnDragListener
 	}
 
 	/**
-	 * Returns the Card (ImageView) associated with the top (i.e., not covered
-	 * by any other cards) cascade card
+	 * Returns the Card (ImageView) associated with the top (i.e., not covered by any other cards) cascade card
 	 * 
 	 * @return The Card associated with the top cascade card
 	 */
@@ -226,12 +211,10 @@ public class Lane extends RelativeLayout implements OnDragListener
 	}
 
 	/**
-	 * Responds to drag events of cascades, accepting drops given the right
-	 * card. If the user fails to drag the card to an appropriate drop point,
-	 * attempts to auto move it to the foundation
+	 * Responds to drag events of cascades, accepting drops given the right card. If the user fails to drag the card to
+	 * an appropriate drop point, attempts to auto move it to the foundation
 	 * 
-	 * @see android.view.View.OnDragListener#onDrag(android.view.View,
-	 *      android.view.DragEvent)
+	 * @see android.view.View.OnDragListener#onDrag(android.view.View, android.view.DragEvent)
 	 */
 	@Override
 	public boolean onDrag(final View v, final DragEvent event)
@@ -250,14 +233,13 @@ public class Lane extends RelativeLayout implements OnDragListener
 			// bottom card alone
 			if (card.startsWith("MULTI"))
 				card = card.substring(5, card.indexOf(';'));
-			return cascadeSize == 0 ? GameState.acceptLaneDrop(laneId, card)
-					: gameState.acceptCascadeDrop(laneId, card);
+			return cascadeSize == 0 ? GameState.acceptLaneDrop(laneId, card) : gameState
+					.acceptCascadeDrop(laneId, card);
 		}
 		else if (event.getAction() == DragEvent.ACTION_DROP && !isMyCascade)
 		{
 			System.gc();
-			final String card = event.getClipData().getItemAt(0).getText()
-					.toString();
+			final String card = event.getClipData().getItemAt(0).getText().toString();
 			final int from = (Integer) event.getLocalState();
 			gameState.move(new Move(Move.Type.PLAYER_MOVE, laneId, from, card));
 			return true;
@@ -312,8 +294,7 @@ public class Lane extends RelativeLayout implements OnDragListener
 	}
 
 	/**
-	 * Sets the stack size to the given size. Note that this method also removes
-	 * all cards from the cascade!
+	 * Sets the stack size to the given size. Note that this method also removes all cards from the cascade!
 	 * 
 	 * @param newStackSize
 	 *            New stack size
@@ -329,16 +310,14 @@ public class Lane extends RelativeLayout implements OnDragListener
 			laneBase.setOnDragListener(null);
 		}
 		stackSize = newStackSize;
-		final int card_vert_overlap_dim = getResources().getDimensionPixelSize(
-				R.dimen.card_vert_overlap_dim);
+		final int card_vert_overlap_dim = getResources().getDimensionPixelSize(R.dimen.card_vert_overlap_dim);
 		// Create the stack
 		for (int stackId = 1; stackId <= stackSize; stackId++)
 		{
 			final Card stackCard = new Card(getContext(), R.drawable.back);
 			stackCard.setId(stackId);
 			final RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
-					android.view.ViewGroup.LayoutParams.WRAP_CONTENT,
-					android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
+					android.view.ViewGroup.LayoutParams.WRAP_CONTENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
 			lp.addRule(RelativeLayout.ALIGN_TOP, stackId - 1);
 			lp.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
 			if (stackId != 1)

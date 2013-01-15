@@ -19,8 +19,7 @@ import com.github.triplesolitaire.provider.GameContract;
 /**
  * Stats Dialog for the application
  */
-public class StatsDialogFragment extends DialogFragment implements
-		LoaderManager.LoaderCallbacks<Cursor>
+public class StatsDialogFragment extends DialogFragment implements LoaderManager.LoaderCallbacks<Cursor>
 {
 	@Override
 	public void onActivityCreated(final Bundle savedInstanceState)
@@ -32,12 +31,10 @@ public class StatsDialogFragment extends DialogFragment implements
 	@Override
 	public Dialog onCreateDialog(final Bundle savedInstanceState)
 	{
-		final AlertDialog.Builder builder = new AlertDialog.Builder(
-				getActivity());
+		final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		final LayoutInflater inflater = getActivity().getLayoutInflater();
 		final View layout = inflater.inflate(R.layout.stats_dialog, null);
-		builder.setTitle(R.string.stats).setIcon(R.drawable.icon)
-				.setView(layout)
+		builder.setTitle(R.string.stats).setIcon(R.drawable.icon).setView(layout)
 				.setNegativeButton(getText(R.string.close), null);
 		return builder.create();
 	}
@@ -45,8 +42,7 @@ public class StatsDialogFragment extends DialogFragment implements
 	@Override
 	public Loader<Cursor> onCreateLoader(final int id, final Bundle args)
 	{
-		return new CursorLoader(getActivity(), GameContract.Games.CONTENT_URI,
-				null, null, null, null);
+		return new CursorLoader(getActivity(), GameContract.Games.CONTENT_URI, null, null, null, null);
 	}
 
 	@Override
@@ -62,42 +58,32 @@ public class StatsDialogFragment extends DialogFragment implements
 		int gamesWon = 0;
 		double averageDuration = 0;
 		double averageMoves = 0;
-		final int durationColumnIndex = data
-				.getColumnIndex(GameContract.Games.COLUMN_NAME_DURATION);
-		final int movesColumnIndex = data
-				.getColumnIndex(GameContract.Games.COLUMN_NAME_MOVES);
+		final int durationColumnIndex = data.getColumnIndex(GameContract.Games.COLUMN_NAME_DURATION);
+		final int movesColumnIndex = data.getColumnIndex(GameContract.Games.COLUMN_NAME_MOVES);
 		while (data.moveToNext())
 		{
 			if (data.isNull(durationColumnIndex))
 				continue;
 			final int curDuration = data.getInt(durationColumnIndex);
-			averageDuration = (curDuration + gamesWon * averageDuration)
-					/ (gamesWon + 1);
+			averageDuration = (curDuration + gamesWon * averageDuration) / (gamesWon + 1);
 			final int curMoves = data.getInt(movesColumnIndex);
-			averageMoves = (curMoves + gamesWon * averageMoves)
-					/ (gamesWon + 1);
+			averageMoves = (curMoves + gamesWon * averageMoves) / (gamesWon + 1);
 			gamesWon++;
 		}
-		final TextView gamesPlayedView = (TextView) getDialog().findViewById(
-				R.id.games_played);
+		final TextView gamesPlayedView = (TextView) getDialog().findViewById(R.id.games_played);
 		gamesPlayedView.setText(Integer.toString(gamesPlayed));
-		final TextView gamesWonView = (TextView) getDialog().findViewById(
-				R.id.games_won);
+		final TextView gamesWonView = (TextView) getDialog().findViewById(R.id.games_won);
 		gamesWonView.setText(Integer.toString(gamesWon));
-		final TextView winPercentageView = (TextView) getDialog().findViewById(
-				R.id.win_percentage);
+		final TextView winPercentageView = (TextView) getDialog().findViewById(R.id.win_percentage);
 		if (gamesPlayed == 0)
 			winPercentageView.setText(R.string.stats_na);
 		else
 		{
-			final NumberFormat percentFormat = NumberFormat
-					.getPercentInstance();
+			final NumberFormat percentFormat = NumberFormat.getPercentInstance();
 			percentFormat.setMaximumFractionDigits(1);
-			winPercentageView.setText(percentFormat.format((double) gamesWon
-					/ gamesPlayed));
+			winPercentageView.setText(percentFormat.format((double) gamesWon / gamesPlayed));
 		}
-		final TextView averageDurationView = (TextView) getDialog()
-				.findViewById(R.id.average_duration);
+		final TextView averageDurationView = (TextView) getDialog().findViewById(R.id.average_duration);
 		if (gamesWon == 0)
 			averageDurationView.setText(getText(R.string.stats_na));
 		else
@@ -113,8 +99,7 @@ public class StatsDialogFragment extends DialogFragment implements
 			averageDurationView.setText(sb);
 		}
 		final NumberFormat integerFormat = NumberFormat.getIntegerInstance();
-		final TextView averageMovesView = (TextView) getDialog().findViewById(
-				R.id.average_moves);
+		final TextView averageMovesView = (TextView) getDialog().findViewById(R.id.average_moves);
 		if (gamesWon == 0)
 			averageMovesView.setText(getText(R.string.stats_na));
 		else

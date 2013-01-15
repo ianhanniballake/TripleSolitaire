@@ -38,39 +38,32 @@ public class GameProvider extends ContentProvider
 		 */
 		DatabaseHelper(final Context context)
 		{
-			super(context, GameProvider.DATABASE_NAME, null,
-					GameProvider.DATABASE_VERSION);
+			super(context, GameProvider.DATABASE_NAME, null, GameProvider.DATABASE_VERSION);
 		}
 
 		/**
-		 * Creates the underlying database with table name and column names
-		 * taken from the GameContract class.
+		 * Creates the underlying database with table name and column names taken from the GameContract class.
 		 */
 		@Override
 		public void onCreate(final SQLiteDatabase db)
 		{
 			if (BuildConfig.DEBUG)
-				Log.d(GameProvider.TAG, "Creating the "
-						+ GameContract.Games.TABLE_NAME + " table");
-			db.execSQL("CREATE TABLE " + GameContract.Games.TABLE_NAME + " ("
-					+ BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-					+ GameContract.Games.COLUMN_NAME_START_TIME + " INTEGER,"
-					+ GameContract.Games.COLUMN_NAME_DURATION + " INTEGER,"
-					+ GameContract.Games.COLUMN_NAME_MOVES + " INTEGER);");
+				Log.d(GameProvider.TAG, "Creating the " + GameContract.Games.TABLE_NAME + " table");
+			db.execSQL("CREATE TABLE " + GameContract.Games.TABLE_NAME + " (" + BaseColumns._ID
+					+ " INTEGER PRIMARY KEY AUTOINCREMENT," + GameContract.Games.COLUMN_NAME_START_TIME + " INTEGER,"
+					+ GameContract.Games.COLUMN_NAME_DURATION + " INTEGER," + GameContract.Games.COLUMN_NAME_MOVES
+					+ " INTEGER);");
 		}
 
 		/**
 		 * 
-		 * Demonstrates that the provider must consider what happens when the
-		 * underlying database is changed. Note that this currently just
-		 * destroys and recreates the database - should upgrade in place
+		 * Demonstrates that the provider must consider what happens when the underlying database is changed. Note that
+		 * this currently just destroys and recreates the database - should upgrade in place
 		 */
 		@Override
-		public void onUpgrade(final SQLiteDatabase db, final int oldVersion,
-				final int newVersion)
+		public void onUpgrade(final SQLiteDatabase db, final int oldVersion, final int newVersion)
 		{
-			Log.w(GameProvider.TAG, "Upgrading database from version "
-					+ oldVersion + " to " + newVersion
+			Log.w(GameProvider.TAG, "Upgrading database from version " + oldVersion + " to " + newVersion
 					+ ", which will destroy all old data");
 			db.execSQL("DROP TABLE IF EXISTS " + GameContract.Games.TABLE_NAME);
 			onCreate(db);
@@ -111,12 +104,10 @@ public class GameProvider extends ContentProvider
 	{
 		final HashMap<String, String> allColumnProjectionMap = new HashMap<String, String>();
 		allColumnProjectionMap.put(BaseColumns._ID, BaseColumns._ID);
-		allColumnProjectionMap.put(GameContract.Games.COLUMN_NAME_START_TIME,
-				GameContract.Games.COLUMN_NAME_START_TIME);
-		allColumnProjectionMap.put(GameContract.Games.COLUMN_NAME_DURATION,
-				GameContract.Games.COLUMN_NAME_DURATION);
-		allColumnProjectionMap.put(GameContract.Games.COLUMN_NAME_MOVES,
-				GameContract.Games.COLUMN_NAME_MOVES);
+		allColumnProjectionMap
+				.put(GameContract.Games.COLUMN_NAME_START_TIME, GameContract.Games.COLUMN_NAME_START_TIME);
+		allColumnProjectionMap.put(GameContract.Games.COLUMN_NAME_DURATION, GameContract.Games.COLUMN_NAME_DURATION);
+		allColumnProjectionMap.put(GameContract.Games.COLUMN_NAME_MOVES, GameContract.Games.COLUMN_NAME_MOVES);
 		return allColumnProjectionMap;
 	}
 
@@ -128,26 +119,22 @@ public class GameProvider extends ContentProvider
 	private static UriMatcher buildUriMatcher()
 	{
 		final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
-		matcher.addURI(GameContract.AUTHORITY, GameContract.Games.TABLE_NAME,
-				GameProvider.GAMES);
-		matcher.addURI(GameContract.AUTHORITY, GameContract.Games.TABLE_NAME
-				+ "/#", GameProvider.GAME_ID);
+		matcher.addURI(GameContract.AUTHORITY, GameContract.Games.TABLE_NAME, GameProvider.GAMES);
+		matcher.addURI(GameContract.AUTHORITY, GameContract.Games.TABLE_NAME + "/#", GameProvider.GAME_ID);
 		return matcher;
 	}
 
 	/**
 	 * An identity all column projection mapping
 	 */
-	final HashMap<String, String> allColumnProjectionMap = GameProvider
-			.buildAllColumnProjectionMap();
+	final HashMap<String, String> allColumnProjectionMap = GameProvider.buildAllColumnProjectionMap();
 	/**
 	 * Handle to a new DatabaseHelper.
 	 */
 	private DatabaseHelper databaseHelper;
 
 	@Override
-	public int delete(final Uri uri, final String where,
-			final String[] whereArgs)
+	public int delete(final Uri uri, final String where, final String[] whereArgs)
 	{
 		// Opens the database object in "write" mode.
 		final SQLiteDatabase db = databaseHelper.getWritableDatabase();
@@ -159,18 +146,15 @@ public class GameProvider extends ContentProvider
 				// If the incoming pattern matches the general pattern for
 				// games, does a delete based on the incoming "where" column and
 				// arguments.
-				count = db.delete(GameContract.Games.TABLE_NAME, where,
-						whereArgs);
+				count = db.delete(GameContract.Games.TABLE_NAME, where, whereArgs);
 				break;
 			case GAME_ID:
 				// If the incoming URI matches a single game ID, does the
 				// delete based on the incoming data, but modifies the where
 				// clause to restrict it to the particular game ID.
 				final String finalWhere = DatabaseUtils.concatenateWhere(
-						BaseColumns._ID + " = " + ContentUris.parseId(uri),
-						where);
-				count = db.delete(GameContract.Games.TABLE_NAME, finalWhere,
-						whereArgs);
+						BaseColumns._ID + " = " + ContentUris.parseId(uri), where);
+				count = db.delete(GameContract.Games.TABLE_NAME, finalWhere, whereArgs);
 				break;
 			default:
 				throw new IllegalArgumentException("Unknown URI " + uri);
@@ -213,20 +197,16 @@ public class GameProvider extends ContentProvider
 		else
 			values = new ContentValues();
 		if (!values.containsKey(GameContract.Games.COLUMN_NAME_START_TIME))
-			values.put(GameContract.Games.COLUMN_NAME_START_TIME,
-					System.currentTimeMillis());
+			values.put(GameContract.Games.COLUMN_NAME_START_TIME, System.currentTimeMillis());
 		final SQLiteDatabase db = databaseHelper.getWritableDatabase();
-		final long rowId = db.insert(GameContract.Games.TABLE_NAME,
-				GameContract.Games.COLUMN_NAME_START_TIME, values);
+		final long rowId = db.insert(GameContract.Games.TABLE_NAME, GameContract.Games.COLUMN_NAME_START_TIME, values);
 		// If the insert succeeded, the row ID exists.
 		if (rowId > 0)
 		{
 			// Creates a URI with the game ID pattern and the new row ID
 			// appended to it.
-			final Uri contractionUri = ContentUris.withAppendedId(
-					GameContract.Games.CONTENT_ID_URI_BASE, rowId);
-			getContext().getContentResolver()
-					.notifyChange(contractionUri, null);
+			final Uri contractionUri = ContentUris.withAppendedId(GameContract.Games.CONTENT_ID_URI_BASE, rowId);
+			getContext().getContentResolver().notifyChange(contractionUri, null);
 			return contractionUri;
 		}
 		// If the insert didn't succeed, then the rowID is <= 0
@@ -246,8 +226,7 @@ public class GameProvider extends ContentProvider
 	}
 
 	@Override
-	public Cursor query(final Uri uri, final String[] projection,
-			final String selection, final String[] selectionArgs,
+	public Cursor query(final Uri uri, final String[] projection, final String selection, final String[] selectionArgs,
 			final String sortOrder)
 	{
 		// Constructs a new query builder and sets its table name
@@ -271,15 +250,13 @@ public class GameProvider extends ContentProvider
 				throw new IllegalArgumentException("Unknown URI " + uri);
 		}
 		final SQLiteDatabase db = databaseHelper.getReadableDatabase();
-		final Cursor c = qb.query(db, projection, selection, selectionArgs,
-				null, null, finalSortOrder, null);
+		final Cursor c = qb.query(db, projection, selection, selectionArgs, null, null, finalSortOrder, null);
 		c.setNotificationUri(getContext().getContentResolver(), uri);
 		return c;
 	}
 
 	@Override
-	public int update(final Uri uri, final ContentValues values,
-			final String selection, final String[] selectionArgs)
+	public int update(final Uri uri, final ContentValues values, final String selection, final String[] selectionArgs)
 	{
 		final SQLiteDatabase db = databaseHelper.getWritableDatabase();
 		int count = 0;
@@ -288,18 +265,15 @@ public class GameProvider extends ContentProvider
 			case GAMES:
 				// If the incoming URI matches the general games pattern,
 				// does the update based on the incoming data.
-				count = db.update(GameContract.Games.TABLE_NAME, values,
-						selection, selectionArgs);
+				count = db.update(GameContract.Games.TABLE_NAME, values, selection, selectionArgs);
 				break;
 			case GAME_ID:
 				// If the incoming URI matches a single game ID, does the
 				// update based on the incoming data, but modifies the where
 				// clause to restrict it to the particular game ID.
 				final String finalWhere = DatabaseUtils.concatenateWhere(
-						BaseColumns._ID + " = " + ContentUris.parseId(uri),
-						selection);
-				count = db.update(GameContract.Games.TABLE_NAME, values,
-						finalWhere, selectionArgs);
+						BaseColumns._ID + " = " + ContentUris.parseId(uri), selection);
+				count = db.update(GameContract.Games.TABLE_NAME, values, finalWhere, selectionArgs);
 				break;
 			default:
 				throw new IllegalArgumentException("Unknown URI " + uri);

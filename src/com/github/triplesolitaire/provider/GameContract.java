@@ -4,11 +4,10 @@ import android.net.Uri;
 import android.provider.BaseColumns;
 
 /**
- * Defines a contract between the Game content provider and its clients. A
- * contract defines the information that a client needs to access the provider
- * as one or more data tables. A contract is a public, non-extendable (final)
- * class that contains constants defining column names and URIs. A well-written
- * client depends only on the constants in the contract.
+ * Defines a contract between the Game content provider and its clients. A contract defines the information that a
+ * client needs to access the provider as one or more data tables. A contract is a public, non-extendable (final) class
+ * that contains constants defining column names and URIs. A well-written client depends only on the constants in the
+ * contract.
  */
 public final class GameContract
 {
@@ -43,20 +42,16 @@ public final class GameContract
 		 */
 		public static final String COLUMN_NAME_START_TIME = "start_time";
 		/**
-		 * The content URI base for a single game. Callers must append a numeric
-		 * game id to this Uri to retrieve a game
+		 * The content URI base for a single game. Callers must append a numeric game id to this Uri to retrieve a game
 		 */
-		public static final Uri CONTENT_ID_URI_BASE = Uri.parse(SCHEME
-				+ AUTHORITY + "/" + TABLE_NAME + "/");
+		public static final Uri CONTENT_ID_URI_BASE = Uri.parse(SCHEME + AUTHORITY + "/" + TABLE_NAME + "/");
 		/**
-		 * The content URI match pattern for a single game, specified by its ID.
-		 * Use this to match incoming URIs or to construct an Intent.
+		 * The content URI match pattern for a single game, specified by its ID. Use this to match incoming URIs or to
+		 * construct an Intent.
 		 */
-		public static final Uri CONTENT_ID_URI_PATTERN = Uri.parse(SCHEME
-				+ AUTHORITY + "/" + TABLE_NAME + "/#");
+		public static final Uri CONTENT_ID_URI_PATTERN = Uri.parse(SCHEME + AUTHORITY + "/" + TABLE_NAME + "/#");
 		/**
-		 * The MIME type of a {@link #CONTENT_URI} sub-directory of a single
-		 * game.
+		 * The MIME type of a {@link #CONTENT_URI} sub-directory of a single game.
 		 */
 		public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.ianhanniballake.solitairegame";
 		/**
@@ -66,13 +61,11 @@ public final class GameContract
 		/**
 		 * The content:// style URL for this table
 		 */
-		public static final Uri CONTENT_URI = Uri.parse(SCHEME + AUTHORITY
-				+ "/games");
+		public static final Uri CONTENT_URI = Uri.parse(SCHEME + AUTHORITY + "/games");
 		/**
 		 * The default sort order for this table
 		 */
-		public static final String DEFAULT_SORT_ORDER = COLUMN_NAME_START_TIME
-				+ " DESC";
+		public static final String DEFAULT_SORT_ORDER = COLUMN_NAME_START_TIME + " DESC";
 
 		/**
 		 * This class cannot be instantiated

@@ -39,19 +39,16 @@ public class GameState
 	 *            Top card of the cascade/the card to be dropped
 	 * @return Whether the lane should accept the drop
 	 */
-	public static boolean acceptLaneDrop(final int laneIndex,
-			final String topNewCard)
+	public static boolean acceptLaneDrop(final int laneIndex, final String topNewCard)
 	{
 		final boolean acceptDrop = topNewCard.endsWith("s13");
 		if (acceptDrop && BuildConfig.DEBUG)
-			Log.d(GameState.TAG, "Drag -> " + laneIndex
-					+ ": Acceptable drag of " + topNewCard + " onto empty lane");
+			Log.d(GameState.TAG, "Drag -> " + laneIndex + ": Acceptable drag of " + topNewCard + " onto empty lane");
 		return acceptDrop;
 	}
 
 	/**
-	 * Parses a given card to return the card number (from ace at 1 to king at
-	 * 13)
+	 * Parses a given card to return the card number (from ace at 1 to king at 13)
 	 * 
 	 * @param card
 	 *            Card to get the number from
@@ -95,13 +92,11 @@ public class GameState
 	}
 
 	/**
-	 * Returns the previous (one number less) card in the same suit as the given
-	 * card
+	 * Returns the previous (one number less) card in the same suit as the given card
 	 * 
 	 * @param card
 	 *            Card to 'decrement'
-	 * @return A card one number less and in the same suit as the given card, or
-	 *         null if the card was an Ace (number=1)
+	 * @return A card one number less and in the same suit as the given card, or null if the card was an Ace (number=1)
 	 */
 	private static String prevInSuit(final String card)
 	{
@@ -115,8 +110,8 @@ public class GameState
 	 */
 	final TripleSolitaireActivity activity;
 	/**
-	 * Whether a lane should be excluded from autoplay (i.e., if the user just
-	 * dragged a card from the foundation to that column
+	 * Whether a lane should be excluded from autoplay (i.e., if the user just dragged a card from the foundation to
+	 * that column
 	 */
 	private boolean[] autoplayLaneIndexLocked = new boolean[13];
 	/**
@@ -136,8 +131,8 @@ public class GameState
 	 */
 	private final AsyncQueryHandler gameQueryHandler;
 	/**
-	 * Increments the game timer is there is at least one move. Posts another
-	 * copy of itself to trigger in 1 second if the game is in progress.
+	 * Increments the game timer is there is at least one move. Posts another copy of itself to trigger in 1 second if
+	 * the game is in progress.
 	 */
 	private final Runnable gameTimerIncrement = new Runnable()
 	{
@@ -157,8 +152,7 @@ public class GameState
 	 */
 	private LaneData[] lane;
 	/**
-	 * To prevent StackOverflow when autoplay animations are off, this Runnable
-	 * can be used to stagger autoplay calls
+	 * To prevent StackOverflow when autoplay animations are off, this Runnable can be used to stagger autoplay calls
 	 */
 	private final Runnable moveCompleter = new Runnable()
 	{
@@ -209,8 +203,7 @@ public class GameState
 		gameQueryHandler = new AsyncQueryHandler(activity.getContentResolver())
 		{
 			@Override
-			protected void onInsertComplete(final int token,
-					final Object cookie, final Uri uri)
+			protected void onInsertComplete(final int token, final Object cookie, final Uri uri)
 			{
 				gameId = ContentUris.parseId(uri);
 			}
@@ -226,8 +219,7 @@ public class GameState
 	 *            Bottom card of the cascade/the card to be dropped
 	 * @return Whether the lane should accept the drop
 	 */
-	public boolean acceptCascadeDrop(final int laneIndex,
-			final String bottomNewCard)
+	public boolean acceptCascadeDrop(final int laneIndex, final String bottomNewCard)
 	{
 		final String cascadeCard = lane[laneIndex - 1].getCascade().getLast();
 		final String cascadeSuit = GameState.getSuit(cascadeCard);
@@ -235,61 +227,51 @@ public class GameState
 		final String bottomNewCardSuit = GameState.getSuit(bottomNewCard);
 		final int bottomNewCardNum = GameState.getNumber(bottomNewCard);
 		boolean acceptDrop = false;
-		final boolean cascadeCardIsBlack = cascadeSuit.equals("clubs")
-				|| cascadeSuit.equals("spades");
-		final boolean bottomNewCardIsBlack = bottomNewCardSuit.equals("clubs")
-				|| bottomNewCardSuit.equals("spades");
+		final boolean cascadeCardIsBlack = cascadeSuit.equals("clubs") || cascadeSuit.equals("spades");
+		final boolean bottomNewCardIsBlack = bottomNewCardSuit.equals("clubs") || bottomNewCardSuit.equals("spades");
 		if (bottomNewCardNum != cascadeNum - 1)
 			acceptDrop = false;
 		else
-			acceptDrop = cascadeCardIsBlack && !bottomNewCardIsBlack
-					|| !cascadeCardIsBlack && bottomNewCardIsBlack;
+			acceptDrop = cascadeCardIsBlack && !bottomNewCardIsBlack || !cascadeCardIsBlack && bottomNewCardIsBlack;
 		if (acceptDrop && BuildConfig.DEBUG)
-			Log.d(GameState.TAG, "Drag -> " + laneIndex
-					+ ": Acceptable drag of " + bottomNewCard + " onto "
+			Log.d(GameState.TAG, "Drag -> " + laneIndex + ": Acceptable drag of " + bottomNewCard + " onto "
 					+ cascadeCard);
 		return acceptDrop;
 	}
 
 	/**
-	 * Whether the given foundation should accept the given dropped card. Note,
-	 * that no multi-card drops are accepted on the foundation
+	 * Whether the given foundation should accept the given dropped card. Note, that no multi-card drops are accepted on
+	 * the foundation
 	 * 
 	 * @param foundationIndex
-	 *            Negative One-based index (-1 through -12) of the foundation
-	 *            drop target
+	 *            Negative One-based index (-1 through -12) of the foundation drop target
 	 * @param newCard
 	 *            The card to be dropped
 	 * @return Whether the foundation should accept the drop
 	 */
-	public boolean acceptFoundationDrop(final int foundationIndex,
-			final String newCard)
+	public boolean acceptFoundationDrop(final int foundationIndex, final String newCard)
 	{
 		if (newCard.startsWith("MULTI"))
 			// Foundations don't accept multiple cards
 			return false;
-		final String existingFoundationCard = foundation[-1 * foundationIndex
-				- 1];
+		final String existingFoundationCard = foundation[-1 * foundationIndex - 1];
 		boolean acceptDrop = false;
 		if (existingFoundationCard == null)
 			acceptDrop = newCard.endsWith("s1");
 		else
-			acceptDrop = newCard.equals(GameState
-					.nextInSuit(existingFoundationCard));
+			acceptDrop = newCard.equals(GameState.nextInSuit(existingFoundationCard));
 		if (acceptDrop && BuildConfig.DEBUG)
 		{
 			final String foundationDisplayCard = existingFoundationCard == null ? "empty foundation"
 					: existingFoundationCard;
-			Log.d(GameState.TAG, "Drag -> " + foundationIndex
-					+ ": Acceptable drag of " + newCard + " onto "
+			Log.d(GameState.TAG, "Drag -> " + foundationIndex + ": Acceptable drag of " + newCard + " onto "
 					+ foundationDisplayCard);
 		}
 		return acceptDrop;
 	}
 
 	/**
-	 * Adds the given move to the undo stack and updates the UI if this is the
-	 * first move in the undo stack
+	 * Adds the given move to the undo stack and updates the UI if this is the first move in the undo stack
 	 * 
 	 * @param move
 	 *            Move to add to the undo stack
@@ -319,8 +301,7 @@ public class GameState
 	 */
 	private boolean attemptAutoFlip(final int laneIndex)
 	{
-		if (lane[laneIndex - 1].getCascade().isEmpty()
-				&& !lane[laneIndex - 1].getStack().isEmpty())
+		if (lane[laneIndex - 1].getCascade().isEmpty() && !lane[laneIndex - 1].getStack().isEmpty())
 		{
 			move(new Move(Move.Type.FLIP, laneIndex));
 			return true;
@@ -329,8 +310,8 @@ public class GameState
 	}
 
 	/**
-	 * Attempts to auto play the first card in the given cascade to the
-	 * foundation (moving from -1 to -12 i.e., left to right)
+	 * Attempts to auto play the first card in the given cascade to the foundation (moving from -1 to -12 i.e., left to
+	 * right)
 	 * 
 	 * @param laneIndex
 	 *            One-based index (1 through 13)
@@ -351,8 +332,7 @@ public class GameState
 	}
 
 	/**
-	 * Attempts to auto play the first card in the waste to the foundation
-	 * (moving from -1 to -12 i.e., left to right)
+	 * Attempts to auto play the first card in the waste to the foundation (moving from -1 to -12 i.e., left to right)
 	 * 
 	 * @return Whether an auto play was found
 	 */
@@ -371,26 +351,21 @@ public class GameState
 	}
 
 	/**
-	 * Using the user's Autoplay preference, attempts to auto play a single
-	 * card, first looking through the lanes (from 1 to 13 i.e., left to right)
-	 * and then to the waste
+	 * Using the user's Autoplay preference, attempts to auto play a single card, first looking through the lanes (from
+	 * 1 to 13 i.e., left to right) and then to the waste
 	 */
 	private void autoPlay()
 	{
 		if (!gameInProgress)
 			return;
-		final SharedPreferences preferences = PreferenceManager
-				.getDefaultSharedPreferences(activity);
-		final boolean autoFlip = preferences.getBoolean(
-				Preferences.AUTO_FLIP_PREFERENCE_KEY, activity.getResources()
-						.getBoolean(R.bool.pref_auto_flip_default));
+		final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(activity);
+		final boolean autoFlip = preferences.getBoolean(Preferences.AUTO_FLIP_PREFERENCE_KEY, activity.getResources()
+				.getBoolean(R.bool.pref_auto_flip_default));
 		if (autoFlip)
 			for (int laneIndex = 0; laneIndex < 13; laneIndex++)
-				if (!autoplayLaneIndexLocked[laneIndex]
-						&& attemptAutoFlip(laneIndex + 1))
+				if (!autoplayLaneIndexLocked[laneIndex] && attemptAutoFlip(laneIndex + 1))
 					return;
-		final String autoPlayMode = preferences.getString(
-				Preferences.AUTO_PLAY_PREFERENCE_KEY,
+		final String autoPlayMode = preferences.getString(Preferences.AUTO_PLAY_PREFERENCE_KEY,
 				activity.getString(R.string.pref_auto_play_default));
 		// If preference is never we have nothing to do
 		if (autoPlayMode.equals("never"))
@@ -406,15 +381,13 @@ public class GameState
 		}
 		// Auto play
 		for (int laneIndex = 0; laneIndex < 13; laneIndex++)
-			if (!autoplayLaneIndexLocked[laneIndex]
-					&& attemptAutoMoveFromCascadeToFoundation(laneIndex + 1))
+			if (!autoplayLaneIndexLocked[laneIndex] && attemptAutoMoveFromCascadeToFoundation(laneIndex + 1))
 				return;
 		attemptAutoMoveFromWasteToFoundation();
 	}
 
 	/**
-	 * Builds a string containing a semicolon separated list of the top
-	 * numCardsToInclude cards from the given lane
+	 * Builds a string containing a semicolon separated list of the top numCardsToInclude cards from the given lane
 	 * 
 	 * @param laneIndex
 	 *            One-based index (1 through 13)
@@ -422,14 +395,11 @@ public class GameState
 	 *            The number of cards to include
 	 * @return A semicolon separated list of the cards in the requested cascade
 	 */
-	public String buildCascadeString(final int laneIndex,
-			final int numCardsToInclude)
+	public String buildCascadeString(final int laneIndex, final int numCardsToInclude)
 	{
 		final LinkedList<String> cascade = lane[laneIndex - 1].getCascade();
-		final StringBuilder cascadeData = new StringBuilder(cascade.get(cascade
-				.size() - numCardsToInclude));
-		for (int cascadeIndex = cascade.size() - numCardsToInclude + 1; cascadeIndex < cascade
-				.size(); cascadeIndex++)
+		final StringBuilder cascadeData = new StringBuilder(cascade.get(cascade.size() - numCardsToInclude));
+		for (int cascadeIndex = cascade.size() - numCardsToInclude + 1; cascadeIndex < cascade.size(); cascadeIndex++)
 		{
 			cascadeData.append(";");
 			cascadeData.append(cascade.get(cascadeIndex));
@@ -448,20 +418,18 @@ public class GameState
 	}
 
 	/**
-	 * Checks to determine if the player has won the game (all foundations have
-	 * a king). If so, shows the 'you won' dialog.
+	 * Checks to determine if the player has won the game (all foundations have a king). If so, shows the 'you won'
+	 * dialog.
 	 */
 	private void checkForWin()
 	{
 		for (int foundationIndex = 0; foundationIndex < 12; foundationIndex++)
-			if (foundation[foundationIndex] == null
-					|| !foundation[foundationIndex].endsWith("s13"))
+			if (foundation[foundationIndex] == null || !foundation[foundationIndex].endsWith("s13"))
 				return;
 		if (BuildConfig.DEBUG)
 			Log.d(GameState.TAG, "Game win detected");
 		pauseGame();
-		final Uri gameUri = ContentUris.withAppendedId(
-				GameContract.Games.CONTENT_ID_URI_BASE, gameId);
+		final Uri gameUri = ContentUris.withAppendedId(GameContract.Games.CONTENT_ID_URI_BASE, gameId);
 		final ContentValues values = new ContentValues();
 		values.put(GameContract.Games.COLUMN_NAME_DURATION, timeInSeconds);
 		values.put(GameContract.Games.COLUMN_NAME_MOVES, moveCount);
@@ -547,9 +515,8 @@ public class GameState
 	}
 
 	/**
-	 * Triggers a move, whether player initiated or an auto play move. Moves are
-	 * assumed to be valid. Note that moves should have to and from locations in
-	 * the following format:
+	 * Triggers a move, whether player initiated or an auto play move. Moves are assumed to be valid. Note that moves
+	 * should have to and from locations in the following format:
 	 * <ul>
 	 * <li>Lanes: One-based index (1 through 13)</li>
 	 * <li>Waste: 0</li>
@@ -563,8 +530,7 @@ public class GameState
 	{
 		if (BuildConfig.DEBUG)
 			Log.d(GameState.TAG, move.toString());
-		final SharedPreferences preferences = PreferenceManager
-				.getDefaultSharedPreferences(activity);
+		final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(activity);
 		switch (move.getType())
 		{
 			case STOCK: // Clicked the stock
@@ -607,8 +573,7 @@ public class GameState
 				else
 				{
 					// We undo the move of cards from the stock to the waste
-					final Iterator<String> iterator = move.getCascade()
-							.descendingIterator();
+					final Iterator<String> iterator = move.getCascade().descendingIterator();
 					while (iterator.hasNext())
 					{
 						stock.push(iterator.next());
@@ -619,32 +584,26 @@ public class GameState
 				activity.updateStockUI();
 				break;
 			case FLIP: // Flipping over a face down card in a lane
-				final String toFlip = lane[move.getToIndex() - 1].getStack()
-						.pop();
+				final String toFlip = lane[move.getToIndex() - 1].getStack().pop();
 				lane[move.getToIndex() - 1].getCascade().add(toFlip);
 				addMoveToUndo(move);
-				activity.getLane(move.getToIndex() - 1)
-						.flipOverTopStack(toFlip);
+				activity.getLane(move.getToIndex() - 1).flipOverTopStack(toFlip);
 				for (int laneIndex = 0; laneIndex < 13; laneIndex++)
 					autoplayLaneIndexLocked[laneIndex] = false;
 				autoPlay();
 				break;
 			case UNDO_FLIP: // Undo'ing the flip of a face down card in a lane
-				final String flippedCard = lane[move.getToIndex() - 1]
-						.getCascade().removeFirst();
+				final String flippedCard = lane[move.getToIndex() - 1].getCascade().removeFirst();
 				lane[move.getToIndex() - 1].getStack().add(flippedCard);
-				final int newStackSize = lane[move.getToIndex() - 1].getStack()
-						.size();
-				activity.getLane(move.getToIndex() - 1).setStackSize(
-						newStackSize);
+				final int newStackSize = lane[move.getToIndex() - 1].getStack().size();
+				activity.getLane(move.getToIndex() - 1).setStackSize(newStackSize);
 				break;
 			case AUTO_PLAY: // Auto play
 			case UNDO: // Undo of a player move or auto play
 			case PLAYER_MOVE: // Player dragged move
 				// Update game state at from location
 				if (move.getFromIndex() < 0)
-					foundation[-1 * move.getFromIndex() - 1] = GameState
-							.prevInSuit(move.getCard());
+					foundation[-1 * move.getFromIndex() - 1] = GameState.prevInSuit(move.getCard());
 				else if (move.getFromIndex() == 0)
 					waste.removeFirst();
 				else
@@ -657,8 +616,7 @@ public class GameState
 				else if (move.getToIndex() == 0)
 					waste.addFirst(move.getCard());
 				else
-					lane[move.getToIndex() - 1].getCascade().addAll(
-							move.getCascade());
+					lane[move.getToIndex() - 1].getCascade().addAll(move.getCascade());
 				// Add move to the undo list if it isn't an undo move
 				if (move.getType() != Move.Type.UNDO)
 					addMoveToUndo(move);
@@ -668,16 +626,14 @@ public class GameState
 				else if (move.getFromIndex() == 0)
 					activity.updateWasteUI();
 				else
-					activity.getLane(move.getFromIndex() - 1)
-							.decrementCascadeSize(move.getCascade().size());
+					activity.getLane(move.getFromIndex() - 1).decrementCascadeSize(move.getCascade().size());
 				// Update the to UI
 				if (move.getType() == Move.Type.AUTO_PLAY)
 				{
 					moveStarted(true);
 					final boolean animateAutoplay = preferences.getBoolean(
 							Preferences.ANIMATE_AUTO_PLAY_PREFERENCE_KEY,
-							activity.getResources().getBoolean(
-									R.bool.pref_animate_auto_play_default));
+							activity.getResources().getBoolean(R.bool.pref_animate_auto_play_default));
 					if (animateAutoplay)
 					{
 						// Animate an auto play and wait for its completion
@@ -690,22 +646,18 @@ public class GameState
 					else
 					{
 						if (move.getToIndex() < 0)
-							activity.updateFoundationUI(-1 * move.getToIndex()
-									- 1);
+							activity.updateFoundationUI(-1 * move.getToIndex() - 1);
 						else if (move.getToIndex() == 0)
 							activity.updateWasteUI();
 						else
-							activity.getLane(move.getToIndex() - 1).addCascade(
-									move.getCascade());
+							activity.getLane(move.getToIndex() - 1).addCascade(move.getCascade());
 						postHandler.post(moveCompleter);
 					}
 				}
 				else if (move.getType() == Move.Type.UNDO)
 				{
-					final boolean animateUndo = preferences.getBoolean(
-							Preferences.ANIMATE_UNDO_PREFERENCE_KEY,
-							activity.getResources().getBoolean(
-									R.bool.pref_animate_undo_default));
+					final boolean animateUndo = preferences.getBoolean(Preferences.ANIMATE_UNDO_PREFERENCE_KEY,
+							activity.getResources().getBoolean(R.bool.pref_animate_undo_default));
 					if (animateUndo)
 						activity.animate(move);
 					else if (move.getToIndex() < 0)
@@ -713,8 +665,7 @@ public class GameState
 					else if (move.getToIndex() == 0)
 						activity.updateWasteUI();
 					else
-						activity.getLane(move.getToIndex() - 1).addCascade(
-								move.getCascade());
+						activity.getLane(move.getToIndex() - 1).addCascade(move.getCascade());
 				}
 				else if (move.getToIndex() < 0) // PLAYER_MOVE
 				{
@@ -733,8 +684,7 @@ public class GameState
 				{
 					if (move.getFromIndex() < 0)
 						autoplayLaneIndexLocked[move.getToIndex() - 1] = true;
-					activity.getLane(move.getToIndex() - 1).addCascade(
-							move.getCascade());
+					activity.getLane(move.getToIndex() - 1).addCascade(move.getCascade());
 					moveStarted(move.getFromIndex() >= 0);
 					moveCompleted();
 				}
@@ -745,8 +695,8 @@ public class GameState
 	}
 
 	/**
-	 * Signals completion of a move, starting auto play if there are no other
-	 * pending animations (which will eventually call this method).
+	 * Signals completion of a move, starting auto play if there are no other pending animations (which will eventually
+	 * call this method).
 	 */
 	void moveCompleted()
 	{
@@ -756,8 +706,8 @@ public class GameState
 	}
 
 	/**
-	 * Signals start of a move, updating the move count, starting the game
-	 * timer, and resetting the auto play lane locks if requested.
+	 * Signals start of a move, updating the move count, starting the game timer, and resetting the auto play lane locks
+	 * if requested.
 	 * 
 	 * @param resetAutoplayLaneIndexLocked
 	 *            Whether to reset the auto play lane locks
@@ -768,8 +718,7 @@ public class GameState
 		activity.updateMoveCount();
 		if (moveCount == 1)
 		{
-			gameQueryHandler.startInsert(0, null,
-					GameContract.Games.CONTENT_URI, null);
+			gameQueryHandler.startInsert(0, null, GameContract.Games.CONTENT_URI, null);
 			resumeGame();
 		}
 		if (resetAutoplayLaneIndexLocked)
@@ -836,23 +785,19 @@ public class GameState
 		activity.updateTime();
 		moveCount = savedInstanceState.getInt("moveCount");
 		activity.updateMoveCount();
-		autoplayLaneIndexLocked = savedInstanceState
-				.getBooleanArray("autoplayLaneIndexLocked");
-		final ArrayList<String> arrayMoves = savedInstanceState
-				.getStringArrayList("moves");
+		autoplayLaneIndexLocked = savedInstanceState.getBooleanArray("autoplayLaneIndexLocked");
+		final ArrayList<String> arrayMoves = savedInstanceState.getStringArrayList("moves");
 		moves = new Stack<Move>();
 		for (final String move : arrayMoves)
 			moves.push(new Move(move));
 		// Restore the stack
-		final ArrayList<String> arrayCardStock = savedInstanceState
-				.getStringArrayList("stock");
+		final ArrayList<String> arrayCardStock = savedInstanceState.getStringArrayList("stock");
 		stock = new Stack<String>();
 		for (final String card : arrayCardStock)
 			stock.push(card);
 		activity.updateStockUI();
 		// Restore the waste data
-		waste = new LinkedList<String>(
-				savedInstanceState.getStringArrayList("waste"));
+		waste = new LinkedList<String>(savedInstanceState.getStringArrayList("waste"));
 		activity.updateWasteUI();
 		// Restore the foundation data
 		foundation = savedInstanceState.getStringArray("foundation");
@@ -861,11 +806,8 @@ public class GameState
 		lane = new LaneData[13];
 		for (int laneIndex = 0; laneIndex < 13; laneIndex++)
 		{
-			lane[laneIndex] = new LaneData(
-					savedInstanceState.getStringArrayList("laneStack"
-							+ laneIndex),
-					savedInstanceState.getStringArrayList("laneCascade"
-							+ laneIndex));
+			lane[laneIndex] = new LaneData(savedInstanceState.getStringArrayList("laneStack" + laneIndex),
+					savedInstanceState.getStringArrayList("laneCascade" + laneIndex));
 			final Lane laneLayout = activity.getLane(laneIndex);
 			laneLayout.setStackSize(lane[laneIndex].getStack().size());
 			laneLayout.addCascade(lane[laneIndex].getCascade());
@@ -884,8 +826,7 @@ public class GameState
 		outState.putLong("gameId", gameId);
 		outState.putInt("timeInSeconds", timeInSeconds);
 		outState.putInt("moveCount", moveCount);
-		outState.putBooleanArray("autoplayLaneIndexLocked",
-				autoplayLaneIndexLocked);
+		outState.putBooleanArray("autoplayLaneIndexLocked", autoplayLaneIndexLocked);
 		final ArrayList<String> arrayMoves = new ArrayList<String>();
 		for (final Move move : moves)
 			arrayMoves.add(move.toString());
@@ -895,10 +836,8 @@ public class GameState
 		outState.putStringArray("foundation", foundation);
 		for (int laneIndex = 0; laneIndex < 13; laneIndex++)
 		{
-			outState.putStringArrayList("laneStack" + laneIndex,
-					new ArrayList<String>(lane[laneIndex].getStack()));
-			outState.putStringArrayList("laneCascade" + laneIndex,
-					new ArrayList<String>(lane[laneIndex].getCascade()));
+			outState.putStringArrayList("laneStack" + laneIndex, new ArrayList<String>(lane[laneIndex].getStack()));
+			outState.putStringArrayList("laneCascade" + laneIndex, new ArrayList<String>(lane[laneIndex].getCascade()));
 		}
 	}
 
@@ -912,8 +851,7 @@ public class GameState
 	}
 
 	/**
-	 * Resumes the game, starting the game timer increment if there has been at
-	 * least one move
+	 * Resumes the game, starting the game timer increment if there has been at least one move
 	 */
 	public void resumeGame()
 	{

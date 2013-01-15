@@ -5,8 +5,8 @@ import java.util.ListIterator;
 import java.util.StringTokenizer;
 
 /**
- * Class encapsulating a single 'move' from any and all sources. See the
- * Move.Type enum for enumeration of all types of Moves
+ * Class encapsulating a single 'move' from any and all sources. See the Move.Type enum for enumeration of all types of
+ * Moves
  */
 public class Move
 {
@@ -82,8 +82,7 @@ public class Move
 	}
 
 	/**
-	 * Move involving no cards and no from/to location, associated with STOCK
-	 * moves.
+	 * Move involving no cards and no from/to location, associated with STOCK moves.
 	 * 
 	 * @param type
 	 *            Type (STOCK)
@@ -122,8 +121,7 @@ public class Move
 	 * @param card
 	 *            Card to move
 	 */
-	public Move(final Type type, final int toIndex, final int fromIndex,
-			final String card)
+	public Move(final Type type, final int toIndex, final int fromIndex, final String card)
 	{
 		this.type = type;
 		this.toIndex = toIndex;
@@ -161,11 +159,9 @@ public class Move
 	}
 
 	/**
-	 * Gets the card if Move of a single card or bottom card of the cascade if
-	 * it is a multiple card Move
+	 * Gets the card if Move of a single card or bottom card of the cascade if it is a multiple card Move
 	 * 
-	 * @return The card if Move of a single card or bottom card of the cascade
-	 *         if it is a multiple card Move
+	 * @return The card if Move of a single card or bottom card of the cascade if it is a multiple card Move
 	 */
 	public String getCard()
 	{
@@ -187,8 +183,7 @@ public class Move
 	/**
 	 * Gets a string representation of the cascade.
 	 * 
-	 * @return A semicolon separated list of cards to use as a string
-	 *         representation of the cascade
+	 * @return A semicolon separated list of cards to use as a string representation of the cascade
 	 */
 	private String getCascadeAsString()
 	{
@@ -246,8 +241,7 @@ public class Move
 	}
 
 	/**
-	 * Returns a string representation of this Move, useful for debugging or
-	 * serialization
+	 * Returns a string representation of this Move, useful for debugging or serialization
 	 * 
 	 * @see java.lang.Object#toString()
 	 */
@@ -266,8 +260,7 @@ public class Move
 	}
 
 	/**
-	 * Converts this move into its Undo equivalent, changing the type and
-	 * from/to locations as necessary
+	 * Converts this move into its Undo equivalent, changing the type and from/to locations as necessary
 	 * 
 	 * @return A Move that would perfectly undo this Move
 	 */

@@ -101,38 +101,30 @@ public class TripleSolitaireActivity extends Activity
 		/**
 		 * Responds to drag events on the foundation
 		 * 
-		 * @see android.view.View.OnDragListener#onDrag(android.view.View,
-		 *      android.view.DragEvent)
+		 * @see android.view.View.OnDragListener#onDrag(android.view.View, android.view.DragEvent)
 		 */
 		@Override
 		public boolean onDrag(final View v, final DragEvent event)
 		{
-			final boolean isMyFoundation = foundationIndex == (Integer) event
-					.getLocalState();
+			final boolean isMyFoundation = foundationIndex == (Integer) event.getLocalState();
 			if (event.getAction() == DragEvent.ACTION_DRAG_STARTED)
 			{
-				final String foundationCard = gameState
-						.getFoundationCard(foundationIndex);
+				final String foundationCard = gameState.getFoundationCard(foundationIndex);
 				if (isMyFoundation)
 				{
 					if (BuildConfig.DEBUG)
-						Log.d(TripleSolitaireActivity.TAG, "Drag "
-								+ foundationIndex + ": Started of "
-								+ foundationCard);
+						Log.d(TripleSolitaireActivity.TAG, "Drag " + foundationIndex + ": Started of " + foundationCard);
 					return false;
 				}
-				final String card = event.getClipDescription().getLabel()
-						.toString();
+				final String card = event.getClipDescription().getLabel().toString();
 				return gameState.acceptFoundationDrop(foundationIndex, card);
 			}
 			else if (event.getAction() == DragEvent.ACTION_DROP)
 			{
 				System.gc();
-				final String card = event.getClipData().getItemAt(0).getText()
-						.toString();
+				final String card = event.getClipData().getItemAt(0).getText().toString();
 				final int from = (Integer) event.getLocalState();
-				gameState.move(new Move(Type.PLAYER_MOVE, foundationIndex,
-						from, card));
+				gameState.move(new Move(Type.PLAYER_MOVE, foundationIndex, from, card));
 				return true;
 			}
 			return true;
@@ -163,21 +155,16 @@ public class TripleSolitaireActivity extends Activity
 		/**
 		 * Responds to ACTION_DOWN events to start drags from the foundation
 		 * 
-		 * @see android.view.View.OnTouchListener#onTouch(android.view.View,
-		 *      android.view.MotionEvent)
+		 * @see android.view.View.OnTouchListener#onTouch(android.view.View, android.view.MotionEvent)
 		 */
 		@Override
 		public boolean onTouch(final View v, final MotionEvent event)
 		{
-			final String foundationCard = gameState
-					.getFoundationCard(foundationIndex);
-			if (event.getAction() != MotionEvent.ACTION_DOWN
-					|| foundationCard == null)
+			final String foundationCard = gameState.getFoundationCard(foundationIndex);
+			if (event.getAction() != MotionEvent.ACTION_DOWN || foundationCard == null)
 				return false;
-			final ClipData dragData = ClipData.newPlainText(foundationCard,
-					foundationCard);
-			return v.startDrag(dragData, new View.DragShadowBuilder(v),
-					foundationIndex, 0);
+			final ClipData dragData = ClipData.newPlainText(foundationCard, foundationCard);
+			return v.startDrag(dragData, new View.DragShadowBuilder(v), foundationIndex, 0);
 		}
 	}
 
@@ -195,9 +182,8 @@ public class TripleSolitaireActivity extends Activity
 	final Handler handler = new Handler();
 
 	/**
-	 * Animates the given move by creating a copy of the source view and
-	 * animating it over to the final position before hiding the temporary view
-	 * and showing the final destination
+	 * Animates the given move by creating a copy of the source view and animating it over to the final position before
+	 * hiding the temporary view and showing the final destination
 	 * 
 	 * @param move
 	 *            Move to animate
@@ -218,28 +204,24 @@ public class TripleSolitaireActivity extends Activity
 			toLoc = getWasteLoc();
 		else
 			toLoc = getCascadeLoc(move.getToIndex() - 1);
-		final Card toAnimate = new Card(getBaseContext(), getResources()
-				.getIdentifier(move.getCard(), "drawable", getPackageName()));
+		final Card toAnimate = new Card(getBaseContext(), getResources().getIdentifier(move.getCard(), "drawable",
+				getPackageName()));
 		final FrameLayout layout = (FrameLayout) findViewById(R.id.animateLayout);
 		layout.addView(toAnimate);
 		layout.setX(fromLoc.x);
 		layout.setY(fromLoc.y);
 		layout.setVisibility(View.VISIBLE);
-		final SharedPreferences preferences = PreferenceManager
-				.getDefaultSharedPreferences(this);
+		final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
 		final String animationSpeedPreference;
 		if (move.getType() == Move.Type.UNDO)
-			animationSpeedPreference = preferences.getString(
-					Preferences.ANIMATE_SPEED_UNDO_PREFERENCE_KEY,
+			animationSpeedPreference = preferences.getString(Preferences.ANIMATE_SPEED_UNDO_PREFERENCE_KEY,
 					getString(R.string.pref_animation_speed_undo_default));
 		else
-			animationSpeedPreference = preferences.getString(
-					Preferences.ANIMATE_SPEED_AUTO_PLAY_PREFERENCE_KEY,
+			animationSpeedPreference = preferences.getString(Preferences.ANIMATE_SPEED_AUTO_PLAY_PREFERENCE_KEY,
 					getString(R.string.pref_animation_speed_auto_play_default));
 		try
 		{
-			layout.animate().x(toLoc.x).y(toLoc.y)
-					.setDuration(Integer.valueOf(animationSpeedPreference))
+			layout.animate().x(toLoc.x).y(toLoc.y).setDuration(Integer.valueOf(animationSpeedPreference))
 					.setListener(new AnimatorListenerAdapter()
 					{
 						@Override
@@ -250,8 +232,7 @@ public class TripleSolitaireActivity extends Activity
 							else if (move.getToIndex() == 0)
 								updateWasteUI();
 							else
-								getLane(move.getToIndex() - 1).addCascade(
-										move.getCascade());
+								getLane(move.getToIndex() - 1).addCascade(move.getCascade());
 							layout.removeAllViews();
 							layout.setVisibility(View.GONE);
 							if (move.getType() != Move.Type.UNDO)
@@ -290,14 +271,10 @@ public class TripleSolitaireActivity extends Activity
 	{
 		final RelativeLayout lane = (RelativeLayout) findViewById(R.id.lane);
 		final Card cascadeView = getLane(laneIndex).getTopCascadeCard();
-		final float x = cascadeView.getX() + cascadeView.getPaddingLeft()
-				+ getLane(laneIndex).getX()
-				+ getLane(laneIndex).getPaddingLeft() + lane.getX()
-				+ lane.getPaddingLeft();
-		final float y = cascadeView.getY() + cascadeView.getPaddingTop()
-				+ getLane(laneIndex).getY()
-				+ getLane(laneIndex).getPaddingTop() + lane.getY()
-				+ lane.getPaddingTop();
+		final float x = cascadeView.getX() + cascadeView.getPaddingLeft() + getLane(laneIndex).getX()
+				+ getLane(laneIndex).getPaddingLeft() + lane.getX() + lane.getPaddingLeft();
+		final float y = cascadeView.getY() + cascadeView.getPaddingTop() + getLane(laneIndex).getY()
+				+ getLane(laneIndex).getPaddingTop() + lane.getY() + lane.getPaddingTop();
 		return new Point((int) x, (int) y);
 	}
 
@@ -311,13 +288,12 @@ public class TripleSolitaireActivity extends Activity
 	private Point getFoundationLoc(final int foundationIndex)
 	{
 		final RelativeLayout foundationLayout = (RelativeLayout) findViewById(R.id.foundation);
-		final ImageView foundationView = (ImageView) findViewById(getResources()
-				.getIdentifier("foundation" + (foundationIndex + 1), "id",
-						getPackageName()));
-		final float x = foundationView.getX() + foundationView.getPaddingLeft()
-				+ foundationLayout.getX() + foundationLayout.getPaddingLeft();
-		final float y = foundationView.getY() + foundationView.getPaddingTop()
-				+ foundationLayout.getY() + foundationLayout.getPaddingTop();
+		final ImageView foundationView = (ImageView) findViewById(getResources().getIdentifier(
+				"foundation" + (foundationIndex + 1), "id", getPackageName()));
+		final float x = foundationView.getX() + foundationView.getPaddingLeft() + foundationLayout.getX()
+				+ foundationLayout.getPaddingLeft();
+		final float y = foundationView.getY() + foundationView.getPaddingTop() + foundationLayout.getY()
+				+ foundationLayout.getPaddingTop();
 		return new Point((int) x, (int) y);
 	}
 
@@ -349,8 +325,7 @@ public class TripleSolitaireActivity extends Activity
 	 */
 	public Lane getLane(final int laneIndex)
 	{
-		return (Lane) findViewById(getResources().getIdentifier(
-				"lane" + (laneIndex + 1), "id", getPackageName()));
+		return (Lane) findViewById(getResources().getIdentifier("lane" + (laneIndex + 1), "id", getPackageName()));
 	}
 
 	/**
@@ -372,10 +347,8 @@ public class TripleSolitaireActivity extends Activity
 	{
 		final RelativeLayout waste = (RelativeLayout) findViewById(R.id.waste);
 		final ImageView waste1View = (ImageView) findViewById(R.id.waste1);
-		final float x = waste.getX() + waste.getPaddingLeft()
-				+ waste1View.getX() + waste1View.getPaddingLeft();
-		final float y = waste.getY() + waste.getPaddingTop()
-				+ waste1View.getY() + waste1View.getPaddingTop();
+		final float x = waste.getX() + waste.getPaddingLeft() + waste1View.getX() + waste1View.getPaddingLeft();
+		final float y = waste.getY() + waste.getPaddingTop() + waste1View.getY() + waste1View.getPaddingTop();
 		return new Point((int) x, (int) y);
 	}
 
@@ -391,20 +364,17 @@ public class TripleSolitaireActivity extends Activity
 	public void onBackPressed()
 	{
 		final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this)
-				.setIcon(android.R.drawable.ic_dialog_alert)
-				.setTitle(R.string.quit_title)
+				.setIcon(android.R.drawable.ic_dialog_alert).setTitle(R.string.quit_title)
 				.setMessage(R.string.quit_message)
-				.setPositiveButton(R.string.quit_positive,
-						new DialogInterface.OnClickListener()
-						{
-							@SuppressWarnings("synthetic-access")
-							@Override
-							public void onClick(final DialogInterface dialog,
-									final int which)
-							{
-								TripleSolitaireActivity.super.onBackPressed();
-							}
-						}).setNegativeButton(R.string.quit_negative, null);
+				.setPositiveButton(R.string.quit_positive, new DialogInterface.OnClickListener()
+				{
+					@SuppressWarnings("synthetic-access")
+					@Override
+					public void onClick(final DialogInterface dialog, final int which)
+					{
+						TripleSolitaireActivity.super.onBackPressed();
+					}
+				}).setNegativeButton(R.string.quit_negative, null);
 		dialogBuilder.setOnCancelListener(new OnCancelListener()
 		{
 			@SuppressWarnings("synthetic-access")
@@ -418,8 +388,7 @@ public class TripleSolitaireActivity extends Activity
 	}
 
 	/**
-	 * Called when the activity is first created. Sets up the appropriate
-	 * listeners and starts a new game
+	 * Called when the activity is first created. Sets up the appropriate listeners and starts a new game
 	 * 
 	 * @see android.app.Activity#onCreate(android.os.Bundle)
 	 */
@@ -430,12 +399,11 @@ public class TripleSolitaireActivity extends Activity
 		gameState = new GameState(this);
 		setContentView(R.layout.main);
 		// Set up the progress bar area
-		final View progressBar = getLayoutInflater().inflate(
-				R.layout.progress_bar, null);
+		final View progressBar = getLayoutInflater().inflate(R.layout.progress_bar, null);
 		final ActionBar bar = getActionBar();
 		bar.setDisplayShowCustomEnabled(true);
-		final ActionBar.LayoutParams layoutParams = new ActionBar.LayoutParams(
-				LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+		final ActionBar.LayoutParams layoutParams = new ActionBar.LayoutParams(LayoutParams.WRAP_CONTENT,
+				LayoutParams.WRAP_CONTENT);
 		layoutParams.gravity = Gravity.LEFT;
 		bar.setCustomView(progressBar, layoutParams);
 		// Set up game listeners
@@ -455,13 +423,10 @@ public class TripleSolitaireActivity extends Activity
 			@Override
 			public boolean onTouch(final View v, final MotionEvent event)
 			{
-				if (event.getAction() != MotionEvent.ACTION_DOWN
-						|| gameState.isWasteEmpty())
+				if (event.getAction() != MotionEvent.ACTION_DOWN || gameState.isWasteEmpty())
 					return false;
-				final ClipData dragData = ClipData.newPlainText(
-						gameState.getWasteCard(0), gameState.getWasteCard(0));
-				return v.startDrag(dragData, new View.DragShadowBuilder(v), 0,
-						0);
+				final ClipData dragData = ClipData.newPlainText(gameState.getWasteCard(0), gameState.getWasteCard(0));
+				return v.startDrag(dragData, new View.DragShadowBuilder(v), 0, 0);
 			}
 		});
 		wasteTopView.setOnDragListener(new OnDragListener()
@@ -470,20 +435,16 @@ public class TripleSolitaireActivity extends Activity
 			public boolean onDrag(final View v, final DragEvent event)
 			{
 				final boolean fromMe = (Integer) event.getLocalState() == 0;
-				if (event.getAction() == DragEvent.ACTION_DRAG_STARTED
-						&& fromMe)
+				if (event.getAction() == DragEvent.ACTION_DRAG_STARTED && fromMe)
 				{
 					if (BuildConfig.DEBUG)
 					{
-						final String card = event.getClipDescription()
-								.getLabel().toString();
-						Log.d(TripleSolitaireActivity.TAG,
-								"Drag W: Started of " + card);
+						final String card = event.getClipDescription().getLabel().toString();
+						Log.d(TripleSolitaireActivity.TAG, "Drag W: Started of " + card);
 					}
 					return true;
 				}
-				else if (event.getAction() == DragEvent.ACTION_DRAG_ENDED
-						&& !event.getResult() && fromMe)
+				else if (event.getAction() == DragEvent.ACTION_DRAG_ENDED && !event.getResult() && fromMe)
 				{
 					System.gc();
 					handler.post(new Runnable()
@@ -501,21 +462,17 @@ public class TripleSolitaireActivity extends Activity
 		});
 		for (int curFoundation = 0; curFoundation < 12; curFoundation++)
 		{
-			final int foundationId = getResources().getIdentifier(
-					"foundation" + (curFoundation + 1), "id", getPackageName());
+			final int foundationId = getResources().getIdentifier("foundation" + (curFoundation + 1), "id",
+					getPackageName());
 			final ImageView foundationLayout = (ImageView) findViewById(foundationId);
-			foundationLayout.setOnTouchListener(new OnFoundationTouchListener(
-					-1 * (curFoundation + 1)));
-			foundationLayout.setOnDragListener(new OnFoundationDragListener(-1
-					* (curFoundation + 1)));
+			foundationLayout.setOnTouchListener(new OnFoundationTouchListener(-1 * (curFoundation + 1)));
+			foundationLayout.setOnDragListener(new OnFoundationDragListener(-1 * (curFoundation + 1)));
 		}
 		for (int curLane = 0; curLane < 13; curLane++)
 		{
-			final int laneId = getResources().getIdentifier(
-					"lane" + (curLane + 1), "id", getPackageName());
+			final int laneId = getResources().getIdentifier("lane" + (curLane + 1), "id", getPackageName());
 			final Lane laneLayout = (Lane) findViewById(laneId);
-			laneLayout
-					.setOnCardFlipListener(new OnCardFlipListener(curLane + 1));
+			laneLayout.setOnCardFlipListener(new OnCardFlipListener(curLane + 1));
 			laneLayout.setLaneId(curLane + 1);
 			laneLayout.setGameState(gameState);
 		}
@@ -577,8 +534,7 @@ public class TripleSolitaireActivity extends Activity
 	}
 
 	/**
-	 * Method called every time the options menu is invalidated/repainted.
-	 * Enables/disables the undo button
+	 * Method called every time the options menu is invalidated/repainted. Enables/disables the undo button
 	 * 
 	 * @see android.app.Activity#onPrepareOptionsMenu(android.view.Menu)
 	 */
@@ -610,13 +566,11 @@ public class TripleSolitaireActivity extends Activity
 			return;
 		// Query on the gameId to ensure that the game still exists - stats may
 		// have been reset
-		final Uri gameUri = ContentUris.withAppendedId(
-				GameContract.Games.CONTENT_ID_URI_BASE, gameId);
+		final Uri gameUri = ContentUris.withAppendedId(GameContract.Games.CONTENT_ID_URI_BASE, gameId);
 		new AsyncQueryHandler(getContentResolver())
 		{
 			@Override
-			protected void onQueryComplete(final int token,
-					final Object cookie, final Cursor cursor)
+			protected void onQueryComplete(final int token, final Object cookie, final Cursor cursor)
 			{
 				if (cursor.getCount() == 0)
 					gameState.newGame();
@@ -639,8 +593,7 @@ public class TripleSolitaireActivity extends Activity
 	}
 
 	/**
-	 * Pauses/resumes the game timer when window focus is lost/gained,
-	 * respectively
+	 * Pauses/resumes the game timer when window focus is lost/gained, respectively
 	 * 
 	 * @see android.app.Activity#onWindowFocusChanged(boolean)
 	 */
@@ -661,10 +614,9 @@ public class TripleSolitaireActivity extends Activity
 	 */
 	public void updateFoundationUI(final int foundationIndex)
 	{
-		final String foundationCard = gameState.getFoundationCard(-1
-				* (foundationIndex + 1));
-		final int foundationViewId = getResources().getIdentifier(
-				"foundation" + (foundationIndex + 1), "id", getPackageName());
+		final String foundationCard = gameState.getFoundationCard(-1 * (foundationIndex + 1));
+		final int foundationViewId = getResources().getIdentifier("foundation" + (foundationIndex + 1), "id",
+				getPackageName());
 		final ImageView foundationView = (ImageView) findViewById(foundationViewId);
 		if (foundationCard == null)
 		{
@@ -673,10 +625,9 @@ public class TripleSolitaireActivity extends Activity
 		}
 		else
 		{
-			foundationView.setBackgroundResource(getResources().getIdentifier(
-					foundationCard, "drawable", getPackageName()));
-			foundationView.setOnTouchListener(new OnFoundationTouchListener(-1
-					* (foundationIndex + 1)));
+			foundationView.setBackgroundResource(getResources().getIdentifier(foundationCard, "drawable",
+					getPackageName()));
+			foundationView.setOnTouchListener(new OnFoundationTouchListener(-1 * (foundationIndex + 1)));
 		}
 	}
 
@@ -685,8 +636,7 @@ public class TripleSolitaireActivity extends Activity
 	 */
 	public void updateMoveCount()
 	{
-		final TextView moveCountView = (TextView) getActionBar()
-				.getCustomView().findViewById(R.id.move_count);
+		final TextView moveCountView = (TextView) getActionBar().getCustomView().findViewById(R.id.move_count);
 		moveCountView.setText(Integer.toString(getMoveCount()));
 	}
 
@@ -707,8 +657,7 @@ public class TripleSolitaireActivity extends Activity
 	 */
 	public void updateTime()
 	{
-		final TextView timeView = (TextView) getActionBar().getCustomView()
-				.findViewById(R.id.time);
+		final TextView timeView = (TextView) getActionBar().getCustomView().findViewById(R.id.time);
 		timeView.setText(getGameTime());
 	}
 
@@ -730,13 +679,11 @@ public class TripleSolitaireActivity extends Activity
 	private void updateWasteUI(final int wasteIndex)
 	{
 		final String wasteCard = gameState.getWasteCard(wasteIndex);
-		final ImageView waste = (ImageView) findViewById(getResources()
-				.getIdentifier("waste" + (wasteIndex + 1), "id",
-						getPackageName()));
+		final ImageView waste = (ImageView) findViewById(getResources().getIdentifier("waste" + (wasteIndex + 1), "id",
+				getPackageName()));
 		if (wasteCard == null)
 			waste.setBackgroundResource(0);
 		else
-			waste.setBackgroundResource(getResources().getIdentifier(wasteCard,
-					"drawable", getPackageName()));
+			waste.setBackgroundResource(getResources().getIdentifier(wasteCard, "drawable", getPackageName()));
 	}
 }

@@ -12,13 +12,11 @@ import android.os.Bundle;
 public class WinDialogFragment extends DialogFragment
 {
 	/**
-	 * Key for saving and restoring the cached message from the saved instance
-	 * state bundle
+	 * Key for saving and restoring the cached message from the saved instance state bundle
 	 */
 	private final static String MESSAGE_KEY = "message";
 	/**
-	 * Cached message to restore on screen rotation or other configuration
-	 * changes
+	 * Cached message to restore on screen rotation or other configuration changes
 	 */
 	private String cachedMessage = null;
 
@@ -36,29 +34,23 @@ public class WinDialogFragment extends DialogFragment
 			cachedMessage = String.format(messageFormat, time, moveCount);
 		}
 		final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-		builder.setMessage(cachedMessage)
-				.setCancelable(false)
-				.setPositiveButton(getString(R.string.new_game),
-						new DialogInterface.OnClickListener()
-						{
-							@Override
-							public void onClick(final DialogInterface dialog,
-									final int dialogId)
-							{
-								dialog.dismiss();
-								activity.newGame();
-							}
-						})
-				.setNegativeButton(getString(R.string.exit),
-						new DialogInterface.OnClickListener()
-						{
-							@Override
-							public void onClick(final DialogInterface dialog,
-									final int dialogId)
-							{
-								activity.finish();
-							}
-						});
+		builder.setMessage(cachedMessage).setCancelable(false)
+				.setPositiveButton(getString(R.string.new_game), new DialogInterface.OnClickListener()
+				{
+					@Override
+					public void onClick(final DialogInterface dialog, final int dialogId)
+					{
+						dialog.dismiss();
+						activity.newGame();
+					}
+				}).setNegativeButton(getString(R.string.exit), new DialogInterface.OnClickListener()
+				{
+					@Override
+					public void onClick(final DialogInterface dialog, final int dialogId)
+					{
+						activity.finish();
+					}
+				});
 		return builder.create();
 	}
 

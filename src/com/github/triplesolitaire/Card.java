@@ -5,8 +5,7 @@ import android.content.Context;
 import android.widget.ImageView;
 
 /**
- * Image View specifically for Cards. Auto sets the width and height to the
- * appropriate values
+ * Image View specifically for Cards. Auto sets the width and height to the appropriate values
  */
 @SuppressLint("ViewConstructor")
 public class Card extends ImageView
@@ -31,11 +30,9 @@ public class Card extends ImageView
 	 * @see android.widget.ImageView#onMeasure(int, int)
 	 */
 	@Override
-	protected void onMeasure(final int widthMeasureSpec,
-			final int heightMeasureSpec)
+	protected void onMeasure(final int widthMeasureSpec, final int heightMeasureSpec)
 	{
-		setMeasuredDimension(
-				getResources().getDimensionPixelSize(R.dimen.card_width_dim),
-				getResources().getDimensionPixelSize(R.dimen.card_height_dim));
+		setMeasuredDimension(getResources().getDimensionPixelSize(R.dimen.card_width_dim), getResources()
+				.getDimensionPixelSize(R.dimen.card_height_dim));
 	}
 }

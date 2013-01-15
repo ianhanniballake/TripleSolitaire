@@ -5,15 +5,14 @@ import java.util.List;
 import java.util.Stack;
 
 /**
- * Stores all game state associated with a Lane, including its stack and
- * cascade. Used to get around inability to create arrays of generic objects
- * (i.e., <code>List&lt;String&gt;[]</code>).
+ * Stores all game state associated with a Lane, including its stack and cascade. Used to get around inability to create
+ * arrays of generic objects (i.e., <code>List&lt;String&gt;[]</code>).
  */
 public class LaneData
 {
 	/**
-	 * Cascade of flipped over card, where the last card is the card on the top
-	 * (i.e., not covered by any other cards) of the cascade
+	 * Cascade of flipped over card, where the last card is the card on the top (i.e., not covered by any other cards)
+	 * of the cascade
 	 */
 	private final LinkedList<String> cascade;
 	/**
@@ -47,8 +46,7 @@ public class LaneData
 	}
 
 	/**
-	 * Getter for the cascade. Additions and removal of cards should be called
-	 * on the returned list.
+	 * Getter for the cascade. Additions and removal of cards should be called on the returned list.
 	 * 
 	 * @return The cards in the cascade
 	 */
@@ -58,8 +56,7 @@ public class LaneData
 	}
 
 	/**
-	 * Getter for the stack. Additions and removal of cards should be called on
-	 * the returned list.
+	 * Getter for the stack. Additions and removal of cards should be called on the returned list.
 	 * 
 	 * @return The cards in the stack
 	 */

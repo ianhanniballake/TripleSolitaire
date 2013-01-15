@@ -20,16 +20,14 @@ public class TripleSolitaireApplication extends Application
 	{
 		getApplicationContext().getApplicationInfo();
 		if (BuildConfig.DEBUG)
-			StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-					.detectDiskReads().detectDiskWrites().detectNetwork()
-					.penaltyLog().penaltyFlashScreen().build());
+			StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectDiskReads().detectDiskWrites()
+					.detectNetwork().penaltyLog().penaltyFlashScreen().build());
 		try
 		{
 			setDefaultValues();
 		} catch (final Exception e)
 		{
-			final SharedPreferences preferences = PreferenceManager
-					.getDefaultSharedPreferences(this);
+			final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
 			preferences.edit().clear().commit();
 			setDefaultValues();
 		}
@@ -40,9 +38,7 @@ public class TripleSolitaireApplication extends Application
 	 */
 	private void setDefaultValues()
 	{
-		PreferenceManager.setDefaultValues(this, R.xml.preferences_gameplay,
-				false);
-		PreferenceManager.setDefaultValues(this, R.xml.preferences_animation,
-				false);
+		PreferenceManager.setDefaultValues(this, R.xml.preferences_gameplay, false);
+		PreferenceManager.setDefaultValues(this, R.xml.preferences_animation, false);
 	}
 }
