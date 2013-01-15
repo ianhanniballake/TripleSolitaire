@@ -1,0 +1,257 @@
+com.github.triplesolitaire.AboutDialogFragment -> com.github.triplesolitaire.a:
+    18:23:android.app.Dialog onCreateDialog(android.os.Bundle) -> onCreateDialog
+com.github.triplesolitaire.Card -> com.github.triplesolitaire.b:
+    35:37:void onMeasure(int,int) -> onMeasure
+com.github.triplesolitaire.GameState -> com.github.triplesolitaire.c:
+    com.github.triplesolitaire.TripleSolitaireActivity activity -> a
+    boolean[] autoplayLaneIndexLocked -> g
+    java.lang.String[] foundation -> h
+    long gameId -> b
+    boolean gameInProgress -> c
+    android.content.AsyncQueryHandler gameQueryHandler -> i
+    java.lang.Runnable gameTimerIncrement -> j
+    com.github.triplesolitaire.LaneData[] lane -> k
+    java.lang.Runnable moveCompleter -> l
+    int moveCount -> d
+    java.util.Stack moves -> m
+    int pendingMoves -> n
+    android.os.Handler postHandler -> e
+    java.util.Stack stock -> o
+    int timeInSeconds -> f
+    java.util.LinkedList waste -> p
+    int[] $SWITCH_TABLE$com$github$triplesolitaire$Move$Type -> q
+    44:47:boolean acceptLaneDrop(int,java.lang.String) -> a
+    60:63:int getNumber(java.lang.String) -> a
+    76:79:java.lang.String getSuit(java.lang.String) -> b
+    91:91:java.lang.String nextInSuit(java.lang.String) -> c
+    103:105:java.lang.String prevInSuit(java.lang.String) -> d
+    224:239:boolean acceptCascadeDrop(int,java.lang.String) -> b
+    254:270:boolean acceptFoundationDrop(int,java.lang.String) -> c
+    281:284:void addMoveToUndo(com.github.triplesolitaire.Move) -> b
+    291:293:void animationCompleted() -> a
+    304:309:boolean attemptAutoFlip(int) -> d
+    322:331:boolean attemptAutoMoveFromCascadeToFoundation(int) -> a
+    341:350:boolean attemptAutoMoveFromWasteToFoundation() -> b
+    359:387:void autoPlay() -> o
+    400:407:java.lang.String buildCascadeString(int,int) -> a
+    417:417:boolean canUndo() -> c
+    426:439:void checkForWin() -> p
+    450:450:java.lang.String getFoundationCard(int) -> b
+    460:460:long getGameId() -> d
+    470:470:int getMoveCount() -> e
+    480:480:int getTimeInSeconds() -> f
+    492:494:java.lang.String getWasteCard(int) -> c
+    504:504:boolean isStockEmpty() -> g
+    514:514:boolean isWasteEmpty() -> h
+    533:695:void move(com.github.triplesolitaire.Move) -> a
+    703:706:void moveCompleted() -> i
+    717:727:void moveStarted(boolean) -> a
+    734:772:void newGame() -> j
+    783:816:void onRestoreInstanceState(android.os.Bundle) -> a
+    826:842:void onSaveInstanceState(android.os.Bundle) -> b
+    849:851:void pauseGame() -> k
+    858:864:void resumeGame() -> l
+    871:876:void undo() -> m
+    26:26:int[] $SWITCH_TABLE$com$github$triplesolitaire$Move$Type() -> n
+com.github.triplesolitaire.GameState$1 -> com.github.triplesolitaire.d:
+    com.github.triplesolitaire.GameState this$0 -> a
+    142:148:void run() -> run
+com.github.triplesolitaire.GameState$2 -> com.github.triplesolitaire.e:
+    com.github.triplesolitaire.GameState this$0 -> a
+    162:163:void run() -> run
+com.github.triplesolitaire.GameState$3 -> com.github.triplesolitaire.f:
+    com.github.triplesolitaire.GameState this$0 -> a
+    208:209:void onInsertComplete(int,java.lang.Object,android.net.Uri) -> onInsertComplete
+com.github.triplesolitaire.Lane -> com.github.triplesolitaire.Lane:
+    int cascadeSize -> a
+    com.github.triplesolitaire.GameState gameState -> b
+    int laneId -> c
+    android.view.View$OnClickListener onCardFlipListener -> d
+    int stackSize -> e
+    110:153:void addCascade(java.util.List) -> a
+    163:183:void decrementCascadeSize(int) -> a
+    193:201:void flipOverTopStack(java.lang.String) -> a
+    210:210:com.github.triplesolitaire.Card getTopCascadeCard() -> getTopCascadeCard
+    222:260:boolean onDrag(android.view.View,android.view.DragEvent) -> onDrag
+    271:272:void setGameState(com.github.triplesolitaire.GameState) -> setGameState
+    282:283:void setLaneId(int) -> setLaneId
+    293:294:void setOnCardFlipListener(android.view.View$OnClickListener) -> setOnCardFlipListener
+    305:329:void setStackSize(int) -> setStackSize
+com.github.triplesolitaire.Lane$1 -> com.github.triplesolitaire.g:
+    com.github.triplesolitaire.Lane this$0 -> a
+    255:256:void run() -> run
+com.github.triplesolitaire.Lane$OnStartDragListener -> com.github.triplesolitaire.h:
+    int cascadeIndex -> b
+    com.github.triplesolitaire.Lane this$0 -> a
+    50:55:boolean onTouch(android.view.View,android.view.MotionEvent) -> onTouch
+com.github.triplesolitaire.LaneData -> com.github.triplesolitaire.i:
+    java.util.LinkedList cascade -> a
+    java.util.Stack stack -> b
+    55:55:java.util.LinkedList getCascade() -> a
+    65:65:java.util.Stack getStack() -> b
+com.github.triplesolitaire.Move -> com.github.triplesolitaire.j:
+    java.util.LinkedList cascade -> a
+    int fromIndex -> b
+    int toIndex -> c
+    com.github.triplesolitaire.Move$Type type -> d
+    156:159:void fillCascade(java.lang.String) -> a
+    168:170:java.lang.String getCard() -> a
+    180:180:java.util.LinkedList getCascade() -> b
+    190:200:java.lang.String getCascadeAsString() -> g
+    215:215:int getFromIndex() -> c
+    230:230:int getToIndex() -> d
+    240:240:com.github.triplesolitaire.Move$Type getType() -> e
+    251:259:java.lang.String toString() -> toString
+    269:273:com.github.triplesolitaire.Move toUndo() -> f
+com.github.triplesolitaire.Move$Type -> com.github.triplesolitaire.k:
+    com.github.triplesolitaire.Move$Type AUTO_PLAY -> a
+    com.github.triplesolitaire.Move$Type FLIP -> b
+    com.github.triplesolitaire.Move$Type PLAYER_MOVE -> c
+    com.github.triplesolitaire.Move$Type STOCK -> d
+    com.github.triplesolitaire.Move$Type UNDO -> e
+    com.github.triplesolitaire.Move$Type UNDO_FLIP -> f
+    com.github.triplesolitaire.Move$Type UNDO_STOCK -> g
+    com.github.triplesolitaire.Move$Type[] ENUM$VALUES -> h
+    1:1:com.github.triplesolitaire.Move$Type[] values() -> values
+    1:1:com.github.triplesolitaire.Move$Type valueOf(java.lang.String) -> valueOf
+com.github.triplesolitaire.Preferences -> com.github.triplesolitaire.Preferences:
+    146:147:void onBuildHeaders(java.util.List) -> onBuildHeaders
+    152:168:void onCreate(android.os.Bundle) -> onCreate
+    173:179:boolean onOptionsItemSelected(android.view.MenuItem) -> onOptionsItemSelected
+    186:188:void onStart() -> onStart
+com.github.triplesolitaire.Preferences$1 -> com.github.triplesolitaire.l:
+    com.github.triplesolitaire.Preferences this$0 -> a
+    162:164:void onClick(android.view.View) -> onClick
+com.github.triplesolitaire.Preferences$AnimationPreferenceFragment -> com.github.triplesolitaire.Preferences$AnimationPreferenceFragment:
+    android.preference.ListPreference animateSpeedAutoplayListPreference -> a
+    android.preference.ListPreference animateSpeedUndoListPreference -> b
+    40:48:void onCreate(android.os.Bundle) -> onCreate
+    53:55:void onPause() -> onPause
+    60:62:void onResume() -> onResume
+    67:72:void onSharedPreferenceChanged(android.content.SharedPreferences,java.lang.String) -> onSharedPreferenceChanged
+com.github.triplesolitaire.Preferences$GameplayPreferenceFragment -> com.github.triplesolitaire.Preferences$GameplayPreferenceFragment:
+    android.preference.ListPreference autoplayListPreference -> a
+    89:93:void onCreate(android.os.Bundle) -> onCreate
+    98:100:void onPause() -> onPause
+    105:107:void onResume() -> onResume
+    112:115:void onSharedPreferenceChanged(android.content.SharedPreferences,java.lang.String) -> onSharedPreferenceChanged
+com.github.triplesolitaire.ResetDialogFragment -> com.github.triplesolitaire.m:
+    20:20:android.app.Dialog onCreateDialog(android.os.Bundle) -> onCreateDialog
+com.github.triplesolitaire.ResetDialogFragment$1 -> com.github.triplesolitaire.n:
+    com.github.triplesolitaire.ResetDialogFragment this$0 -> a
+    27:31:void onClick(android.content.DialogInterface,int) -> onClick
+com.github.triplesolitaire.ResetDialogFragment$1$1 -> com.github.triplesolitaire.o:
+    com.github.triplesolitaire.ResetDialogFragment$1 this$1 -> a
+com.github.triplesolitaire.StatsDialogFragment -> com.github.triplesolitaire.p:
+    27:29:void onActivityCreated(android.os.Bundle) -> onActivityCreated
+    34:39:android.app.Dialog onCreateDialog(android.os.Bundle) -> onCreateDialog
+    45:45:android.content.Loader onCreateLoader(int,android.os.Bundle) -> onCreateLoader
+    52:52:void onLoaderReset(android.content.Loader) -> onLoaderReset
+    57:107:void onLoadFinished(android.content.Loader,android.database.Cursor) -> a
+    1:1:void onLoadFinished(android.content.Loader,java.lang.Object) -> onLoadFinished
+com.github.triplesolitaire.TripleSolitaireActivity -> com.github.triplesolitaire.TripleSolitaireActivity:
+    com.github.triplesolitaire.GameState gameState -> a
+    android.os.Handler handler -> b
+    194:251:void animate(com.github.triplesolitaire.Move) -> a
+    259:261:void cancelAnimation() -> h
+    272:278:android.graphics.Point getCascadeLoc(int) -> c
+    290:297:android.graphics.Point getFoundationLoc(int) -> d
+    307:316:java.lang.CharSequence getGameTime() -> a
+    328:328:com.github.triplesolitaire.Lane getLane(int) -> a
+    338:338:int getMoveCount() -> b
+    348:352:android.graphics.Point getWasteLoc() -> i
+    360:361:void newGame() -> c
+    366:388:void onBackPressed() -> onBackPressed
+    398:481:void onCreate(android.os.Bundle) -> onCreate
+    491:492:boolean onCreateOptionsMenu(android.view.Menu) -> onCreateOptionsMenu
+    503:524:boolean onOptionsItemSelected(android.view.MenuItem) -> onOptionsItemSelected
+    531:534:void onPause() -> onPause
+    544:545:boolean onPrepareOptionsMenu(android.view.Menu) -> onPrepareOptionsMenu
+    556:558:void onRestoreInstanceState(android.os.Bundle) -> onRestoreInstanceState
+    563:579:void onResume() -> onResume
+    589:593:void onSaveInstanceState(android.os.Bundle) -> onSaveInstanceState
+    603:607:void onWindowFocusChanged(boolean) -> onWindowFocusChanged
+    617:632:void updateFoundationUI(int) -> b
+    639:641:void updateMoveCount() -> d
+    648:653:void updateStockUI() -> e
+    660:662:void updateTime() -> f
+    669:671:void updateWasteUI() -> g
+    681:688:void updateWasteUI(int) -> e
+    1:1:void access$0(com.github.triplesolitaire.TripleSolitaireActivity) -> a
+com.github.triplesolitaire.TripleSolitaireActivity$1 -> com.github.triplesolitaire.q:
+    com.github.triplesolitaire.TripleSolitaireActivity this$0 -> a
+    com.github.triplesolitaire.Move val$move -> b
+    android.widget.FrameLayout val$layout -> c
+    230:240:void onAnimationEnd(android.animation.Animator) -> onAnimationEnd
+com.github.triplesolitaire.TripleSolitaireActivity$2 -> com.github.triplesolitaire.r:
+    com.github.triplesolitaire.TripleSolitaireActivity this$0 -> a
+    375:376:void onClick(android.content.DialogInterface,int) -> onClick
+com.github.triplesolitaire.TripleSolitaireActivity$3 -> com.github.triplesolitaire.s:
+    com.github.triplesolitaire.TripleSolitaireActivity this$0 -> a
+    384:385:void onCancel(android.content.DialogInterface) -> onCancel
+com.github.triplesolitaire.TripleSolitaireActivity$4 -> com.github.triplesolitaire.t:
+    com.github.triplesolitaire.TripleSolitaireActivity this$0 -> a
+    416:418:void onClick(android.view.View) -> onClick
+com.github.triplesolitaire.TripleSolitaireActivity$5 -> com.github.triplesolitaire.u:
+    com.github.triplesolitaire.TripleSolitaireActivity this$0 -> a
+    426:429:boolean onTouch(android.view.View,android.view.MotionEvent) -> onTouch
+com.github.triplesolitaire.TripleSolitaireActivity$6 -> com.github.triplesolitaire.v:
+    com.github.triplesolitaire.TripleSolitaireActivity this$0 -> a
+    437:460:boolean onDrag(android.view.View,android.view.DragEvent) -> onDrag
+    432:432:com.github.triplesolitaire.TripleSolitaireActivity access$0(com.github.triplesolitaire.TripleSolitaireActivity$6) -> a
+com.github.triplesolitaire.TripleSolitaireActivity$6$1 -> com.github.triplesolitaire.w:
+    com.github.triplesolitaire.TripleSolitaireActivity$6 this$1 -> a
+    455:456:void run() -> run
+com.github.triplesolitaire.TripleSolitaireActivity$7 -> com.github.triplesolitaire.x:
+    com.github.triplesolitaire.TripleSolitaireActivity this$0 -> a
+    575:577:void onQueryComplete(int,java.lang.Object,android.database.Cursor) -> onQueryComplete
+com.github.triplesolitaire.TripleSolitaireActivity$OnCardFlipListener -> com.github.triplesolitaire.y:
+    int laneIndex -> b
+    com.github.triplesolitaire.TripleSolitaireActivity this$0 -> a
+    76:77:void onClick(android.view.View) -> onClick
+com.github.triplesolitaire.TripleSolitaireActivity$OnFoundationDragListener -> com.github.triplesolitaire.z:
+    int foundationIndex -> b
+    com.github.triplesolitaire.TripleSolitaireActivity this$0 -> a
+    109:130:boolean onDrag(android.view.View,android.view.DragEvent) -> onDrag
+com.github.triplesolitaire.TripleSolitaireActivity$OnFoundationTouchListener -> com.github.triplesolitaire.aa:
+    int foundationIndex -> b
+    com.github.triplesolitaire.TripleSolitaireActivity this$0 -> a
+    163:167:boolean onTouch(android.view.View,android.view.MotionEvent) -> onTouch
+com.github.triplesolitaire.TripleSolitaireApplication -> com.github.triplesolitaire.TripleSolitaireApplication:
+    21:34:void onCreate() -> onCreate
+    41:43:void setDefaultValues() -> a
+com.github.triplesolitaire.TripleSolitaireBackupAgent -> com.github.triplesolitaire.TripleSolitaireBackupAgent:
+    18:18:java.lang.String getDefaultSharedPreferencesName() -> a
+    24:27:void onCreate() -> onCreate
+com.github.triplesolitaire.WinDialogFragment -> com.github.triplesolitaire.ab:
+    java.lang.String cachedMessage -> a
+    26:54:android.app.Dialog onCreateDialog(android.os.Bundle) -> onCreateDialog
+    60:62:void onSaveInstanceState(android.os.Bundle) -> onSaveInstanceState
+com.github.triplesolitaire.WinDialogFragment$1 -> com.github.triplesolitaire.ac:
+    com.github.triplesolitaire.WinDialogFragment this$0 -> a
+    com.github.triplesolitaire.TripleSolitaireActivity val$activity -> b
+    43:45:void onClick(android.content.DialogInterface,int) -> onClick
+com.github.triplesolitaire.WinDialogFragment$2 -> com.github.triplesolitaire.ad:
+    com.github.triplesolitaire.WinDialogFragment this$0 -> a
+    com.github.triplesolitaire.TripleSolitaireActivity val$activity -> b
+    51:52:void onClick(android.content.DialogInterface,int) -> onClick
+com.github.triplesolitaire.provider.GameContract -> com.github.triplesolitaire.provider.a:
+com.github.triplesolitaire.provider.GameContract$Games -> com.github.triplesolitaire.provider.b:
+    android.net.Uri CONTENT_ID_URI_BASE -> a
+    android.net.Uri CONTENT_ID_URI_PATTERN -> b
+    android.net.Uri CONTENT_URI -> c
+com.github.triplesolitaire.provider.GameProvider -> com.github.triplesolitaire.provider.GameProvider:
+    android.content.UriMatcher uriMatcher -> b
+    java.util.HashMap allColumnProjectionMap -> a
+    com.github.triplesolitaire.provider.GameProvider$DatabaseHelper databaseHelper -> c
+    105:111:java.util.HashMap buildAllColumnProjectionMap() -> a
+    121:124:android.content.UriMatcher buildUriMatcher() -> b
+    140:163:int delete(android.net.Uri,java.lang.String,java.lang.String[]) -> delete
+    172:183:java.lang.String getType(android.net.Uri) -> getType
+    192:213:android.net.Uri insert(android.net.Uri,android.content.ContentValues) -> insert
+    224:225:boolean onCreate() -> onCreate
+    233:255:android.database.Cursor query(android.net.Uri,java.lang.String[],java.lang.String,java.lang.String[],java.lang.String) -> query
+    261:282:int update(android.net.Uri,android.content.ContentValues,java.lang.String,java.lang.String[]) -> update
+com.github.triplesolitaire.provider.GameProvider$DatabaseHelper -> com.github.triplesolitaire.provider.c:
+    52:56:void onCreate(android.database.sqlite.SQLiteDatabase) -> onCreate
+    66:70:void onUpgrade(android.database.sqlite.SQLiteDatabase,int,int) -> onUpgrade
