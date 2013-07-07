@@ -199,7 +199,8 @@ public class GameProvider extends ContentProvider
 		if (!values.containsKey(GameContract.Games.COLUMN_NAME_START_TIME))
 			values.put(GameContract.Games.COLUMN_NAME_START_TIME, System.currentTimeMillis());
 		final SQLiteDatabase db = databaseHelper.getWritableDatabase();
-		final long rowId = db.insert(GameContract.Games.TABLE_NAME, GameContract.Games.COLUMN_NAME_START_TIME, values);
+		final long rowId = db.insertWithOnConflict(GameContract.Games.TABLE_NAME,
+				GameContract.Games.COLUMN_NAME_START_TIME, values, SQLiteDatabase.CONFLICT_IGNORE);
 		// If the insert succeeded, the row ID exists.
 		if (rowId > 0)
 		{
@@ -209,7 +210,13 @@ public class GameProvider extends ContentProvider
 			getContext().getContentResolver().notifyChange(contractionUri, null);
 			return contractionUri;
 		}
-		// If the insert didn't succeed, then the rowID is <= 0
+		final String startTime = values.getAsString(GameContract.Games.COLUMN_NAME_START_TIME);
+		final Cursor existingRow = query(GameContract.Games.CONTENT_ID_URI_BASE, new String[] { BaseColumns._ID },
+				GameContract.Games.COLUMN_NAME_START_TIME + "=?", new String[] { startTime }, null);
+		if (existingRow.moveToFirst())
+			return ContentUris.withAppendedId(GameContract.Games.CONTENT_ID_URI_BASE,
+					existingRow.getLong(existingRow.getColumnIndex(BaseColumns._ID)));
+		// If the insert didn't succeed and we didn't find an existing row, then something went terribly wrong
 		throw new SQLException("Failed to insert row into " + uri);
 	}
 

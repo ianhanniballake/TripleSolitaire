@@ -5,76 +5,43 @@ import java.text.NumberFormat;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.app.LoaderManager;
-import android.content.CursorLoader;
-import android.content.Loader;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 
-import com.github.triplesolitaire.provider.GameContract;
-
 /**
  * Stats Dialog for the application
  */
-public class StatsDialogFragment extends DialogFragment implements LoaderManager.LoaderCallbacks<Cursor>
+public class StatsDialogFragment extends DialogFragment
 {
-	@Override
-	public void onActivityCreated(final Bundle savedInstanceState)
+	private static final String STATS_STATE = "STATS_STATE";
+
+	public static StatsDialogFragment createInstance(final StatsState stats)
 	{
-		super.onActivityCreated(savedInstanceState);
-		getLoaderManager().initLoader(0, null, this);
+		final StatsDialogFragment statsDialogFragment = new StatsDialogFragment();
+		final Bundle args = new Bundle();
+		args.putString(STATS_STATE, stats.toString());
+		statsDialogFragment.setArguments(args);
+		return statsDialogFragment;
 	}
 
 	@Override
 	public Dialog onCreateDialog(final Bundle savedInstanceState)
 	{
+		final StatsState stats = new StatsState(getArguments().getString(STATS_STATE));
+		final int gamesPlayed = stats.getGamesPlayed();
+		final int gamesWon = stats.getGamesWon();
+		final double averageDuration = stats.getAverageDuration();
+		final double averageMoves = stats.getAverageMoves();
 		final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		final LayoutInflater inflater = getActivity().getLayoutInflater();
 		final View layout = inflater.inflate(R.layout.stats_dialog, null);
-		builder.setTitle(R.string.stats).setIcon(R.drawable.icon).setView(layout)
-				.setNegativeButton(getText(R.string.close), null);
-		return builder.create();
-	}
-
-	@Override
-	public Loader<Cursor> onCreateLoader(final int id, final Bundle args)
-	{
-		return new CursorLoader(getActivity(), GameContract.Games.CONTENT_URI, null, null, null, null);
-	}
-
-	@Override
-	public void onLoaderReset(final Loader<Cursor> loader)
-	{
-		// Nothing to do
-	}
-
-	@Override
-	public void onLoadFinished(final Loader<Cursor> loader, final Cursor data)
-	{
-		final int gamesPlayed = data.getCount();
-		int gamesWon = 0;
-		double averageDuration = 0;
-		double averageMoves = 0;
-		final int durationColumnIndex = data.getColumnIndex(GameContract.Games.COLUMN_NAME_DURATION);
-		final int movesColumnIndex = data.getColumnIndex(GameContract.Games.COLUMN_NAME_MOVES);
-		while (data.moveToNext())
-		{
-			if (data.isNull(durationColumnIndex))
-				continue;
-			final int curDuration = data.getInt(durationColumnIndex);
-			averageDuration = (curDuration + gamesWon * averageDuration) / (gamesWon + 1);
-			final int curMoves = data.getInt(movesColumnIndex);
-			averageMoves = (curMoves + gamesWon * averageMoves) / (gamesWon + 1);
-			gamesWon++;
-		}
-		final TextView gamesPlayedView = (TextView) getDialog().findViewById(R.id.games_played);
+		final TextView gamesPlayedView = (TextView) layout.findViewById(R.id.games_played);
 		gamesPlayedView.setText(Integer.toString(gamesPlayed));
-		final TextView gamesWonView = (TextView) getDialog().findViewById(R.id.games_won);
+		final TextView gamesWonView = (TextView) layout.findViewById(R.id.games_won);
 		gamesWonView.setText(Integer.toString(gamesWon));
-		final TextView winPercentageView = (TextView) getDialog().findViewById(R.id.win_percentage);
+		final TextView winPercentageView = (TextView) layout.findViewById(R.id.win_percentage);
 		if (gamesPlayed == 0)
 			winPercentageView.setText(R.string.stats_na);
 		else
@@ -83,7 +50,7 @@ public class StatsDialogFragment extends DialogFragment implements LoaderManager
 			percentFormat.setMaximumFractionDigits(1);
 			winPercentageView.setText(percentFormat.format((double) gamesWon / gamesPlayed));
 		}
-		final TextView averageDurationView = (TextView) getDialog().findViewById(R.id.average_duration);
+		final TextView averageDurationView = (TextView) layout.findViewById(R.id.average_duration);
 		if (gamesWon == 0)
 			averageDurationView.setText(getText(R.string.stats_na));
 		else
@@ -99,10 +66,13 @@ public class StatsDialogFragment extends DialogFragment implements LoaderManager
 			averageDurationView.setText(sb);
 		}
 		final NumberFormat integerFormat = NumberFormat.getIntegerInstance();
-		final TextView averageMovesView = (TextView) getDialog().findViewById(R.id.average_moves);
+		final TextView averageMovesView = (TextView) layout.findViewById(R.id.average_moves);
 		if (gamesWon == 0)
 			averageMovesView.setText(getText(R.string.stats_na));
 		else
 			averageMovesView.setText(integerFormat.format(averageMoves));
+		builder.setTitle(R.string.stats).setIcon(R.drawable.icon).setView(layout)
+				.setNegativeButton(getText(R.string.close), null);
+		return builder.create();
 	}
 }

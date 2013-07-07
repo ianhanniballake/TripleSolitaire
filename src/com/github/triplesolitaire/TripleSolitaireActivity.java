@@ -1,17 +1,23 @@
 package com.github.triplesolitaire;
 
+import java.util.ArrayList;
+
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.ActionBar;
-import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.LoaderManager.LoaderCallbacks;
 import android.content.AsyncQueryHandler;
 import android.content.ClipData;
+import android.content.ContentProviderOperation;
 import android.content.ContentUris;
+import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
+import android.content.Loader;
+import android.content.OperationApplicationException;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Point;
@@ -19,6 +25,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.DragEvent;
@@ -38,11 +45,15 @@ import android.widget.TextView;
 
 import com.github.triplesolitaire.Move.Type;
 import com.github.triplesolitaire.provider.GameContract;
+import com.google.android.gms.appstate.AppStateClient;
+import com.google.android.gms.appstate.OnStateLoadedListener;
+import com.google.android.gms.common.SignInButton;
+import com.google.example.games.basegameutils.BaseGameActivity;
 
 /**
  * Main class which controls the UI of the Triple Solitaire game
  */
-public class TripleSolitaireActivity extends Activity
+public class TripleSolitaireActivity extends BaseGameActivity implements LoaderCallbacks<Cursor>, OnStateLoadedListener
 {
 	/**
 	 * Handles Card flip clicks
@@ -168,6 +179,7 @@ public class TripleSolitaireActivity extends Activity
 		}
 	}
 
+	private static final int OUR_STATE_KEY = 0;
 	/**
 	 * Logging tag
 	 */
@@ -180,6 +192,18 @@ public class TripleSolitaireActivity extends Activity
 	 * Handler used to post delayed calls
 	 */
 	final Handler handler = new Handler();
+	private boolean mAlreadyLoadedState = false;
+	private boolean mPendingUpdateState = false;
+	StatsState stats = new StatsState();
+
+	/**
+	 * Constructs a new TripleSolitaireActivity that uses all Google Play Services
+	 */
+	public TripleSolitaireActivity()
+	{
+		// request that superclass initialize and manage the Google Play Services for us
+		super(BaseGameActivity.CLIENT_ALL);
+	}
 
 	/**
 	 * Animates the given move by creating a copy of the source view and animating it over to the final position before
@@ -406,6 +430,17 @@ public class TripleSolitaireActivity extends Activity
 				LayoutParams.WRAP_CONTENT);
 		layoutParams.gravity = Gravity.LEFT;
 		bar.setCustomView(progressBar, layoutParams);
+		// Set up sign in button
+		final SignInButton signIn = (SignInButton) findViewById(R.id.sign_in);
+		signIn.setOnClickListener(new OnClickListener()
+		{
+			@SuppressWarnings("synthetic-access")
+			@Override
+			public void onClick(final View v)
+			{
+				beginUserInitiatedSignIn();
+			}
+		});
 		// Set up game listeners
 		final ImageView stockView = (ImageView) findViewById(R.id.stock);
 		stockView.setOnClickListener(new OnClickListener()
@@ -478,6 +513,13 @@ public class TripleSolitaireActivity extends Activity
 		}
 		if (savedInstanceState == null)
 			gameState.newGame();
+		getLoaderManager().initLoader(0, null, this);
+	}
+
+	@Override
+	public Loader<Cursor> onCreateLoader(final int id, final Bundle args)
+	{
+		return new CursorLoader(this, GameContract.Games.CONTENT_URI, null, null, null, null);
 	}
 
 	/**
@@ -490,6 +532,22 @@ public class TripleSolitaireActivity extends Activity
 	{
 		getMenuInflater().inflate(R.menu.menu, menu);
 		return true;
+	}
+
+	@Override
+	public void onLoaderReset(final Loader<Cursor> loader)
+	{
+		// Nothing to do
+	}
+
+	@Override
+	public void onLoadFinished(final Loader<Cursor> loader, final Cursor data)
+	{
+		stats = stats.unionWith(new StatsState(data));
+		if (isSignedIn())
+			getAppStateClient().updateState(OUR_STATE_KEY, stats.toBytes());
+		else if (data.getCount() > 0)
+			mPendingUpdateState = true;
 	}
 
 	/**
@@ -509,11 +567,14 @@ public class TripleSolitaireActivity extends Activity
 				gameState.newGame();
 				return true;
 			case R.id.stats:
-				final StatsDialogFragment statsDialogFragment = new StatsDialogFragment();
-				statsDialogFragment.show(getFragmentManager(), "stats");
+				StatsDialogFragment.createInstance(stats).show(getFragmentManager(), "stats");
 				return true;
 			case R.id.settings:
 				startActivity(new Intent(this, Preferences.class));
+				return true;
+			case R.id.sign_out:
+				signOut();
+				findViewById(R.id.sign_in_layout).setVisibility(View.VISIBLE);
 				return true;
 			case android.R.id.home:
 			case R.id.about:
@@ -541,8 +602,10 @@ public class TripleSolitaireActivity extends Activity
 	@Override
 	public boolean onPrepareOptionsMenu(final Menu menu)
 	{
+		super.onPrepareOptionsMenu(menu);
 		menu.findItem(R.id.undo).setEnabled(gameState.canUndo());
-		return super.onPrepareOptionsMenu(menu);
+		menu.findItem(R.id.sign_out).setVisible(isSignedIn());
+		return true;
 	}
 
 	/**
@@ -564,8 +627,7 @@ public class TripleSolitaireActivity extends Activity
 		final long gameId = gameState.getGameId();
 		if (gameId == -1)
 			return;
-		// Query on the gameId to ensure that the game still exists - stats may
-		// have been reset
+		// Query on the gameId to ensure that the game still exists - stats may have been reset
 		final Uri gameUri = ContentUris.withAppendedId(GameContract.Games.CONTENT_ID_URI_BASE, gameId);
 		new AsyncQueryHandler(getContentResolver())
 		{
@@ -592,6 +654,93 @@ public class TripleSolitaireActivity extends Activity
 			Log.d(TripleSolitaireActivity.TAG, "onSaveInstanceState");
 	}
 
+	@Override
+	public void onSignInFailed()
+	{
+		if (BuildConfig.DEBUG)
+			Log.d(TripleSolitaireActivity.TAG, "onSignInFailed");
+		invalidateOptionsMenu();
+	}
+
+	@Override
+	public void onSignInSucceeded()
+	{
+		if (BuildConfig.DEBUG)
+			Log.d(TripleSolitaireActivity.TAG, "onSignInSucceeded");
+		invalidateOptionsMenu();
+		findViewById(R.id.sign_in_layout).setVisibility(View.GONE);
+		if (!mAlreadyLoadedState)
+			getAppStateClient().loadState(this, OUR_STATE_KEY);
+	}
+
+	@Override
+	public void onStateConflict(final int stateKey, final String resolvedVersion, final byte[] localData,
+			final byte[] serverData)
+	{
+		if (BuildConfig.DEBUG)
+			Log.d(TripleSolitaireActivity.TAG, "onStateConflict");
+		// Union the two sets of data together to form a resolved, consistent set of stats
+		final StatsState localStats = new StatsState(localData);
+		final StatsState serverStats = new StatsState(serverData);
+		final StatsState resolvedGame = localStats.unionWith(serverStats);
+		getAppStateClient().resolveState(this, OUR_STATE_KEY, resolvedVersion, resolvedGame.toBytes());
+	}
+
+	@Override
+	public void onStateLoaded(final int statusCode, final int stateKey, final byte[] localData)
+	{
+		switch (statusCode)
+		{
+			case AppStateClient.STATUS_OK:
+				if (BuildConfig.DEBUG)
+					Log.d(TripleSolitaireActivity.TAG, "State loaded successfully");
+				// Data was successfully loaded from the cloud: merge with local data.
+				stats = stats.unionWith(new StatsState(localData));
+				mAlreadyLoadedState = true;
+				persistStats();
+				if (mPendingUpdateState)
+				{
+					getAppStateClient().updateState(OUR_STATE_KEY, stats.toBytes());
+					mPendingUpdateState = false;
+				}
+				break;
+			case AppStateClient.STATUS_STATE_KEY_NOT_FOUND:
+				if (BuildConfig.DEBUG)
+					Log.d(TripleSolitaireActivity.TAG, "State loaded, no key found");
+				// key not found means there is no saved data. To us, this is the same as
+				// having empty data, so we treat this as a success.
+				mAlreadyLoadedState = true;
+				if (mPendingUpdateState)
+				{
+					getAppStateClient().updateState(OUR_STATE_KEY, stats.toBytes());
+					mPendingUpdateState = false;
+				}
+				break;
+			case AppStateClient.STATUS_NETWORK_ERROR_NO_DATA:
+				if (BuildConfig.DEBUG)
+					Log.d(TripleSolitaireActivity.TAG, "State not loaded - network error with no data");
+				// can't reach cloud, and we have no local state. Warn user that
+				// they may not see their existing progress, but any new progress won't be lost.
+				// TODO warn about network error
+				break;
+			case AppStateClient.STATUS_NETWORK_ERROR_STALE_DATA:
+				if (BuildConfig.DEBUG)
+					Log.d(TripleSolitaireActivity.TAG, "State not loaded - network error with stale data");
+				// can't reach cloud, but we have locally cached data.
+				// TODO warn about stale data
+				break;
+			case AppStateClient.STATUS_CLIENT_RECONNECT_REQUIRED:
+				if (BuildConfig.DEBUG)
+					Log.d(TripleSolitaireActivity.TAG, "State not loaded - reconnect required");
+				// need to reconnect AppStateClient
+				reconnectClients(BaseGameActivity.CLIENT_APPSTATE);
+				break;
+			default:
+				// TODO warn about generic error
+				break;
+		}
+	}
+
 	/**
 	 * Pauses/resumes the game timer when window focus is lost/gained, respectively
 	 * 
@@ -604,6 +753,21 @@ public class TripleSolitaireActivity extends Activity
 			gameState.resumeGame();
 		else
 			gameState.pauseGame();
+	}
+
+	private void persistStats()
+	{
+		final ArrayList<ContentProviderOperation> operations = stats.getLocalSaveOperations();
+		try
+		{
+			getContentResolver().applyBatch(GameContract.AUTHORITY, operations);
+		} catch (final RemoteException e)
+		{
+			Log.e(StatsState.class.getSimpleName(), "Failed persisting stats", e);
+		} catch (final OperationApplicationException e)
+		{
+			Log.e(StatsState.class.getSimpleName(), "Failed persisting stats", e);
+		}
 	}
 
 	/**

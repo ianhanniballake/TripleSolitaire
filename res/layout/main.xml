@@ -1,273 +1,298 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:tools="http://schemas.android.com/tools"
-	android:layout_width="fill_parent"
-	android:layout_height="fill_parent"
-	android:background="@color/background"
-	android:padding="5dp" >
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/background"
+    android:padding="8dp" >
 
-	<ImageView
-		android:id="@+id/stock"
-		android:layout_width="@dimen/card_width_dim"
-		android:layout_height="@dimen/card_height_dim"
-		android:layout_alignParentLeft="true"
-		android:layout_alignParentTop="true"
-		android:layout_margin="@dimen/between_card_dim" />
+    <ImageView
+        android:id="@+id/stock"
+        android:layout_width="@dimen/card_width_dim"
+        android:layout_height="@dimen/card_height_dim"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="@dimen/between_card_dim" />
 
-	<RelativeLayout
-		android:id="@+id/waste"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_alignParentTop="true"
-		android:layout_margin="@dimen/between_card_dim"
-		android:layout_toRightOf="@id/stock" >
+    <RelativeLayout
+        android:id="@+id/waste"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_margin="@dimen/between_card_dim"
+        android:layout_toRightOf="@id/stock" >
 
-		<ImageView
-			android:id="@+id/waste3"
-			android:layout_width="@dimen/card_width_dim"
-			android:layout_height="@dimen/card_height_dim"
-			android:layout_alignParentLeft="true"
-			android:layout_alignParentTop="true" />
+        <ImageView
+            android:id="@+id/waste3"
+            android:layout_width="@dimen/card_width_dim"
+            android:layout_height="@dimen/card_height_dim"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true" />
 
-		<ImageView
-			android:id="@+id/waste2"
-			android:layout_width="@dimen/card_width_dim"
-			android:layout_height="@dimen/card_height_dim"
-			android:layout_alignLeft="@id/waste3"
-			android:layout_alignParentTop="true"
-			android:layout_marginLeft="@dimen/card_horz_overlap_dim" />
+        <ImageView
+            android:id="@+id/waste2"
+            android:layout_width="@dimen/card_width_dim"
+            android:layout_height="@dimen/card_height_dim"
+            android:layout_alignLeft="@id/waste3"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="@dimen/card_horz_overlap_dim" />
 
-		<ImageView
-			android:id="@+id/waste1"
-			android:layout_width="@dimen/card_width_dim"
-			android:layout_height="@dimen/card_height_dim"
-			android:layout_alignLeft="@id/waste2"
-			android:layout_alignParentTop="true"
-			android:layout_marginLeft="@dimen/card_horz_overlap_dim" />
-	</RelativeLayout>
+        <ImageView
+            android:id="@+id/waste1"
+            android:layout_width="@dimen/card_width_dim"
+            android:layout_height="@dimen/card_height_dim"
+            android:layout_alignLeft="@id/waste2"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="@dimen/card_horz_overlap_dim" />
+    </RelativeLayout>
 
-	<RelativeLayout
-		android:id="@+id/foundation"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_alignParentRight="true"
-		android:layout_alignParentTop="true" >
+    <RelativeLayout
+        android:id="@+id/foundation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true" >
 
-		<ImageView
-			android:id="@+id/foundation12"
-			android:layout_width="@dimen/card_width_dim"
-			android:layout_height="@dimen/card_height_dim"
-			android:layout_alignParentRight="true"
-			android:layout_alignParentTop="true"
-			android:layout_margin="@dimen/between_card_dim" />
+        <ImageView
+            android:id="@+id/foundation12"
+            android:layout_width="@dimen/card_width_dim"
+            android:layout_height="@dimen/card_height_dim"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_margin="@dimen/between_card_dim" />
 
-		<ImageView
-			android:id="@+id/foundation11"
-			android:layout_width="@dimen/card_width_dim"
-			android:layout_height="@dimen/card_height_dim"
-			android:layout_alignParentTop="true"
-			android:layout_margin="@dimen/between_card_dim"
-			android:layout_toLeftOf="@id/foundation12" />
+        <ImageView
+            android:id="@+id/foundation11"
+            android:layout_width="@dimen/card_width_dim"
+            android:layout_height="@dimen/card_height_dim"
+            android:layout_alignParentTop="true"
+            android:layout_margin="@dimen/between_card_dim"
+            android:layout_toLeftOf="@id/foundation12" />
 
-		<ImageView
-			android:id="@+id/foundation10"
-			android:layout_width="@dimen/card_width_dim"
-			android:layout_height="@dimen/card_height_dim"
-			android:layout_alignParentTop="true"
-			android:layout_margin="@dimen/between_card_dim"
-			android:layout_toLeftOf="@id/foundation11" />
+        <ImageView
+            android:id="@+id/foundation10"
+            android:layout_width="@dimen/card_width_dim"
+            android:layout_height="@dimen/card_height_dim"
+            android:layout_alignParentTop="true"
+            android:layout_margin="@dimen/between_card_dim"
+            android:layout_toLeftOf="@id/foundation11" />
 
-		<ImageView
-			android:id="@+id/foundation9"
-			android:layout_width="@dimen/card_width_dim"
-			android:layout_height="@dimen/card_height_dim"
-			android:layout_alignParentTop="true"
-			android:layout_margin="@dimen/between_card_dim"
-			android:layout_toLeftOf="@id/foundation10" />
+        <ImageView
+            android:id="@+id/foundation9"
+            android:layout_width="@dimen/card_width_dim"
+            android:layout_height="@dimen/card_height_dim"
+            android:layout_alignParentTop="true"
+            android:layout_margin="@dimen/between_card_dim"
+            android:layout_toLeftOf="@id/foundation10" />
 
-		<ImageView
-			android:id="@+id/foundation8"
-			android:layout_width="@dimen/card_width_dim"
-			android:layout_height="@dimen/card_height_dim"
-			android:layout_alignParentTop="true"
-			android:layout_margin="@dimen/between_card_dim"
-			android:layout_toLeftOf="@id/foundation9" />
+        <ImageView
+            android:id="@+id/foundation8"
+            android:layout_width="@dimen/card_width_dim"
+            android:layout_height="@dimen/card_height_dim"
+            android:layout_alignParentTop="true"
+            android:layout_margin="@dimen/between_card_dim"
+            android:layout_toLeftOf="@id/foundation9" />
 
-		<ImageView
-			android:id="@+id/foundation7"
-			android:layout_width="@dimen/card_width_dim"
-			android:layout_height="@dimen/card_height_dim"
-			android:layout_alignParentTop="true"
-			android:layout_margin="@dimen/between_card_dim"
-			android:layout_toLeftOf="@id/foundation8" />
+        <ImageView
+            android:id="@+id/foundation7"
+            android:layout_width="@dimen/card_width_dim"
+            android:layout_height="@dimen/card_height_dim"
+            android:layout_alignParentTop="true"
+            android:layout_margin="@dimen/between_card_dim"
+            android:layout_toLeftOf="@id/foundation8" />
 
-		<ImageView
-			android:id="@+id/foundation6"
-			android:layout_width="@dimen/card_width_dim"
-			android:layout_height="@dimen/card_height_dim"
-			android:layout_alignParentTop="true"
-			android:layout_margin="@dimen/between_card_dim"
-			android:layout_toLeftOf="@id/foundation7" />
+        <ImageView
+            android:id="@+id/foundation6"
+            android:layout_width="@dimen/card_width_dim"
+            android:layout_height="@dimen/card_height_dim"
+            android:layout_alignParentTop="true"
+            android:layout_margin="@dimen/between_card_dim"
+            android:layout_toLeftOf="@id/foundation7" />
 
-		<ImageView
-			android:id="@+id/foundation5"
-			android:layout_width="@dimen/card_width_dim"
-			android:layout_height="@dimen/card_height_dim"
-			android:layout_alignParentTop="true"
-			android:layout_margin="@dimen/between_card_dim"
-			android:layout_toLeftOf="@id/foundation6" />
+        <ImageView
+            android:id="@+id/foundation5"
+            android:layout_width="@dimen/card_width_dim"
+            android:layout_height="@dimen/card_height_dim"
+            android:layout_alignParentTop="true"
+            android:layout_margin="@dimen/between_card_dim"
+            android:layout_toLeftOf="@id/foundation6" />
 
-		<ImageView
-			android:id="@+id/foundation4"
-			android:layout_width="@dimen/card_width_dim"
-			android:layout_height="@dimen/card_height_dim"
-			android:layout_alignParentTop="true"
-			android:layout_margin="@dimen/between_card_dim"
-			android:layout_toLeftOf="@id/foundation5" />
+        <ImageView
+            android:id="@+id/foundation4"
+            android:layout_width="@dimen/card_width_dim"
+            android:layout_height="@dimen/card_height_dim"
+            android:layout_alignParentTop="true"
+            android:layout_margin="@dimen/between_card_dim"
+            android:layout_toLeftOf="@id/foundation5" />
 
-		<ImageView
-			android:id="@+id/foundation3"
-			android:layout_width="@dimen/card_width_dim"
-			android:layout_height="@dimen/card_height_dim"
-			android:layout_alignParentTop="true"
-			android:layout_margin="@dimen/between_card_dim"
-			android:layout_toLeftOf="@id/foundation4" />
+        <ImageView
+            android:id="@+id/foundation3"
+            android:layout_width="@dimen/card_width_dim"
+            android:layout_height="@dimen/card_height_dim"
+            android:layout_alignParentTop="true"
+            android:layout_margin="@dimen/between_card_dim"
+            android:layout_toLeftOf="@id/foundation4" />
 
-		<ImageView
-			android:id="@+id/foundation2"
-			android:layout_width="@dimen/card_width_dim"
-			android:layout_height="@dimen/card_height_dim"
-			android:layout_alignParentTop="true"
-			android:layout_margin="@dimen/between_card_dim"
-			android:layout_toLeftOf="@id/foundation3" />
+        <ImageView
+            android:id="@+id/foundation2"
+            android:layout_width="@dimen/card_width_dim"
+            android:layout_height="@dimen/card_height_dim"
+            android:layout_alignParentTop="true"
+            android:layout_margin="@dimen/between_card_dim"
+            android:layout_toLeftOf="@id/foundation3" />
 
-		<ImageView
-			android:id="@+id/foundation1"
-			android:layout_width="@dimen/card_width_dim"
-			android:layout_height="@dimen/card_height_dim"
-			android:layout_alignParentTop="true"
-			android:layout_margin="@dimen/between_card_dim"
-			android:layout_toLeftOf="@id/foundation2"
-			tools:ignore="UnusedIds" />
-	</RelativeLayout>
+        <ImageView
+            android:id="@+id/foundation1"
+            android:layout_width="@dimen/card_width_dim"
+            android:layout_height="@dimen/card_height_dim"
+            android:layout_alignParentTop="true"
+            android:layout_margin="@dimen/between_card_dim"
+            android:layout_toLeftOf="@id/foundation2"
+            tools:ignore="UnusedIds" />
+    </RelativeLayout>
 
-	<RelativeLayout
-		android:id="@+id/lane"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_alignParentRight="true"
-		android:layout_below="@id/foundation" >
+    <RelativeLayout
+        android:id="@+id/lane"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/foundation" >
 
-		<com.github.triplesolitaire.Lane
-			android:id="@+id/lane13"
-			android:layout_width="@dimen/card_width_dim"
-			android:layout_height="wrap_content"
-			android:layout_alignParentRight="true"
-			android:layout_alignParentTop="true"
-			android:layout_margin="@dimen/between_card_dim" />
+        <com.github.triplesolitaire.Lane
+            android:id="@+id/lane13"
+            android:layout_width="@dimen/card_width_dim"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_margin="@dimen/between_card_dim" />
 
-		<com.github.triplesolitaire.Lane
-			android:id="@+id/lane12"
-			android:layout_width="@dimen/card_width_dim"
-			android:layout_height="wrap_content"
-			android:layout_alignParentTop="true"
-			android:layout_margin="@dimen/between_card_dim"
-			android:layout_toLeftOf="@id/lane13" />
+        <com.github.triplesolitaire.Lane
+            android:id="@+id/lane12"
+            android:layout_width="@dimen/card_width_dim"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_margin="@dimen/between_card_dim"
+            android:layout_toLeftOf="@id/lane13" />
 
-		<com.github.triplesolitaire.Lane
-			android:id="@+id/lane11"
-			android:layout_width="@dimen/card_width_dim"
-			android:layout_height="wrap_content"
-			android:layout_alignParentTop="true"
-			android:layout_margin="@dimen/between_card_dim"
-			android:layout_toLeftOf="@id/lane12" />
+        <com.github.triplesolitaire.Lane
+            android:id="@+id/lane11"
+            android:layout_width="@dimen/card_width_dim"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_margin="@dimen/between_card_dim"
+            android:layout_toLeftOf="@id/lane12" />
 
-		<com.github.triplesolitaire.Lane
-			android:id="@+id/lane10"
-			android:layout_width="@dimen/card_width_dim"
-			android:layout_height="wrap_content"
-			android:layout_alignParentTop="true"
-			android:layout_margin="@dimen/between_card_dim"
-			android:layout_toLeftOf="@id/lane11" />
+        <com.github.triplesolitaire.Lane
+            android:id="@+id/lane10"
+            android:layout_width="@dimen/card_width_dim"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_margin="@dimen/between_card_dim"
+            android:layout_toLeftOf="@id/lane11" />
 
-		<com.github.triplesolitaire.Lane
-			android:id="@+id/lane9"
-			android:layout_width="@dimen/card_width_dim"
-			android:layout_height="wrap_content"
-			android:layout_alignParentTop="true"
-			android:layout_margin="@dimen/between_card_dim"
-			android:layout_toLeftOf="@id/lane10" />
+        <com.github.triplesolitaire.Lane
+            android:id="@+id/lane9"
+            android:layout_width="@dimen/card_width_dim"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_margin="@dimen/between_card_dim"
+            android:layout_toLeftOf="@id/lane10" />
 
-		<com.github.triplesolitaire.Lane
-			android:id="@+id/lane8"
-			android:layout_width="@dimen/card_width_dim"
-			android:layout_height="wrap_content"
-			android:layout_alignParentTop="true"
-			android:layout_margin="@dimen/between_card_dim"
-			android:layout_toLeftOf="@id/lane9" />
+        <com.github.triplesolitaire.Lane
+            android:id="@+id/lane8"
+            android:layout_width="@dimen/card_width_dim"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_margin="@dimen/between_card_dim"
+            android:layout_toLeftOf="@id/lane9" />
 
-		<com.github.triplesolitaire.Lane
-			android:id="@+id/lane7"
-			android:layout_width="@dimen/card_width_dim"
-			android:layout_height="wrap_content"
-			android:layout_alignParentTop="true"
-			android:layout_margin="@dimen/between_card_dim"
-			android:layout_toLeftOf="@id/lane8" />
+        <com.github.triplesolitaire.Lane
+            android:id="@+id/lane7"
+            android:layout_width="@dimen/card_width_dim"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_margin="@dimen/between_card_dim"
+            android:layout_toLeftOf="@id/lane8" />
 
-		<com.github.triplesolitaire.Lane
-			android:id="@+id/lane6"
-			android:layout_width="@dimen/card_width_dim"
-			android:layout_height="wrap_content"
-			android:layout_alignParentTop="true"
-			android:layout_margin="@dimen/between_card_dim"
-			android:layout_toLeftOf="@id/lane7" />
+        <com.github.triplesolitaire.Lane
+            android:id="@+id/lane6"
+            android:layout_width="@dimen/card_width_dim"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_margin="@dimen/between_card_dim"
+            android:layout_toLeftOf="@id/lane7" />
 
-		<com.github.triplesolitaire.Lane
-			android:id="@+id/lane5"
-			android:layout_width="@dimen/card_width_dim"
-			android:layout_height="wrap_content"
-			android:layout_alignParentTop="true"
-			android:layout_margin="@dimen/between_card_dim"
-			android:layout_toLeftOf="@id/lane6" />
+        <com.github.triplesolitaire.Lane
+            android:id="@+id/lane5"
+            android:layout_width="@dimen/card_width_dim"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_margin="@dimen/between_card_dim"
+            android:layout_toLeftOf="@id/lane6" />
 
-		<com.github.triplesolitaire.Lane
-			android:id="@+id/lane4"
-			android:layout_width="@dimen/card_width_dim"
-			android:layout_height="wrap_content"
-			android:layout_alignParentTop="true"
-			android:layout_margin="@dimen/between_card_dim"
-			android:layout_toLeftOf="@id/lane5" />
+        <com.github.triplesolitaire.Lane
+            android:id="@+id/lane4"
+            android:layout_width="@dimen/card_width_dim"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_margin="@dimen/between_card_dim"
+            android:layout_toLeftOf="@id/lane5" />
 
-		<com.github.triplesolitaire.Lane
-			android:id="@+id/lane3"
-			android:layout_width="@dimen/card_width_dim"
-			android:layout_height="wrap_content"
-			android:layout_alignParentTop="true"
-			android:layout_margin="@dimen/between_card_dim"
-			android:layout_toLeftOf="@id/lane4" />
+        <com.github.triplesolitaire.Lane
+            android:id="@+id/lane3"
+            android:layout_width="@dimen/card_width_dim"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_margin="@dimen/between_card_dim"
+            android:layout_toLeftOf="@id/lane4" />
 
-		<com.github.triplesolitaire.Lane
-			android:id="@+id/lane2"
-			android:layout_width="@dimen/card_width_dim"
-			android:layout_height="wrap_content"
-			android:layout_alignParentTop="true"
-			android:layout_margin="@dimen/between_card_dim"
-			android:layout_toLeftOf="@id/lane3" />
+        <com.github.triplesolitaire.Lane
+            android:id="@+id/lane2"
+            android:layout_width="@dimen/card_width_dim"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_margin="@dimen/between_card_dim"
+            android:layout_toLeftOf="@id/lane3" />
 
-		<com.github.triplesolitaire.Lane
-			android:id="@+id/lane1"
-			android:layout_width="@dimen/card_width_dim"
-			android:layout_height="wrap_content"
-			android:layout_alignParentTop="true"
-			android:layout_margin="@dimen/between_card_dim"
-			android:layout_toLeftOf="@id/lane2"
-			tools:ignore="UnusedIds" />
-	</RelativeLayout>
+        <com.github.triplesolitaire.Lane
+            android:id="@+id/lane1"
+            android:layout_width="@dimen/card_width_dim"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@id/lane2"
+            android:layout_margin="@dimen/between_card_dim"
+            tools:ignore="UnusedIds" />
 
-	<FrameLayout
-		android:id="@+id/animateLayout"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:visibility="gone" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/sign_in_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:background="@color/background_sign_in"
+        android:orientation="horizontal"
+        android:padding="@dimen/sign_in_padding" >
+
+        <com.google.android.gms.common.SignInButton
+            android:id="@+id/sign_in"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingRight="@dimen/sign_in_padding" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:paddingLeft="@dimen/sign_in_padding"
+            android:text="@string/sign_in_explanation" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/animateLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
 
 </RelativeLayout>

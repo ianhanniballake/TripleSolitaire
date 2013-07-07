@@ -12,9 +12,9 @@
     <supports-screens
         android:largeScreens="true"
         android:normalScreens="false"
+        android:requiresSmallestWidthDp="600"
         android:smallScreens="false"
-        android:xlargeScreens="true"
-        android:requiresSmallestWidthDp="600" />
+        android:xlargeScreens="true" />
 
     <application
         android:name="TripleSolitaireApplication"
@@ -46,6 +46,12 @@
         <meta-data
             android:name="com.google.android.backup.api_key"
             android:value="AEdPqrEAAAAIWFaQFsEUFijeNdxXu-uN6_FwEQJqgAWDbeg_bw" />
+        <meta-data
+            android:name="com.google.android.gms.games.APP_ID"
+            android:value="@string/app_id" />
+        <meta-data
+            android:name="com.google.android.gms.appstate.APP_ID"
+            android:value="@string/app_id" />
     </application>
 
 </manifest>
