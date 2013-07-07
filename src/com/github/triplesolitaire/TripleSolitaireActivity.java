@@ -180,6 +180,8 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
 	}
 
 	private static final int OUR_STATE_KEY = 0;
+	private static final int REQUEST_ACHIEVEMENTS = 0;
+	private static final int REQUEST_LEADERBOARDS = 1;
 	/**
 	 * Logging tag
 	 */
@@ -569,6 +571,12 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
 			case R.id.stats:
 				StatsDialogFragment.createInstance(stats).show(getFragmentManager(), "stats");
 				return true;
+			case R.id.achievements:
+				startActivityForResult(getGamesClient().getAchievementsIntent(), REQUEST_ACHIEVEMENTS);
+				return true;
+			case R.id.leaderboards:
+				startActivityForResult(getGamesClient().getAllLeaderboardsIntent(), REQUEST_LEADERBOARDS);
+				return true;
 			case R.id.settings:
 				startActivity(new Intent(this, Preferences.class));
 				return true;
@@ -604,7 +612,10 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
 	{
 		super.onPrepareOptionsMenu(menu);
 		menu.findItem(R.id.undo).setEnabled(gameState.canUndo());
-		menu.findItem(R.id.sign_out).setVisible(isSignedIn());
+		final boolean isSignedIn = isSignedIn();
+		menu.findItem(R.id.achievements).setVisible(isSignedIn);
+		menu.findItem(R.id.leaderboards).setVisible(isSignedIn);
+		menu.findItem(R.id.sign_out).setVisible(isSignedIn);
 		return true;
 	}
 

@@ -12,6 +12,16 @@
         android:id="@+id/stats"
         android:title="@string/stats"/>
     <item
+        android:id="@+id/achievements"
+        android:showAsAction="never"
+        android:title="@string/achievements"
+        android:visible="false"/>
+    <item
+        android:id="@+id/leaderboards"
+        android:showAsAction="never"
+        android:title="@string/leaderboards"
+        android:visible="false"/>
+    <item
         android:id="@+id/settings"
         android:showAsAction="never"
         android:title="@string/settings"/>
