@@ -451,16 +451,6 @@ public class GameState
 	}
 
 	/**
-	 * Getter for the current game id
-	 * 
-	 * @return Current game id
-	 */
-	public long getGameId()
-	{
-		return gameId;
-	}
-
-	/**
 	 * Getter for the current move count
 	 * 
 	 * @return Current move count

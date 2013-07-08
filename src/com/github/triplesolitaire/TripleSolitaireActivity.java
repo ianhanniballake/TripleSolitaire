@@ -8,10 +8,8 @@ import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.LoaderManager.LoaderCallbacks;
-import android.content.AsyncQueryHandler;
 import android.content.ClipData;
 import android.content.ContentProviderOperation;
-import android.content.ContentUris;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
@@ -21,7 +19,6 @@ import android.content.OperationApplicationException;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Point;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -684,26 +681,6 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
 	{
 		gameState.onRestoreInstanceState(savedInstanceState);
 		super.onRestoreInstanceState(savedInstanceState);
-	}
-
-	@Override
-	protected void onResume()
-	{
-		super.onResume();
-		final long gameId = gameState.getGameId();
-		if (gameId == -1)
-			return;
-		// Query on the gameId to ensure that the game still exists - stats may have been reset
-		final Uri gameUri = ContentUris.withAppendedId(GameContract.Games.CONTENT_ID_URI_BASE, gameId);
-		new AsyncQueryHandler(getContentResolver())
-		{
-			@Override
-			protected void onQueryComplete(final int token, final Object cookie, final Cursor cursor)
-			{
-				if (cursor.getCount() == 0)
-					gameState.newGame();
-			}
-		}.startQuery(0, null, gameUri, null, null, null, null);
 	}
 
 	/**

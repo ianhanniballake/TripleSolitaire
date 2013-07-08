@@ -10,9 +10,6 @@ import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
 
 /**
  * Activity managing the various application preferences
@@ -144,27 +141,6 @@ public class Preferences extends PreferenceActivity
 	public void onBuildHeaders(final List<Header> target)
 	{
 		loadHeadersFromResource(R.xml.preference_headers, target);
-	}
-
-	@Override
-	protected void onCreate(final Bundle savedInstanceState)
-	{
-		super.onCreate(savedInstanceState);
-		if (hasHeaders())
-		{
-			final Button resetStatsButton = new Button(this);
-			resetStatsButton.setText(getText(R.string.reset));
-			resetStatsButton.setOnClickListener(new OnClickListener()
-			{
-				@Override
-				public void onClick(final View v)
-				{
-					final ResetDialogFragment resetDialogFragment = new ResetDialogFragment();
-					resetDialogFragment.show(getFragmentManager(), "reset");
-				}
-			});
-			setListFooter(resetStatsButton);
-		}
 	}
 
 	@Override
