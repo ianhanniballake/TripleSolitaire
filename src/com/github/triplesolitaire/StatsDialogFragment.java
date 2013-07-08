@@ -17,6 +17,13 @@ public class StatsDialogFragment extends DialogFragment
 {
 	private static final String STATS_STATE = "STATS_STATE";
 
+	/**
+	 * Create a new StatsDialogFragment with the given StatsState
+	 * 
+	 * @param stats
+	 *            Stats to display
+	 * @return A valid StatsDialogFragment
+	 */
 	public static StatsDialogFragment createInstance(final StatsState stats)
 	{
 		final StatsDialogFragment statsDialogFragment = new StatsDialogFragment();
@@ -32,8 +39,6 @@ public class StatsDialogFragment extends DialogFragment
 		final StatsState stats = new StatsState(getArguments().getString(STATS_STATE));
 		final int gamesPlayed = stats.getGamesPlayed();
 		final int gamesWon = stats.getGamesWon();
-		final double averageDuration = stats.getAverageDuration();
-		final double averageMoves = stats.getAverageMoves();
 		final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		final LayoutInflater inflater = getActivity().getLayoutInflater();
 		final View layout = inflater.inflate(R.layout.stats_dialog, null);
@@ -55,6 +60,7 @@ public class StatsDialogFragment extends DialogFragment
 			averageDurationView.setText(getText(R.string.stats_na));
 		else
 		{
+			final double averageDuration = stats.getAverageDuration();
 			final int minutes = (int) (averageDuration / 60);
 			final int seconds = (int) (averageDuration % 60);
 			final StringBuilder sb = new StringBuilder();
@@ -70,7 +76,10 @@ public class StatsDialogFragment extends DialogFragment
 		if (gamesWon == 0)
 			averageMovesView.setText(getText(R.string.stats_na));
 		else
+		{
+			final double averageMoves = stats.getAverageMoves();
 			averageMovesView.setText(integerFormat.format(averageMoves));
+		}
 		builder.setTitle(R.string.stats).setIcon(R.drawable.icon).setView(layout)
 				.setNegativeButton(getText(R.string.close), null);
 		return builder.create();

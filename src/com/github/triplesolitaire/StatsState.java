@@ -9,6 +9,7 @@ import org.json.JSONObject;
 import android.content.ContentProviderOperation;
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.util.Log;
 import android.util.SparseArray;
 
 import com.github.triplesolitaire.provider.GameContract;
@@ -18,7 +19,7 @@ import com.github.triplesolitaire.provider.GameContract;
  */
 public class StatsState
 {
-	public static class GameStats
+	private static class GameStats
 	{
 		int duration = 0;
 		boolean loss = true;
@@ -61,21 +62,32 @@ public class StatsState
 
 	// serialization format version
 	private static final String SERIAL_VERSION = "1.0";
-	SparseArray<GameStats> gameStats = new SparseArray<GameStats>();
+	private final SparseArray<GameStats> gameStats = new SparseArray<GameStats>();
 
-	/** Constructs an empty SaveState object. No stars on no levels. */
+	/**
+	 * Constructs an empty StatsState (i.e., no games played)
+	 */
 	public StatsState()
 	{
 	}
 
-	/** Constructs a SaveState object from serialized data. */
+	/**
+	 * Constructs a StatsState object from serialized data.
+	 * 
+	 * @param data
+	 *            Serialized data to parse
+	 */
 	public StatsState(final byte[] data)
 	{
-		if (data == null)
-			return; // default progress
-		loadFromJson(new String(data));
+		this(new String(data));
 	}
 
+	/**
+	 * Constructs a StatsState object from Cursor data.
+	 * 
+	 * @param data
+	 *            Cursor data to parse
+	 */
 	public StatsState(final Cursor data)
 	{
 		final int startTimeColumnIndex = data.getColumnIndex(GameContract.Games.COLUMN_NAME_START_TIME);
@@ -95,15 +107,44 @@ public class StatsState
 		}
 	}
 
-	/** Constructs a SaveState object from a JSON string. */
+	/**
+	 * Constructs a StatsState object from a JSON string.
+	 * 
+	 * @param json
+	 *            JSON data to parse
+	 */
 	public StatsState(final String json)
 	{
-		if (json == null)
+		if (json == null || json.trim().equals(""))
 			return; // default progress
-		loadFromJson(json);
+		try
+		{
+			final JSONObject obj = new JSONObject(json);
+			final String format = obj.getString("version");
+			if (!format.equals(SERIAL_VERSION))
+				throw new RuntimeException("Unexpected stats format " + format);
+			final JSONObject levels = obj.getJSONObject("games");
+			final Iterator<?> iter = levels.keys();
+			while (iter.hasNext())
+			{
+				final String startTime = (String) iter.next();
+				final GameStats gameStat = new GameStats(levels.getJSONObject(startTime));
+				gameStats.put(Integer.valueOf(startTime), gameStat);
+			}
+		} catch (final JSONException e)
+		{
+			Log.e(StatsState.class.getSimpleName(), "Error parsing JSON", e);
+			throw new RuntimeException("Save data has a syntax error: " + json, e);
+		} catch (final NumberFormatException e)
+		{
+			Log.e(StatsState.class.getSimpleName(), "Invalid number while parsing JSON", e);
+			throw new RuntimeException("Save data has an invalid number in it: " + json, e);
+		}
 	}
 
-	/** Returns a clone of this SaveState object. */
+	/**
+	 * Returns a clone of this StatsState object.
+	 */
 	@Override
 	public StatsState clone()
 	{
@@ -117,6 +158,11 @@ public class StatsState
 		return result;
 	}
 
+	/**
+	 * Get the average game duration of games won. This should only be called when the user has won at least one game
+	 * 
+	 * @return Average game duration in seconds
+	 */
 	public double getAverageDuration()
 	{
 		double durationSum = 0;
@@ -126,6 +172,11 @@ public class StatsState
 		return durationSum / getGamesWon();
 	}
 
+	/**
+	 * Gets the average game moves of games won. This should only be called when the user has won at least one game
+	 * 
+	 * @return Average game moves
+	 */
 	public double getAverageMoves()
 	{
 		double moveSum = 0;
@@ -135,11 +186,21 @@ public class StatsState
 		return moveSum / getGamesWon();
 	}
 
+	/**
+	 * Gets the total number of games played
+	 * 
+	 * @return The number of games played
+	 */
 	public int getGamesPlayed()
 	{
 		return gameStats.size();
 	}
 
+	/**
+	 * Gets the total number of games won
+	 * 
+	 * @return The number of games won
+	 */
 	public int getGamesWon()
 	{
 		int gamesWon = 0;
@@ -149,6 +210,12 @@ public class StatsState
 		return gamesWon;
 	}
 
+	/**
+	 * Gets a list of ContentProviderOperations that save all of the current game stats to the local ContentProvider.
+	 * Note that this does not look for already existing records, but assumes the ContentProvider can ignore duplicates
+	 * 
+	 * @return List of operations needed to save these stats to the local ContentProvider
+	 */
 	public ArrayList<ContentProviderOperation> getLocalSaveOperations()
 	{
 		final ArrayList<ContentProviderOperation> operations = new ArrayList<ContentProviderOperation>();
@@ -170,6 +237,11 @@ public class StatsState
 		return operations;
 	}
 
+	/**
+	 * Get longest win streak (i.e., multiple games won in a row
+	 * 
+	 * @return The maximum number of games won in a row
+	 */
 	public int getLongestWinStreak()
 	{
 		int currentStreak = 0;
@@ -190,6 +262,11 @@ public class StatsState
 		return longestWinStreak;
 	}
 
+	/**
+	 * Gets the minimum number of moves in any won game
+	 * 
+	 * @return The minimum number of moves used to win a game
+	 */
 	public int getMinimumMoves()
 	{
 		int minimumMoves = Integer.MAX_VALUE;
@@ -204,6 +281,11 @@ public class StatsState
 		return minimumMoves;
 	}
 
+	/**
+	 * Gets the shortest time (duration) in any won game
+	 * 
+	 * @return The shortest time (in seconds) in any won game
+	 */
 	public int getShortestTime()
 	{
 		int shortestDuration = Integer.MAX_VALUE;
@@ -218,44 +300,19 @@ public class StatsState
 		return shortestDuration;
 	}
 
-	/** Replaces this SaveState's content with the content loaded from the given JSON string. */
-	public void loadFromJson(final String json)
-	{
-		gameStats.clear();
-		if (json == null || json.trim().equals(""))
-			return;
-		try
-		{
-			final JSONObject obj = new JSONObject(json);
-			final String format = obj.getString("version");
-			if (!format.equals(SERIAL_VERSION))
-				throw new RuntimeException("Unexpected stats format " + format);
-			final JSONObject levels = obj.getJSONObject("games");
-			final Iterator<?> iter = levels.keys();
-			while (iter.hasNext())
-			{
-				final String startTime = (String) iter.next();
-				final GameStats gameStat = new GameStats(levels.getJSONObject(startTime));
-				gameStats.put(Integer.valueOf(startTime), gameStat);
-			}
-		} catch (final JSONException ex)
-		{
-			ex.printStackTrace();
-			throw new RuntimeException("Save data has a syntax error: " + json, ex);
-		} catch (final NumberFormatException ex)
-		{
-			ex.printStackTrace();
-			throw new RuntimeException("Save data has an invalid number in it: " + json, ex);
-		}
-	}
-
-	/** Serializes this SaveState to an array of bytes. */
+	/**
+	 * Serializes this StatsState to an array of bytes.
+	 * 
+	 * @return A byte array representing this StatsState
+	 */
 	public byte[] toBytes()
 	{
 		return toString().getBytes();
 	}
 
-	/** Serializes this SaveState to a JSON string. */
+	/**
+	 * Serializes this StatsState to a JSON string.
+	 */
 	@Override
 	public String toString()
 	{
@@ -272,16 +329,16 @@ public class StatsState
 			obj.put("version", SERIAL_VERSION);
 			obj.put("games", games);
 			return obj.toString();
-		} catch (final JSONException ex)
+		} catch (final JSONException e)
 		{
-			ex.printStackTrace();
-			throw new RuntimeException("Error converting save data to JSON.", ex);
+			Log.e(StatsState.class.getSimpleName(), "Error converting save data to JSON", e);
+			throw new RuntimeException("Error converting save data to JSON.", e);
 		}
 	}
 
 	/**
-	 * Computes the union of this SaveState with the given SaveState. The union will have any levels present in either
-	 * operand. If the same level is present in both operands, then the number of stars will be the greatest of the two.
+	 * Computes the union of this StatsState with the given StatsState. The other stats always overwrite the current
+	 * stats
 	 * 
 	 * @param other
 	 *            The other operand with which to compute the union.

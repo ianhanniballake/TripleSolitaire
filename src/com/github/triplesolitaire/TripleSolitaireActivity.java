@@ -199,7 +199,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
 	final Handler handler = new Handler();
 	private boolean mAlreadyLoadedState = false;
 	private boolean mPendingUpdateState = false;
-	StatsState stats = new StatsState();
+	private StatsState stats = new StatsState();
 
 	/**
 	 * Constructs a new TripleSolitaireActivity that uses all Google Play Services
