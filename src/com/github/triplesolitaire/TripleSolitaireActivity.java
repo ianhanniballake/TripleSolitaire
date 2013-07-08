@@ -441,6 +441,11 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
 	@Override
 	public void onBackPressed()
 	{
+		if (!gameState.gameInProgress)
+		{
+			super.onBackPressed();
+			return;
+		}
 		final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this)
 				.setIcon(android.R.drawable.ic_dialog_alert).setTitle(R.string.quit_title)
 				.setMessage(R.string.quit_message)
