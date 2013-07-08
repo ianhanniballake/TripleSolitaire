@@ -170,6 +170,54 @@ public class StatsState
 		return operations;
 	}
 
+	public int getLongestWinStreak()
+	{
+		int currentStreak = 0;
+		int longestWinStreak = 0;
+		final int size = gameStats.size();
+		for (int index = 0; index < size; index++)
+		{
+			final GameStats stats = gameStats.get(gameStats.keyAt(index));
+			if (stats.loss)
+			{
+				longestWinStreak = Math.max(longestWinStreak, currentStreak);
+				currentStreak = 0;
+			}
+			else
+				currentStreak++;
+		}
+		longestWinStreak = Math.max(longestWinStreak, currentStreak);
+		return longestWinStreak;
+	}
+
+	public int getMinimumMoves()
+	{
+		int minimumMoves = Integer.MAX_VALUE;
+		final int size = gameStats.size();
+		for (int index = 0; index < size; index++)
+		{
+			final GameStats stats = gameStats.get(gameStats.keyAt(index));
+			if (stats.loss)
+				continue;
+			minimumMoves = Math.min(minimumMoves, stats.moves);
+		}
+		return minimumMoves;
+	}
+
+	public int getShortestTime()
+	{
+		int shortestDuration = Integer.MAX_VALUE;
+		final int size = gameStats.size();
+		for (int index = 0; index < size; index++)
+		{
+			final GameStats stats = gameStats.get(gameStats.keyAt(index));
+			if (stats.loss)
+				continue;
+			shortestDuration = Math.min(shortestDuration, stats.duration);
+		}
+		return shortestDuration;
+	}
+
 	/** Replaces this SaveState's content with the content loaded from the given JSON string. */
 	public void loadFromJson(final String json)
 	{
