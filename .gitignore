@@ -1,8 +1,14 @@
-# Exclude files for those using git/git-svn
-
-# Exclude all svn files
-.svn/
-
-# Exclude all files in the bin and the gen folders
+# Exclude all generated folders
 bin/
 gen/
+build/
+
+# Exclude IntelliJ/Android Studio files
+local.properties
+.gradle
+.idea/
+*.iml
+*.iws
+*.ipr
+*~
+*.swp
