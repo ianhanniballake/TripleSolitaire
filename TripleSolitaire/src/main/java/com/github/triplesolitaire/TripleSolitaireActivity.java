@@ -484,6 +484,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
 		// Set up the progress bar area
 		final View progressBar = getLayoutInflater().inflate(R.layout.progress_bar, null);
 		final ActionBar bar = getActionBar();
+        bar.setDisplayHomeAsUpEnabled(true);
 		bar.setDisplayShowCustomEnabled(true);
 		final ActionBar.LayoutParams layoutParams = new ActionBar.LayoutParams(LayoutParams.WRAP_CONTENT,
 				LayoutParams.WRAP_CONTENT);
