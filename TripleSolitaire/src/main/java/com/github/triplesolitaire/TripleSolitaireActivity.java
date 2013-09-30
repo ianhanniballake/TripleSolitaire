@@ -410,9 +410,9 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
 					if (achievementId.equals(win10) && increment > 0)
 						getGamesClient().incrementAchievement(win10, increment);
 					if (achievementId.equals(win100) && increment > 0)
-						getGamesClient().incrementAchievement(win10, increment);
+						getGamesClient().incrementAchievement(win100, increment);
 					if (achievementId.equals(win250) && increment > 0)
-						getGamesClient().incrementAchievement(win10, increment);
+						getGamesClient().incrementAchievement(win250, increment);
 				}
 				break;
 			case GamesClient.STATUS_NETWORK_ERROR_NO_DATA:
