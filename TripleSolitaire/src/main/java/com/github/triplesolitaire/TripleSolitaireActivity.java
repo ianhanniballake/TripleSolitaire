@@ -848,7 +848,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
 		if (shortestTime < 8 * 60)
 			gamesClient.unlockAchievement(getString(R.string.achievement_time_8));
 		// Load achievements to handle incremental achievements
-		gamesClient.loadAchievements(this);
+		gamesClient.loadAchievements(this, false);
 		mPendingUpdateState = false;
 	}
 
