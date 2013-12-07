@@ -273,7 +273,8 @@
         android:layout_alignParentLeft="true"
         android:background="@color/background_sign_in"
         android:orientation="horizontal"
-        android:padding="@dimen/sign_in_padding" >
+        android:padding="@dimen/sign_in_padding"
+        android:visibility="invisible">
 
         <com.google.android.gms.common.SignInButton
             android:id="@+id/sign_in"

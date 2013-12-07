@@ -709,6 +709,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
 		if (BuildConfig.DEBUG)
 			Log.d(TripleSolitaireActivity.TAG, "onSignInFailed");
 		invalidateOptionsMenu();
+        findViewById(R.id.sign_in_layout).setVisibility(View.VISIBLE);
 	}
 
 	@Override
@@ -717,7 +718,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
 		if (BuildConfig.DEBUG)
 			Log.d(TripleSolitaireActivity.TAG, "onSignInSucceeded");
 		invalidateOptionsMenu();
-		findViewById(R.id.sign_in_layout).setVisibility(View.GONE);
+		findViewById(R.id.sign_in_layout).setVisibility(View.INVISIBLE);
 		if (!mAlreadyLoadedState)
 			getAppStateClient().loadState(this, OUR_STATE_KEY);
 	}
