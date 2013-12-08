@@ -436,6 +436,8 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
 				// TODO warn about generic error
 				break;
 		}
+        if (buffer != null)
+            buffer.close();
 	}
 
 	@Override
