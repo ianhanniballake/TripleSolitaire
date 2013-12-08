@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Google Play game services IDs.
+Save this file as res/values/games-ids.xml in your project.
+-->
+<resources>
+    <string name="app_id">530657914687</string>
+    <string name="achievement_youre_a_winner">CgkIv9607bgPEAIQAQ</string>
+    <string name="achievement_getting_good">CgkIv9607bgPEAIQAg</string>
+    <string name="achievement_so_youve_played_triple_solitaire">CgkIv9607bgPEAIQAw</string>
+    <string name="achievement_stop_playing_never">CgkIv9607bgPEAIQBA</string>
+    <string name="achievement_streaker">CgkIv9607bgPEAIQBQ</string>
+    <string name="achievement_master_streaker">CgkIv9607bgPEAIQBg</string>
+    <string name="achievement_quarter_hour">CgkIv9607bgPEAIQBw</string>
+    <string name="achievement_single_digits">CgkIv9607bgPEAIQCA</string>
+    <string name="achievement_speed_demon">CgkIv9607bgPEAIQCQ</string>
+    <string name="achievement_figured_it_out">CgkIv9607bgPEAIQCg</string>
+    <string name="achievement_no_mistakes">CgkIv9607bgPEAIQCw</string>
+    <string name="leaderboard_moves">CgkIv9607bgPEAIQDA</string>
+    <string name="leaderboard_time">CgkIv9607bgPEAIQDg</string>
+</resources>

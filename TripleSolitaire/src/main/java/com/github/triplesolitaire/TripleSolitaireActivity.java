@@ -398,9 +398,9 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
 				if (BuildConfig.DEBUG)
 					Log.d(TripleSolitaireActivity.TAG, "Achievements loaded successfully");
 				// Data was successfully loaded from the cloud, update incremental achievements
-				final String win10 = getString(R.string.achievement_win_10);
-				final String win100 = getString(R.string.achievement_win_100);
-				final String win250 = getString(R.string.achievement_win_250);
+				final String win10 = getString(R.string.achievement_getting_good);
+				final String win100 = getString(R.string.achievement_so_youve_played_triple_solitaire);
+				final String win250 = getString(R.string.achievement_stop_playing_never);
 				for (final Achievement achievement : buffer)
 				{
 					final String achievementId = achievement.getAchievementId();
@@ -825,31 +825,31 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
 		if (BuildConfig.DEBUG)
 			Log.d(TripleSolitaireActivity.TAG, "Longest Win Streak: " + longestWinStreak);
 		if (longestWinStreak > 0)
-			gamesClient.unlockAchievement(getString(R.string.achievement_winner));
+			gamesClient.unlockAchievement(getString(R.string.achievement_youre_a_winner));
 		if (longestWinStreak > 5)
-			gamesClient.unlockAchievement(getString(R.string.achievement_streak_5));
+			gamesClient.unlockAchievement(getString(R.string.achievement_streaker));
 		if (longestWinStreak > 10)
-			gamesClient.unlockAchievement(getString(R.string.achievement_streak_10));
+			gamesClient.unlockAchievement(getString(R.string.achievement_master_streaker));
 		// Check minimum moves achievements
 		final int minimumMoves = stats.getMinimumMoves();
 		if (BuildConfig.DEBUG)
 			Log.d(TripleSolitaireActivity.TAG, "Minimum Moves: " + minimumMoves);
 		gamesClient.submitScore(getString(R.string.leaderboard_moves), minimumMoves);
 		if (minimumMoves < 400)
-			gamesClient.unlockAchievement(getString(R.string.achievement_moves_400));
+			gamesClient.unlockAchievement(getString(R.string.achievement_figured_it_out));
 		if (minimumMoves < 300)
-			gamesClient.unlockAchievement(getString(R.string.achievement_moves_300));
+			gamesClient.unlockAchievement(getString(R.string.achievement_no_mistakes));
 		// Check shortest time achievements
 		final int shortestTime = stats.getShortestTime();
 		if (BuildConfig.DEBUG)
 			Log.d(TripleSolitaireActivity.TAG, "Shortest Time (minutes): " + (double) shortestTime / 60);
 		gamesClient.submitScore(getString(R.string.leaderboard_time), shortestTime * DateUtils.SECOND_IN_MILLIS);
 		if (shortestTime < 15 * 60)
-			gamesClient.unlockAchievement(getString(R.string.achievement_time_15));
+			gamesClient.unlockAchievement(getString(R.string.achievement_quarter_hour));
 		if (shortestTime < 10 * 60)
-			gamesClient.unlockAchievement(getString(R.string.achievement_time_10));
+			gamesClient.unlockAchievement(getString(R.string.achievement_single_digits));
 		if (shortestTime < 8 * 60)
-			gamesClient.unlockAchievement(getString(R.string.achievement_time_8));
+			gamesClient.unlockAchievement(getString(R.string.achievement_speed_demon));
 		// Load achievements to handle incremental achievements
 		gamesClient.loadAchievements(this, false);
 		mPendingUpdateState = false;
