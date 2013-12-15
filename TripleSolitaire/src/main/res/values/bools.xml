@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<bool name="pref_auto_flip_default">false</bool>
-	<bool name="pref_animate_auto_play_default">true</bool>
-	<bool name="pref_animate_undo_default">true</bool>
+    <bool name="pref_auto_flip_default">false</bool>
+    <bool name="pref_animate_auto_play_default">true</bool>
+    <bool name="pref_animate_undo_default">true</bool>
 </resources>

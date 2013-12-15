@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="pref_switch_text_on">ON</string>
-	<string name="pref_switch_text_off">OFF</string>
+    <string name="pref_switch_text_off">OFF</string>
     <string name="pref_auto_flip_summary_on">Face down cards will be automatically flipped over when uncovered</string>
     <string name="pref_auto_flip_summary_off">Face down cards will not automatically flip over when uncovered</string>
     <string name="pref_animate_auto_play_summary_on">Auto play moves will be animated</string>

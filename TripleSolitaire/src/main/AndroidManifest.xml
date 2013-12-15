@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.github.triplesolitaire"
-    android:installLocation="auto"
-    android:versionCode="1244130"
-    android:versionName="1.3" >
+          package="com.github.triplesolitaire"
+          android:installLocation="auto"
+          android:versionCode="1244130"
+          android:versionName="1.3">
 
     <uses-sdk
         android:minSdkVersion="12"
-        android:targetSdkVersion="19" />
+        android:targetSdkVersion="19"/>
 
     <supports-screens
         android:largeScreens="true"
         android:normalScreens="false"
         android:requiresSmallestWidthDp="600"
         android:smallScreens="false"
-        android:xlargeScreens="true" />
+        android:xlargeScreens="true"/>
 
     <application
         android:name="TripleSolitaireApplication"
@@ -22,39 +22,39 @@
         android:backupAgent="TripleSolitaireBackupAgent"
         android:hardwareAccelerated="true"
         android:icon="@drawable/icon"
-        android:label="@string/app_name" >
+        android:label="@string/app_name">
         <provider
             android:name=".provider.GameProvider"
             android:authorities="com.github.triplesolitaire"
-            android:exported="false" >
-            <grant-uri-permission android:pathPattern=".*" />
+            android:exported="false">
+            <grant-uri-permission android:pathPattern=".*"/>
         </provider>
 
         <activity
             android:name=".TripleSolitaireActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
         <activity
             android:name=".Preferences"
-            android:label="@string/settings" />
+            android:label="@string/settings"/>
 
         <meta-data
             android:name="com.google.android.backup.api_key"
-            android:value="AEdPqrEAAAAIWFaQFsEUFijeNdxXu-uN6_FwEQJqgAWDbeg_bw" />
+            android:value="AEdPqrEAAAAIWFaQFsEUFijeNdxXu-uN6_FwEQJqgAWDbeg_bw"/>
         <meta-data
             android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
+            android:value="@integer/google_play_services_version"/>
         <meta-data
             android:name="com.google.android.gms.games.APP_ID"
-            android:value="@string/app_id" />
+            android:value="@string/app_id"/>
         <meta-data
             android:name="com.google.android.gms.appstate.APP_ID"
-            android:value="@string/app_id" />
+            android:value="@string/app_id"/>
     </application>
 
 </manifest>

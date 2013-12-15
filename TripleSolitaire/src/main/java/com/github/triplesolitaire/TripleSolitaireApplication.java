@@ -8,37 +8,32 @@ import android.preference.PreferenceManager;
 /**
  * Creates the Triple Solitaire application, setting strict mode in debug mode
  */
-public class TripleSolitaireApplication extends Application
-{
-	/**
-	 * Sets strict mode if we are in debug mode
-	 * 
-	 * @see android.app.Application#onCreate()
-	 */
-	@Override
-	public void onCreate()
-	{
-		getApplicationContext().getApplicationInfo();
-		if (BuildConfig.DEBUG)
-			StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectDiskReads().detectDiskWrites()
-					.detectNetwork().penaltyLog().penaltyFlashScreen().build());
-		try
-		{
-			setDefaultValues();
-		} catch (final Exception e)
-		{
-			final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-			preferences.edit().clear().commit();
-			setDefaultValues();
-		}
-	}
+public class TripleSolitaireApplication extends Application {
+    /**
+     * Sets strict mode if we are in debug mode
+     *
+     * @see android.app.Application#onCreate()
+     */
+    @Override
+    public void onCreate() {
+        getApplicationContext().getApplicationInfo();
+        if (BuildConfig.DEBUG)
+            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectDiskReads().detectDiskWrites()
+                    .detectNetwork().penaltyLog().penaltyFlashScreen().build());
+        try {
+            setDefaultValues();
+        } catch (final Exception e) {
+            final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+            preferences.edit().clear().commit();
+            setDefaultValues();
+        }
+    }
 
-	/**
-	 * Sets the default preference values
-	 */
-	private void setDefaultValues()
-	{
-		PreferenceManager.setDefaultValues(this, R.xml.preferences_gameplay, false);
-		PreferenceManager.setDefaultValues(this, R.xml.preferences_animation, false);
-	}
+    /**
+     * Sets the default preference values
+     */
+    private void setDefaultValues() {
+        PreferenceManager.setDefaultValues(this, R.xml.preferences_gameplay, false);
+        PreferenceManager.setDefaultValues(this, R.xml.preferences_animation, false);
+    }
 }
