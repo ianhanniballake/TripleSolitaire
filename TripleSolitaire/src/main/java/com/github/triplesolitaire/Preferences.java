@@ -143,7 +143,16 @@ public class Preferences extends PreferenceActivity
 		loadHeadersFromResource(R.xml.preference_headers, target);
 	}
 
-	@Override
+    @Override
+    protected boolean isValidFragment(final String fragmentName) {
+        if (fragmentName.equals(GameplayPreferenceFragment.class.getName()))
+            return true;
+        else if (fragmentName.equals(AnimationPreferenceFragment.class.getName()))
+            return true;
+        return false;
+    }
+
+    @Override
 	public boolean onOptionsItemSelected(final MenuItem item)
 	{
 		switch (item.getItemId())
