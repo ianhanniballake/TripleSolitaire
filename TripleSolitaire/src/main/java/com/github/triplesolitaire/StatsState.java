@@ -24,16 +24,19 @@ public class StatsState
 		int duration = 0;
 		boolean loss = true;
 		int moves = 0;
+        boolean synced = true;
 
-		public GameStats()
+		public GameStats(final boolean synced)
 		{
+            this.synced = synced;
 		}
 
-		public GameStats(final int duration, final int moves)
+		public GameStats(final int duration, final int moves, final boolean synced)
 		{
 			loss = false;
 			this.duration = duration;
 			this.moves = moves;
+            this.synced = synced;
 		}
 
 		public GameStats(final JSONObject jsonObject) throws JSONException
@@ -73,7 +76,7 @@ public class StatsState
 
 	/**
 	 * Constructs a StatsState object from serialized data.
-	 * 
+	 *
 	 * @param data
 	 *            Serialized data to parse
 	 */
@@ -84,7 +87,7 @@ public class StatsState
 
 	/**
 	 * Constructs a StatsState object from Cursor data.
-	 * 
+	 *
 	 * @param data
 	 *            Cursor data to parse
 	 */
@@ -93,23 +96,25 @@ public class StatsState
 		final int startTimeColumnIndex = data.getColumnIndex(GameContract.Games.COLUMN_NAME_START_TIME);
 		final int durationColumnIndex = data.getColumnIndex(GameContract.Games.COLUMN_NAME_DURATION);
 		final int movesColumnIndex = data.getColumnIndex(GameContract.Games.COLUMN_NAME_MOVES);
+        final int syncedColumnIndex = data.getColumnIndex(GameContract.Games.COLUMN_NAME_SYNCED);
 		while (data.moveToNext())
 		{
 			final int startTime = data.getInt(startTimeColumnIndex);
+            final boolean synced = data.getInt(syncedColumnIndex) != 0;
 			if (data.isNull(durationColumnIndex))
-				gameStats.put(startTime, new GameStats());
+				gameStats.put(startTime, new GameStats(synced));
 			else
 			{
 				final int duration = data.getInt(durationColumnIndex);
 				final int moves = data.getInt(movesColumnIndex);
-				gameStats.put(startTime, new GameStats(duration, moves));
+				gameStats.put(startTime, new GameStats(duration, moves, synced));
 			}
 		}
 	}
 
 	/**
 	 * Constructs a StatsState object from a JSON string.
-	 * 
+	 *
 	 * @param json
 	 *            JSON data to parse
 	 */
@@ -160,7 +165,7 @@ public class StatsState
 
 	/**
 	 * Get the average game duration of games won. This should only be called when the user has won at least one game
-	 * 
+	 *
 	 * @return Average game duration in seconds
 	 */
 	public double getAverageDuration()
@@ -174,7 +179,7 @@ public class StatsState
 
 	/**
 	 * Gets the average game moves of games won. This should only be called when the user has won at least one game
-	 * 
+	 *
 	 * @return Average game moves
 	 */
 	public double getAverageMoves()
@@ -188,7 +193,7 @@ public class StatsState
 
 	/**
 	 * Gets the total number of games played
-	 * 
+	 *
 	 * @return The number of games played
 	 */
 	public int getGamesPlayed()
@@ -198,7 +203,7 @@ public class StatsState
 
 	/**
 	 * Gets the total number of games won
-	 * 
+	 *
 	 * @return The number of games won
 	 */
 	public int getGamesWon()
@@ -213,10 +218,11 @@ public class StatsState
 	/**
 	 * Gets a list of ContentProviderOperations that save all of the current game stats to the local ContentProvider.
 	 * Note that this does not look for already existing records, but assumes the ContentProvider can ignore duplicates
-	 * 
+	 *
+     * @param syncCompleted Whether all records should be marked as synced
 	 * @return List of operations needed to save these stats to the local ContentProvider
 	 */
-	public ArrayList<ContentProviderOperation> getLocalSaveOperations()
+	public ArrayList<ContentProviderOperation> getLocalSaveOperations(final boolean syncCompleted)
 	{
 		final ArrayList<ContentProviderOperation> operations = new ArrayList<ContentProviderOperation>();
 		final int size = gameStats.size();
@@ -231,6 +237,7 @@ public class StatsState
 				values.put(GameContract.Games.COLUMN_NAME_DURATION, stats.duration);
 				values.put(GameContract.Games.COLUMN_NAME_MOVES, stats.moves);
 			}
+            values.put(GameContract.Games.COLUMN_NAME_SYNCED, syncCompleted || stats.synced);
 			operations.add(ContentProviderOperation.newInsert(GameContract.Games.CONTENT_URI).withValues(values)
 					.build());
 		}
@@ -239,7 +246,7 @@ public class StatsState
 
 	/**
 	 * Get longest win streak (i.e., multiple games won in a row
-	 * 
+	 *
 	 * @return The maximum number of games won in a row
 	 */
 	public int getLongestWinStreak()
@@ -263,18 +270,18 @@ public class StatsState
 	}
 
 	/**
-	 * Gets the minimum number of moves in any won game
-	 * 
-	 * @return The minimum number of moves used to win a game
+	 * Gets the minimum number of moves in any won game that has not yet been synced
+	 *
+	 * @return The minimum number of moves used to win a game that has not yet been synced
 	 */
-	public int getMinimumMoves()
+	public int getMinimumMovesUnsynced()
 	{
 		int minimumMoves = Integer.MAX_VALUE;
 		final int size = gameStats.size();
 		for (int index = 0; index < size; index++)
 		{
 			final GameStats stats = gameStats.get(gameStats.keyAt(index));
-			if (stats.loss)
+			if (stats.loss || stats.synced)
 				continue;
 			minimumMoves = Math.min(minimumMoves, stats.moves);
 		}
@@ -282,18 +289,18 @@ public class StatsState
 	}
 
 	/**
-	 * Gets the shortest time (duration) in any won game
-	 * 
-	 * @return The shortest time (in seconds) in any won game
+	 * Gets the shortest time (duration) in any won game that has not yet been synced
+	 *
+	 * @return The shortest time (in seconds) in any won game that has not yet been synced
 	 */
-	public int getShortestTime()
+	public int getShortestTimeUnsynced()
 	{
 		int shortestDuration = Integer.MAX_VALUE;
 		final int size = gameStats.size();
 		for (int index = 0; index < size; index++)
 		{
 			final GameStats stats = gameStats.get(gameStats.keyAt(index));
-			if (stats.loss)
+			if (stats.loss || stats.synced)
 				continue;
 			shortestDuration = Math.min(shortestDuration, stats.duration);
 		}
@@ -302,7 +309,7 @@ public class StatsState
 
 	/**
 	 * Serializes this StatsState to an array of bytes.
-	 * 
+	 *
 	 * @return A byte array representing this StatsState
 	 */
 	public byte[] toBytes()
@@ -339,7 +346,7 @@ public class StatsState
 	/**
 	 * Computes the union of this StatsState with the given StatsState. The other stats always overwrite the current
 	 * stats
-	 * 
+	 *
 	 * @param other
 	 *            The other operand with which to compute the union.
 	 * @return The result of the union.

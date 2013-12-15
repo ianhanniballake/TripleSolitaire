@@ -32,7 +32,7 @@ public class GameProvider extends ContentProvider
 	{
 		/**
 		 * Creates a new DatabaseHelper
-		 * 
+		 *
 		 * @param context
 		 *            context of this database
 		 */
@@ -56,17 +56,19 @@ public class GameProvider extends ContentProvider
 		}
 
 		/**
-		 * 
+		 *
 		 * Demonstrates that the provider must consider what happens when the underlying database is changed. Note that
 		 * this currently just destroys and recreates the database - should upgrade in place
 		 */
 		@Override
 		public void onUpgrade(final SQLiteDatabase db, final int oldVersion, final int newVersion)
 		{
-			Log.w(GameProvider.TAG, "Upgrading database from version " + oldVersion + " to " + newVersion
-					+ ", which will destroy all old data");
-			db.execSQL("DROP TABLE IF EXISTS " + GameContract.Games.TABLE_NAME);
-			onCreate(db);
+			Log.w(GameProvider.TAG, "Upgrading database from version " + oldVersion + " to " + newVersion);
+            if (oldVersion == 1) {
+                // New column added in version 2
+                db.execSQL("ALTER TABLE " + GameContract.Games.TABLE_NAME + " ADD COLUMN " + GameContract.Games
+                        .COLUMN_NAME_SYNCED + " INTEGER");
+            }
 		}
 	}
 
@@ -77,7 +79,7 @@ public class GameProvider extends ContentProvider
 	/**
 	 * The database version
 	 */
-	private static final int DATABASE_VERSION = 1;
+	private static final int DATABASE_VERSION = 2;
 	/**
 	 * The incoming URI matches the Game ID URI pattern
 	 */
@@ -97,7 +99,7 @@ public class GameProvider extends ContentProvider
 
 	/**
 	 * Creates and initializes a column project for all columns
-	 * 
+	 *
 	 * @return The all column projection map
 	 */
 	private static HashMap<String, String> buildAllColumnProjectionMap()
@@ -108,12 +110,13 @@ public class GameProvider extends ContentProvider
 				.put(GameContract.Games.COLUMN_NAME_START_TIME, GameContract.Games.COLUMN_NAME_START_TIME);
 		allColumnProjectionMap.put(GameContract.Games.COLUMN_NAME_DURATION, GameContract.Games.COLUMN_NAME_DURATION);
 		allColumnProjectionMap.put(GameContract.Games.COLUMN_NAME_MOVES, GameContract.Games.COLUMN_NAME_MOVES);
+        allColumnProjectionMap.put(GameContract.Games.COLUMN_NAME_SYNCED, GameContract.Games.COLUMN_NAME_SYNCED);
 		return allColumnProjectionMap;
 	}
 
 	/**
 	 * Creates and initializes the URI matcher
-	 * 
+	 *
 	 * @return the URI Matcher
 	 */
 	private static UriMatcher buildUriMatcher()
@@ -198,6 +201,8 @@ public class GameProvider extends ContentProvider
 			values = new ContentValues();
 		if (!values.containsKey(GameContract.Games.COLUMN_NAME_START_TIME))
 			values.put(GameContract.Games.COLUMN_NAME_START_TIME, System.currentTimeMillis());
+        if (!values.containsKey(GameContract.Games.COLUMN_NAME_SYNCED))
+            values.put(GameContract.Games.COLUMN_NAME_SYNCED, false);
 		final SQLiteDatabase db = databaseHelper.getWritableDatabase();
 		final long rowId = db.insertWithOnConflict(GameContract.Games.TABLE_NAME,
 				GameContract.Games.COLUMN_NAME_START_TIME, values, SQLiteDatabase.CONFLICT_IGNORE);
@@ -222,7 +227,7 @@ public class GameProvider extends ContentProvider
 
 	/**
 	 * Creates the underlying DatabaseHelper
-	 * 
+	 *
 	 * @see android.content.ContentProvider#onCreate()
 	 */
 	@Override

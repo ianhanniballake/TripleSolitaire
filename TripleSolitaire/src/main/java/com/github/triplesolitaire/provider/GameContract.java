@@ -20,6 +20,13 @@ public final class GameContract
 		 * The table name offered by this provider
 		 */
 		public static final String TABLE_NAME = "games";
+        /**
+         * Column name for whether this game has been synced (for leaderboards)
+         * <P>
+         * Type: INTEGER (boolean)
+         * </P>
+         */
+        public static final String COLUMN_NAME_SYNCED = "synced";
 		/**
 		 * Column name for the game's duration (in seconds) to completion
 		 * <P>

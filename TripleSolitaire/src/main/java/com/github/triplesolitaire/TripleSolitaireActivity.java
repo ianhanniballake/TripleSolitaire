@@ -70,7 +70,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
 
 		/**
 		 * Creates a new listener for the given lane
-		 * 
+		 *
 		 * @param laneIndex
 		 *            One-based index (1 through 13) of the lane to be clicked
 		 */
@@ -81,7 +81,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
 
 		/**
 		 * Triggers flipping over a card in this lane
-		 * 
+		 *
 		 * @see android.view.View.OnClickListener#onClick(android.view.View)
 		 */
 		@Override
@@ -103,7 +103,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
 
 		/**
 		 * Creates a new drag listener for the given foundation
-		 * 
+		 *
 		 * @param foundationIndex
 		 *            Negative One-based index (-1 through -12)
 		 */
@@ -114,7 +114,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
 
 		/**
 		 * Responds to drag events on the foundation
-		 * 
+		 *
 		 * @see android.view.View.OnDragListener#onDrag(android.view.View, android.view.DragEvent)
 		 */
 		@Override
@@ -157,7 +157,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
 
 		/**
 		 * Creates a new listener for the given foundation
-		 * 
+		 *
 		 * @param foundationIndex
 		 *            Negative One-based index (-1 through -12)
 		 */
@@ -168,7 +168,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
 
 		/**
 		 * Responds to ACTION_DOWN events to start drags from the foundation
-		 * 
+		 *
 		 * @see android.view.View.OnTouchListener#onTouch(android.view.View, android.view.MotionEvent)
 		 */
 		@Override
@@ -213,7 +213,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
 	/**
 	 * Animates the given move by creating a copy of the source view and animating it over to the final position before
 	 * hiding the temporary view and showing the final destination
-	 * 
+	 *
 	 * @param move
 	 *            Move to animate
 	 */
@@ -291,7 +291,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
 
 	/**
 	 * Gets the screen location for the top cascade card of the given lane
-	 * 
+	 *
 	 * @param laneIndex
 	 *            One-based index (1 through 13) for the lane
 	 * @return The exact (x,y) position of the top cascade card in the lane
@@ -309,7 +309,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
 
 	/**
 	 * Gets the screen location for the given foundation
-	 * 
+	 *
 	 * @param foundationIndex
 	 *            Negative One-based index (-1 through -12)
 	 * @return The exact (x,y) position of the foundation
@@ -328,7 +328,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
 
 	/**
 	 * Gets a string representation (MMM:SS) of the current game time
-	 * 
+	 *
 	 * @return Current formatted game time
 	 */
 	public CharSequence getGameTime()
@@ -347,7 +347,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
 
 	/**
 	 * Gets the Lane associated with the given index
-	 * 
+	 *
 	 * @param laneIndex
 	 *            One-based index (1 through 13) for the lane
 	 * @return The Lane for the given index
@@ -359,7 +359,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
 
 	/**
 	 * Gets the current move count
-	 * 
+	 *
 	 * @return Current move count
 	 */
 	public int getMoveCount()
@@ -369,7 +369,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
 
 	/**
 	 * Gets the screen location for the top card in the waste
-	 * 
+	 *
 	 * @return The exact (x,y) position of the top card in the waste
 	 */
 	private Point getWasteLoc()
@@ -474,7 +474,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
 
 	/**
 	 * Called when the activity is first created. Sets up the appropriate listeners and starts a new game
-	 * 
+	 *
 	 * @see android.app.Activity#onCreate(android.os.Bundle)
 	 */
 	@Override
@@ -586,7 +586,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
 
 	/**
 	 * One time method to inflate the options menu / action bar
-	 * 
+	 *
 	 * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
 	 */
 	@Override
@@ -614,7 +614,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
 
 	/**
 	 * Called to handle when options menu / action bar buttons are tapped
-	 * 
+	 *
 	 * @see android.app.Activity#onOptionsItemSelected(android.view.MenuItem)
 	 */
 	@Override
@@ -664,7 +664,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
 
 	/**
 	 * Method called every time the options menu is invalidated/repainted. Enables/disables the undo button
-	 * 
+	 *
 	 * @see android.app.Activity#onPrepareOptionsMenu(android.view.Menu)
 	 */
 	@Override
@@ -681,7 +681,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
 
 	/**
 	 * Restores the game state
-	 * 
+	 *
 	 * @see android.app.Activity#onRestoreInstanceState(android.os.Bundle)
 	 */
 	@Override
@@ -693,7 +693,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
 
 	/**
 	 * Saves the game state
-	 * 
+	 *
 	 * @see android.app.Activity#onSaveInstanceState(android.os.Bundle)
 	 */
 	@Override
@@ -749,7 +749,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
 				// Data was successfully loaded from the cloud: merge with local data.
 				stats = stats.unionWith(new StatsState(localData));
 				mAlreadyLoadedState = true;
-				persistStats();
+				persistStats(false);
 				if (mPendingUpdateState)
 					saveToCloud();
 				break;
@@ -789,7 +789,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
 
 	/**
 	 * Pauses/resumes the game timer when window focus is lost/gained, respectively
-	 * 
+	 *
 	 * @see android.app.Activity#onWindowFocusChanged(boolean)
 	 */
 	@Override
@@ -801,9 +801,9 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
 			gameState.pauseGame();
 	}
 
-	private void persistStats()
+	private void persistStats(final boolean syncCompleted)
 	{
-		final ArrayList<ContentProviderOperation> operations = stats.getLocalSaveOperations();
+		final ArrayList<ContentProviderOperation> operations = stats.getLocalSaveOperations(syncCompleted);
 		try
 		{
 			getContentResolver().applyBatch(GameContract.AUTHORITY, operations);
@@ -831,25 +831,28 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
 		if (longestWinStreak > 10)
 			gamesClient.unlockAchievement(getString(R.string.achievement_master_streaker));
 		// Check minimum moves achievements
-		final int minimumMoves = stats.getMinimumMoves();
+		final int minimumMoves = stats.getMinimumMovesUnsynced();
 		if (BuildConfig.DEBUG)
 			Log.d(TripleSolitaireActivity.TAG, "Minimum Moves: " + minimumMoves);
-		gamesClient.submitScore(getString(R.string.leaderboard_moves), minimumMoves);
+        if (minimumMoves < Integer.MAX_VALUE)
+    		gamesClient.submitScore(getString(R.string.leaderboard_moves), minimumMoves);
 		if (minimumMoves < 400)
 			gamesClient.unlockAchievement(getString(R.string.achievement_figured_it_out));
 		if (minimumMoves < 300)
 			gamesClient.unlockAchievement(getString(R.string.achievement_no_mistakes));
 		// Check shortest time achievements
-		final int shortestTime = stats.getShortestTime();
+		final int shortestTime = stats.getShortestTimeUnsynced();
 		if (BuildConfig.DEBUG)
 			Log.d(TripleSolitaireActivity.TAG, "Shortest Time (minutes): " + (double) shortestTime / 60);
-		gamesClient.submitScore(getString(R.string.leaderboard_time), shortestTime * DateUtils.SECOND_IN_MILLIS);
+        if (shortestTime < Integer.MAX_VALUE)
+    		gamesClient.submitScore(getString(R.string.leaderboard_time), shortestTime * DateUtils.SECOND_IN_MILLIS);
 		if (shortestTime < 15 * 60)
 			gamesClient.unlockAchievement(getString(R.string.achievement_quarter_hour));
 		if (shortestTime < 10 * 60)
 			gamesClient.unlockAchievement(getString(R.string.achievement_single_digits));
 		if (shortestTime < 8 * 60)
 			gamesClient.unlockAchievement(getString(R.string.achievement_speed_demon));
+        persistStats(true);
 		// Load achievements to handle incremental achievements
 		gamesClient.loadAchievements(this, false);
 		mPendingUpdateState = false;
@@ -857,7 +860,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
 
 	/**
 	 * Updates the given foundation UI
-	 * 
+	 *
 	 * @param foundationIndex
 	 *            Negative One-based index (-1 through -12) for the foundation
 	 */
@@ -921,7 +924,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
 
 	/**
 	 * Updates each card in the waste
-	 * 
+	 *
 	 * @param wasteIndex
 	 *            Index of the card (0-2)
 	 */
