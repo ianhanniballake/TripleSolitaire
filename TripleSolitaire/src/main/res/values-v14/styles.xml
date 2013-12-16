@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.TripleSolitaire" parent="@android:style/Theme.Holo">
+        <item name="android:actionBarStyle">@style/ActionBar.Solid.TripleSolitaire</item>
+    </style>
+
+    <style name="ActionBar.Solid.TripleSolitaire" parent="@android:style/Widget.Holo.ActionBar.Solid">
+    </style>
+</resources>
