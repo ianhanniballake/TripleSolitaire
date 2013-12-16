@@ -124,7 +124,8 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
                 final String card = event.getClipDescription().getLabel().toString();
                 return gameState.acceptFoundationDrop(foundationIndex, card);
             } else if (event.getAction() == DragEvent.ACTION_DROP) {
-                System.gc();
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT)
+                    System.gc();
                 final String card = event.getClipData().getItemAt(0).getText().toString();
                 final int from = (Integer) event.getLocalState();
                 gameState.move(new Move(Type.PLAYER_MOVE, foundationIndex, from, card));
@@ -193,6 +194,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
     public TripleSolitaireActivity() {
         // request that superclass initialize and manage the Google Play Services for us
         super(BaseGameActivity.CLIENT_ALL);
+        enableDebugLog(BuildConfig.DEBUG, TripleSolitaireActivity.TAG);
     }
 
     /**
@@ -491,7 +493,8 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
                     }
                     return true;
                 } else if (event.getAction() == DragEvent.ACTION_DRAG_ENDED && !event.getResult() && fromMe) {
-                    System.gc();
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT)
+                        System.gc();
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
