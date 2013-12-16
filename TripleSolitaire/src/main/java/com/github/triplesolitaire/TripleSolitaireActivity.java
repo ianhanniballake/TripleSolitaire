@@ -451,7 +451,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
         bar.setDisplayHomeAsUpEnabled(true);
         bar.setDisplayShowCustomEnabled(true);
         final ActionBar.LayoutParams layoutParams = new ActionBar.LayoutParams(LayoutParams.WRAP_CONTENT,
-                LayoutParams.WRAP_CONTENT);
+                LayoutParams.MATCH_PARENT);
         layoutParams.gravity = Gravity.LEFT;
         bar.setCustomView(progressBar, layoutParams);
         // Set up sign in button

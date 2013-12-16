@@ -9,6 +9,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_marginLeft="20dp"
+        android:gravity="center_vertical"
         android:text="@string/time"/>
 
     <TextView
@@ -16,7 +17,8 @@
         style="@android:style/TextAppearance.Medium"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_marginLeft="5dp"/>
+        android:layout_marginLeft="5dp"
+        android:gravity="center_vertical"/>
 
     <TextView
         android:id="@+id/move_count_label"
@@ -24,6 +26,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_marginLeft="20dp"
+        android:gravity="center_vertical"
         android:text="@string/move_count"/>
 
     <TextView
@@ -31,6 +34,7 @@
         style="@android:style/TextAppearance.Medium"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_marginLeft="5dp"/>
+        android:layout_marginLeft="5dp"
+        android:gravity="center_vertical"/>
 
 </LinearLayout>
