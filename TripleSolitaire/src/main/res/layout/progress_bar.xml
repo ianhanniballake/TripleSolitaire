@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="wrap_content"
-              android:layout_height="fill_parent"
+              android:layout_height="match_parent"
               android:orientation="horizontal">
 
     <TextView
         style="@android:style/TextAppearance.Medium"
         android:layout_width="wrap_content"
-        android:layout_height="fill_parent"
+        android:layout_height="match_parent"
         android:layout_marginLeft="20dp"
         android:text="@string/time"/>
 
@@ -15,14 +15,14 @@
         android:id="@+id/time"
         style="@android:style/TextAppearance.Medium"
         android:layout_width="wrap_content"
-        android:layout_height="fill_parent"
+        android:layout_height="match_parent"
         android:layout_marginLeft="5dp"/>
 
     <TextView
         android:id="@+id/move_count_label"
         style="@android:style/TextAppearance.Medium"
         android:layout_width="wrap_content"
-        android:layout_height="fill_parent"
+        android:layout_height="match_parent"
         android:layout_marginLeft="20dp"
         android:text="@string/move_count"/>
 
@@ -30,7 +30,7 @@
         android:id="@+id/move_count"
         style="@android:style/TextAppearance.Medium"
         android:layout_width="wrap_content"
-        android:layout_height="fill_parent"
+        android:layout_height="match_parent"
         android:layout_marginLeft="5dp"/>
 
 </LinearLayout>
