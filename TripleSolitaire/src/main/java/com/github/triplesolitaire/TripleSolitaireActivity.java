@@ -6,8 +6,10 @@ import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.LoaderManager.LoaderCallbacks;
+import android.content.AsyncQueryHandler;
 import android.content.ClipData;
 import android.content.ContentProviderOperation;
+import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
@@ -183,6 +185,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
     private boolean mAlreadyLoadedState = false;
     private boolean mPendingUpdateState = false;
     private StatsState stats = new StatsState();
+    private AsyncQueryHandler mAsyncQueryHandler;
 
     /**
      * Constructs a new TripleSolitaireActivity that uses all Google Play Services
@@ -437,6 +440,8 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         gameState = new GameState(this);
+        mAsyncQueryHandler = new AsyncQueryHandler(getContentResolver()) {
+        };
         setContentView(R.layout.main);
         // Set up the progress bar area
         final View progressBar = getLayoutInflater().inflate(R.layout.progress_bar, null);
@@ -673,7 +678,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
                 // Data was successfully loaded from the cloud: merge with local data.
                 stats = stats.unionWith(new StatsState(localData));
                 mAlreadyLoadedState = true;
-                persistStats(false);
+                persistStats();
                 if (mPendingUpdateState)
                     saveToCloud();
                 break;
@@ -724,8 +729,8 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
             gameState.pauseGame();
     }
 
-    private void persistStats(final boolean syncCompleted) {
-        final ArrayList<ContentProviderOperation> operations = stats.getLocalSaveOperations(syncCompleted);
+    private void persistStats() {
+        final ArrayList<ContentProviderOperation> operations = stats.getLocalSaveOperations();
         try {
             getContentResolver().applyBatch(GameContract.AUTHORITY, operations);
         } catch (final RemoteException e) {
@@ -750,27 +755,32 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
             gamesClient.unlockAchievement(getString(R.string.achievement_master_streaker));
         // Check minimum moves achievements
         final int minimumMoves = stats.getMinimumMovesUnsynced();
-        if (BuildConfig.DEBUG)
-            Log.d(TripleSolitaireActivity.TAG, "Minimum Moves: " + minimumMoves);
-        if (minimumMoves < Integer.MAX_VALUE)
+        if (minimumMoves < Integer.MAX_VALUE) {
+            if (BuildConfig.DEBUG)
+                Log.d(TripleSolitaireActivity.TAG, "Minimum Moves: " + minimumMoves);
             gamesClient.submitScore(getString(R.string.leaderboard_moves), minimumMoves);
+        }
         if (minimumMoves < 400)
             gamesClient.unlockAchievement(getString(R.string.achievement_figured_it_out));
         if (minimumMoves < 300)
             gamesClient.unlockAchievement(getString(R.string.achievement_no_mistakes));
         // Check shortest time achievements
         final int shortestTime = stats.getShortestTimeUnsynced();
-        if (BuildConfig.DEBUG)
-            Log.d(TripleSolitaireActivity.TAG, "Shortest Time (minutes): " + (double) shortestTime / 60);
-        if (shortestTime < Integer.MAX_VALUE)
+        if (shortestTime < Integer.MAX_VALUE) {
+            if (BuildConfig.DEBUG)
+                Log.d(TripleSolitaireActivity.TAG, "Shortest Time (minutes): " + (double) shortestTime / 60);
             gamesClient.submitScore(getString(R.string.leaderboard_time), shortestTime * DateUtils.SECOND_IN_MILLIS);
+        }
         if (shortestTime < 15 * 60)
             gamesClient.unlockAchievement(getString(R.string.achievement_quarter_hour));
         if (shortestTime < 10 * 60)
             gamesClient.unlockAchievement(getString(R.string.achievement_single_digits));
         if (shortestTime < 8 * 60)
             gamesClient.unlockAchievement(getString(R.string.achievement_speed_demon));
-        persistStats(true);
+        ContentValues values = new ContentValues();
+        values.put(GameContract.Games.COLUMN_NAME_SYNCED, true);
+        mAsyncQueryHandler.startUpdate(0, null, GameContract.Games.CONTENT_URI, values,
+                GameContract.Games.COLUMN_NAME_SYNCED + "=0", null);
         // Load achievements to handle incremental achievements
         gamesClient.loadAchievements(this, false);
         mPendingUpdateState = false;

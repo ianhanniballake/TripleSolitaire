@@ -151,7 +151,8 @@ public class GameProvider extends ContentProvider {
             default:
                 throw new IllegalArgumentException("Unknown URI " + uri);
         }
-        getContext().getContentResolver().notifyChange(uri, null);
+        if (count > 0)
+            getContext().getContentResolver().notifyChange(uri, null);
         return count;
     }
 
@@ -270,7 +271,8 @@ public class GameProvider extends ContentProvider {
             default:
                 throw new IllegalArgumentException("Unknown URI " + uri);
         }
-        getContext().getContentResolver().notifyChange(uri, null);
+        if (count > 0)
+            getContext().getContentResolver().notifyChange(uri, null);
         return count;
     }
 }

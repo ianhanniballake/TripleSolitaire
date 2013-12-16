@@ -192,10 +192,9 @@ public class StatsState {
      * Gets a list of ContentProviderOperations that save all of the current game stats to the local ContentProvider.
      * Note that this does not look for already existing records, but assumes the ContentProvider can ignore duplicates
      *
-     * @param syncCompleted Whether all records should be marked as synced
      * @return List of operations needed to save these stats to the local ContentProvider
      */
-    public ArrayList<ContentProviderOperation> getLocalSaveOperations(final boolean syncCompleted) {
+    public ArrayList<ContentProviderOperation> getLocalSaveOperations() {
         final ArrayList<ContentProviderOperation> operations = new ArrayList<ContentProviderOperation>();
         final int size = gameStats.size();
         for (int index = 0; index < size; index++) {
@@ -207,7 +206,7 @@ public class StatsState {
                 values.put(GameContract.Games.COLUMN_NAME_DURATION, stats.duration);
                 values.put(GameContract.Games.COLUMN_NAME_MOVES, stats.moves);
             }
-            values.put(GameContract.Games.COLUMN_NAME_SYNCED, syncCompleted || stats.synced);
+            values.put(GameContract.Games.COLUMN_NAME_SYNCED, stats.synced);
             operations.add(ContentProviderOperation.newInsert(GameContract.Games.CONTENT_URI).withValues(values)
                     .build());
         }
