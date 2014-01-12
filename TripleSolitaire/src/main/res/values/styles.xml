@@ -3,4 +3,11 @@
 
     <style name="Theme.TripleSolitaire" parent="@android:style/Theme.Holo">
     </style>
+
+    <style name="Theme.TripleSolitaire.Main" parent="Theme.TripleSolitaire">
+    </style>
+
+    <style name="Theme.TripleSolitaire.Game" parent="Theme.TripleSolitaire">
+    </style>
+
 </resources>

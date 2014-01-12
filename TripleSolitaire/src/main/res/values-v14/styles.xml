@@ -5,6 +5,14 @@
         <item name="android:actionBarStyle">@style/ActionBar.Solid.TripleSolitaire</item>
     </style>
 
+    <style name="Theme.TripleSolitaire.Game" parent="Theme.TripleSolitaire">
+        <item name="android:actionBarStyle">@style/ActionBar.Solid.TripleSolitaire.Game</item>
+    </style>
+
     <style name="ActionBar.Solid.TripleSolitaire" parent="@android:style/Widget.Holo.ActionBar.Solid">
+    </style>
+
+    <style name="ActionBar.Solid.TripleSolitaire.Game" parent="ActionBar.Solid.TripleSolitaire">
+        <item name="android:background">@drawable/ab_solid_triplesolitaire</item>
     </style>
 </resources>

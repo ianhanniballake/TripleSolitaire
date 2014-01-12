@@ -3,6 +3,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/background"
+                android:fitsSystemWindows="true"
                 android:padding="8dp"
                 tools:context="com.github.triplesolitaire.GameActivity">
 
@@ -259,8 +260,8 @@
             android:layout_width="@dimen/card_width_dim"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:layout_toLeftOf="@id/lane2"
             android:layout_margin="@dimen/between_card_dim"
+            android:layout_toLeftOf="@id/lane2"
             tools:ignore="UnusedIds"/>
 
     </RelativeLayout>

@@ -510,9 +510,14 @@ public class GameActivity extends Activity {
      */
     @Override
     public void onWindowFocusChanged(final boolean hasFocus) {
-        if (hasFocus)
+        if (hasFocus) {
             gameState.resumeGame();
-        else
+            getWindow().getDecorView().setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LOW_PROFILE
+                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+        } else
             gameState.pauseGame();
     }
 
