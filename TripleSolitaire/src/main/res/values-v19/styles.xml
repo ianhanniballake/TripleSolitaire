@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- Main Menu theme -->
     <style name="Theme.TripleSolitaire.Main" parent="Theme.TripleSolitaire">
-        <item name="android:actionBarStyle">@style/ActionBar.Solid.TripleSolitaire.Main</item>
+        <item name="android:actionBarStyle">@style/ActionBar.TripleSolitaire.Main</item>
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowTranslucentNavigation">true</item>
     </style>
 
-    <style name="ActionBar.Solid.TripleSolitaire.Main" parent="@android:style/Widget.Holo.ActionBar">
+    <style name="ActionBar.TripleSolitaire.Main" parent="@android:style/Widget.Holo.ActionBar">
         <item name="android:background">@android:color/transparent</item>
         <item name="android:displayOptions">none</item>
     </style>
+
 </resources>

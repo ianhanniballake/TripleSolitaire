@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.TripleSolitaire" parent="@android:style/Theme.Holo">
-        <item name="android:actionBarStyle">@style/ActionBar.Solid.TripleSolitaire</item>
+    <!-- Default theme -->
+    <style name="ActionBar.TripleSolitaire" parent="@android:style/Widget.Holo.ActionBar.Solid">
     </style>
 
-    <style name="Theme.TripleSolitaire.Game" parent="Theme.TripleSolitaire">
-        <item name="android:actionBarStyle">@style/ActionBar.Solid.TripleSolitaire.Game</item>
+    <!-- Main Menu theme -->
+    <style name="ActionBar.TripleSolitaire.Main" parent="ActionBar.TripleSolitaire">
+        <item name="android:displayOptions">none</item>
     </style>
 
-    <style name="ActionBar.Solid.TripleSolitaire" parent="@android:style/Widget.Holo.ActionBar.Solid">
-    </style>
-
-    <style name="ActionBar.Solid.TripleSolitaire.Game" parent="ActionBar.Solid.TripleSolitaire">
+    <!-- Game theme -->
+    <style name="ActionBar.TripleSolitaire.Game" parent="ActionBar.TripleSolitaire">
         <item name="android:background">@drawable/ab_solid_triplesolitaire</item>
     </style>
 </resources>
