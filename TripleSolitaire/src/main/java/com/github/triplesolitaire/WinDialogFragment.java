@@ -21,7 +21,7 @@ public class WinDialogFragment extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(final Bundle savedInstanceState) {
-        final TripleSolitaireActivity activity = (TripleSolitaireActivity) getActivity();
+        final GameActivity activity = (GameActivity) getActivity();
         if (savedInstanceState != null)
             cachedMessage = savedInstanceState.getString(MESSAGE_KEY, null);
         if (cachedMessage == null) {

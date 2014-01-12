@@ -27,7 +27,7 @@ public class GameState {
     /**
      * Logging tag
      */
-    private static final String TAG = "TripleSolitaireActivity";
+    private static final String TAG = "GameActivity";
 
     /**
      * Whether the empty lane should accept a dropped card/cascade
@@ -96,7 +96,7 @@ public class GameState {
     /**
      * Activity to issue UI update callbacks
      */
-    final TripleSolitaireActivity activity;
+    final GameActivity activity;
     /**
      * Whether a lane should be excluded from autoplay (i.e., if the user just dragged a card from the foundation to
      * that column
@@ -180,7 +180,7 @@ public class GameState {
      *
      * @param activity Activity to send UI update commands
      */
-    public GameState(final TripleSolitaireActivity activity) {
+    public GameState(final GameActivity activity) {
         this.activity = activity;
         gameQueryHandler = new AsyncQueryHandler(activity.getContentResolver()) {
             @Override
