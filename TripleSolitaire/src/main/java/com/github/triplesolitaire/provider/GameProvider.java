@@ -47,7 +47,7 @@ public class GameProvider extends ContentProvider {
             db.execSQL("CREATE TABLE " + GameContract.Games.TABLE_NAME + " (" + BaseColumns._ID
                     + " INTEGER PRIMARY KEY AUTOINCREMENT," + GameContract.Games.COLUMN_NAME_START_TIME + " INTEGER,"
                     + GameContract.Games.COLUMN_NAME_DURATION + " INTEGER," + GameContract.Games.COLUMN_NAME_MOVES
-                    + " INTEGER);");
+                    + " INTEGER," + GameContract.Games.COLUMN_NAME_SYNCED + " INTEGER);");
         }
 
         /**
