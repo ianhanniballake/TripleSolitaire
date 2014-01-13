@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.ViewFlipper;
 
 import com.github.triplesolitaire.provider.GameContract;
 import com.google.android.gms.appstate.AppStateClient;
@@ -43,6 +44,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
      * Logging tag
      */
     private static final String TAG = "TripleSolitaireActivity";
+    private ViewFlipper googlePlayGamesViewFlipper;
     private boolean mAlreadyLoadedState = false;
     private boolean mPendingUpdateState = false;
     private StatsState stats = new StatsState();
@@ -116,20 +118,43 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
         mAsyncQueryHandler = new AsyncQueryHandler(getContentResolver()) {
         };
         setContentView(R.layout.main);
-        final Button newGame = (Button) findViewById(R.id.new_game);
-        newGame.setOnClickListener(new OnClickListener() {
+        googlePlayGamesViewFlipper = (ViewFlipper) findViewById(R.id.google_play_games);
+        final Button newGameBtn = (Button) findViewById(R.id.new_game);
+        newGameBtn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(final View v) {
                 startActivity(new Intent(TripleSolitaireActivity.this, GameActivity.class));
             }
         });
+        final Button statsBtn = (Button) findViewById(R.id.stats);
+        statsBtn.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                StatsDialogFragment.createInstance(stats).show(getFragmentManager(), "stats");
+            }
+        });
         // Set up sign in button
-        final SignInButton signIn = (SignInButton) findViewById(R.id.sign_in);
-        signIn.setOnClickListener(new OnClickListener() {
+        final SignInButton signInBtn = (SignInButton) findViewById(R.id.sign_in);
+        signInBtn.setOnClickListener(new OnClickListener() {
             @SuppressWarnings("synthetic-access")
             @Override
             public void onClick(final View v) {
                 beginUserInitiatedSignIn();
+            }
+        });
+        // Set up Google Play Games buttons
+        final Button achievementsBtn = (Button) findViewById(R.id.achievements);
+        achievementsBtn.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                startActivityForResult(getGamesClient().getAchievementsIntent(), REQUEST_ACHIEVEMENTS);
+            }
+        });
+        final Button leaderboardsBtn = (Button) findViewById(R.id.leaderboards);
+        leaderboardsBtn.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                startActivityForResult(getGamesClient().getAllLeaderboardsIntent(), REQUEST_LEADERBOARDS);
             }
         });
         getLoaderManager().initLoader(0, null, this);
@@ -173,21 +198,12 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.stats:
-                StatsDialogFragment.createInstance(stats).show(getFragmentManager(), "stats");
-                return true;
-            case R.id.achievements:
-                startActivityForResult(getGamesClient().getAchievementsIntent(), REQUEST_ACHIEVEMENTS);
-                return true;
-            case R.id.leaderboards:
-                startActivityForResult(getGamesClient().getAllLeaderboardsIntent(), REQUEST_LEADERBOARDS);
-                return true;
             case R.id.settings:
                 startActivity(new Intent(this, Preferences.class));
                 return true;
             case R.id.sign_out:
                 signOut();
-                findViewById(R.id.sign_in_layout).setVisibility(View.VISIBLE);
+                googlePlayGamesViewFlipper.setDisplayedChild(1);
                 return true;
             case R.id.about:
                 final AboutDialogFragment aboutDialogFragment = new AboutDialogFragment();
@@ -199,7 +215,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
     }
 
     /**
-     * Method called every time the options menu is invalidated/repainted. Enables/disables the undo button
+     * Method called every time the options menu is invalidated/repainted. Shows/hides the sign out button
      *
      * @see android.app.Activity#onPrepareOptionsMenu(android.view.Menu)
      */
@@ -207,9 +223,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
     public boolean onPrepareOptionsMenu(final Menu menu) {
         super.onPrepareOptionsMenu(menu);
         final boolean isSignedIn = isSignedIn();
-        menu.findItem(R.id.achievements).setVisible(isSignedIn);
-        menu.findItem(R.id.leaderboards).setVisible(isSignedIn);
-        menu.findItem(R.id.sign_out).setVisible(isSignedIn);
+        menu.findItem(R.id.sign_out).setVisible(isSignedIn());
         return true;
     }
 
@@ -218,7 +232,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
         if (BuildConfig.DEBUG)
             Log.d(TripleSolitaireActivity.TAG, "onSignInFailed");
         invalidateOptionsMenu();
-        findViewById(R.id.sign_in_layout).setVisibility(View.VISIBLE);
+        googlePlayGamesViewFlipper.setDisplayedChild(1);
     }
 
     @Override
@@ -226,7 +240,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
         if (BuildConfig.DEBUG)
             Log.d(TripleSolitaireActivity.TAG, "onSignInSucceeded");
         invalidateOptionsMenu();
-        findViewById(R.id.sign_in_layout).setVisibility(View.INVISIBLE);
+        googlePlayGamesViewFlipper.setDisplayedChild(2);
         if (!mAlreadyLoadedState)
             getAppStateClient().loadState(this, OUR_STATE_KEY);
     }

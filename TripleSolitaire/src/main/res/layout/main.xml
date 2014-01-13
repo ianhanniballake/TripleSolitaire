@@ -6,36 +6,120 @@
                 android:background="@color/background"
                 tools:context="com.github.triplesolitaire.TripleSolitaireActivity">
 
-    <Button
-        android:id="@+id/new_game"
+    <TextView
+        android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/new_game"
-        android:layout_centerInParent="true"/>
+        android:layout_centerHorizontal="true"
+        android:paddingBottom="8dp"
+        android:paddingTop="24dp"
+        android:text="@string/app_name"
+        android:textSize="72sp"/>
 
-    <LinearLayout
-        android:id="@+id/sign_in_layout"
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/title"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/title"/>
+
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:background="@color/background_sign_in"
-        android:orientation="horizontal"
-        android:padding="@dimen/sign_in_padding"
-        android:visibility="invisible">
+        android:fitsSystemWindows="true">
 
-        <com.google.android.gms.common.SignInButton
-            android:id="@+id/sign_in"
+        <ViewFlipper
+            android:id="@+id/google_play_games"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingRight="@dimen/sign_in_padding"/>
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_margin="8dp"
+            android:measureAllChildren="true">
 
-        <TextView
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/background_sign_in"
+                android:orientation="horizontal"
+                android:padding="@dimen/sign_in_padding">
+
+                <com.google.android.gms.common.SignInButton
+                    android:id="@+id/sign_in"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingRight="@dimen/sign_in_padding"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:paddingLeft="@dimen/sign_in_padding"
+                    android:text="@string/sign_in_explanation"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/background_sign_in"
+                android:orientation="horizontal"
+                android:padding="@dimen/sign_in_padding">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:src="@drawable/games_controller"/>
+
+                <Button
+                    android:id="@+id/achievements"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:drawableLeft="@drawable/games_achievements"
+                    android:drawablePadding="8dp"
+                    android:padding="16dp"
+                    android:text="@string/achievements"/>
+
+                <Button
+                    android:id="@+id/leaderboards"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:drawableLeft="@drawable/games_leaderboards"
+                    android:drawablePadding="8dp"
+                    android:padding="16dp"
+                    android:text="@string/leaderboards"/>
+            </LinearLayout>
+        </ViewFlipper>
+
+        <Button
+            android:id="@+id/new_game"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:paddingLeft="@dimen/sign_in_padding"
-            android:text="@string/sign_in_explanation"/>
-    </LinearLayout>
+            android:layout_above="@id/google_play_games"
+            android:layout_marginLeft="8dp"
+            android:padding="16dp"
+            android:text="@string/new_game"
+            android:textSize="24sp"/>
+
+        <Button
+            android:id="@+id/stats"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/google_play_games"
+            android:layout_marginLeft="8dp"
+            android:layout_toRightOf="@id/new_game"
+            android:padding="16dp"
+            android:text="@string/stats"
+            android:textSize="24sp"/>
+
+    </RelativeLayout>
 
 </RelativeLayout>
