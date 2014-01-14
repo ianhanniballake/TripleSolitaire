@@ -21,6 +21,9 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/title"
         android:layout_centerHorizontal="true"
+        android:adjustViewBounds="true"
+        android:padding="8dp"
+        android:scaleType="centerInside"
         android:src="@drawable/title"/>
 
     <RelativeLayout
