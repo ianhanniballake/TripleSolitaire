@@ -203,7 +203,7 @@ public class GameState {
         final int cascadeNum = GameState.getNumber(cascadeCard);
         final String bottomNewCardSuit = GameState.getSuit(bottomNewCard);
         final int bottomNewCardNum = GameState.getNumber(bottomNewCard);
-        boolean acceptDrop = false;
+        boolean acceptDrop;
         final boolean cascadeCardIsBlack = cascadeSuit.equals("clubs") || cascadeSuit.equals("spades");
         final boolean bottomNewCardIsBlack = bottomNewCardSuit.equals("clubs") || bottomNewCardSuit.equals("spades");
         if (bottomNewCardNum != cascadeNum - 1)
@@ -229,7 +229,7 @@ public class GameState {
             // Foundations don't accept multiple cards
             return false;
         final String existingFoundationCard = foundation[-1 * foundationIndex - 1];
-        boolean acceptDrop = false;
+        boolean acceptDrop;
         if (existingFoundationCard == null)
             acceptDrop = newCard.endsWith("s1");
         else
@@ -474,7 +474,7 @@ public class GameState {
                     addMoveToUndo(move);
                 } else {
                     // Move up to 3 cards from the stock to the waste
-                    final StringBuffer sb = new StringBuffer();
+                    final StringBuilder sb = new StringBuilder();
                     String card = stock.pop();
                     sb.append(card);
                     waste.addFirst(card);

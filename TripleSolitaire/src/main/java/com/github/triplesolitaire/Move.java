@@ -168,7 +168,7 @@ public class Move {
     private String getCascadeAsString() {
         if (cascade.isEmpty())
             return "";
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         final ListIterator<String> listIterator = cascade.listIterator();
         sb.append(listIterator.next());
         while (listIterator.hasNext()) {
@@ -222,7 +222,7 @@ public class Move {
      */
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         sb.append(type.toString());
         sb.append(':');
         sb.append(fromIndex);

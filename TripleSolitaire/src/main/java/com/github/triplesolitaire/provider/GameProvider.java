@@ -253,7 +253,7 @@ public class GameProvider extends ContentProvider {
     @Override
     public int update(final Uri uri, final ContentValues values, final String selection, final String[] selectionArgs) {
         final SQLiteDatabase db = databaseHelper.getWritableDatabase();
-        int count = 0;
+        int count;
         switch (GameProvider.uriMatcher.match(uri)) {
             case GAMES:
                 // If the incoming URI matches the general games pattern,

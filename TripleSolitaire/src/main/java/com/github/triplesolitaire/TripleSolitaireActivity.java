@@ -222,7 +222,6 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
     @Override
     public boolean onPrepareOptionsMenu(final Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        final boolean isSignedIn = isSignedIn();
         menu.findItem(R.id.sign_out).setVisible(isSignedIn());
         return true;
     }
