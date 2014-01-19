@@ -13,6 +13,7 @@
         android:layout_centerHorizontal="true"
         android:paddingBottom="8dp"
         android:paddingTop="24dp"
+        android:fontFamily="serif"
         android:text="@string/app_name"
         android:textSize="72sp"/>
 
