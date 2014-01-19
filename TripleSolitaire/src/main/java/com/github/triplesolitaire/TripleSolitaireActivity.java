@@ -71,7 +71,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
 
         @Override
         protected void onPostExecute(final Void aVoid) {
-            if (mPendingUpdateState)
+            if (mPendingUpdateState && isSignedIn())
                 saveToCloud();
         }
     };
