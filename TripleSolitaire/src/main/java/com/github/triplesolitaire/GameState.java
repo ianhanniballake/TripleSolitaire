@@ -388,8 +388,7 @@ public class GameState {
         values.put(GameContract.Games.COLUMN_NAME_DURATION, timeInSeconds);
         values.put(GameContract.Games.COLUMN_NAME_MOVES, moveCount);
         gameQueryHandler.startUpdate(0, null, gameUri, values, null, null);
-        final WinDialogFragment winDialogFragment = new WinDialogFragment();
-        winDialogFragment.show(activity.getFragmentManager(), "win");
+        activity.triggerWin();
     }
 
     /**

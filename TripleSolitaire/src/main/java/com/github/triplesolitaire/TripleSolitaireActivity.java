@@ -40,6 +40,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
     private static final int OUR_STATE_KEY = 0;
     private static final int REQUEST_ACHIEVEMENTS = 0;
     private static final int REQUEST_LEADERBOARDS = 1;
+    private static final int REQUEST_GAME = 2;
     /**
      * Logging tag
      */
@@ -57,6 +58,10 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
         // request that superclass initialize and manage the Google Play Services for us
         super(BaseGameActivity.CLIENT_ALL);
         enableDebugLog(BuildConfig.DEBUG, TripleSolitaireActivity.TAG);
+    }
+
+    public void newGame() {
+        startActivityForResult(new Intent(this, GameActivity.class), REQUEST_GAME);
     }
 
     @Override
@@ -107,6 +112,15 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
             buffer.close();
     }
 
+    @Override
+    protected void onActivityResult(int request, int response, Intent data) {
+        super.onActivityResult(request, response, data);
+        if (request == REQUEST_GAME && response == RESULT_OK) {
+            WinDialogFragment winDialogFragment = WinDialogFragment.createInstance(data);
+            winDialogFragment.show(getFragmentManager(), "win");
+        }
+    }
+
     /**
      * Called when the activity is first created. Sets up the appropriate listeners and starts a new game
      *
@@ -123,7 +137,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
         newGameBtn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(final View v) {
-                startActivity(new Intent(TripleSolitaireActivity.this, GameActivity.class));
+                newGame();
             }
         });
         final Button statsBtn = (Button) findViewById(R.id.stats);

@@ -521,6 +521,11 @@ public class GameActivity extends Activity {
             gameState.pauseGame();
     }
 
+    public void triggerWin() {
+        setResult(RESULT_OK, WinDialogFragment.createDataIntent(getGameTime(), getMoveCount()));
+        finish();
+    }
+
     /**
      * Updates the given foundation UI
      *

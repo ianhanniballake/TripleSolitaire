@@ -4,34 +4,54 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 
 /**
  * Dialog to show when a user wins the game
  */
 public class WinDialogFragment extends DialogFragment {
+    private static final String GAME_WIN_TIME = "GAME_WIN_TIME";
+    private static final String GAME_WIN_MOVE_COUNT = "GAME_WIN_MOVE_COUNT";
+
     /**
-     * Key for saving and restoring the cached message from the saved instance state bundle
+     * Create a new Intent which can be passed via setResult(int requestCode, Intent data) to eventually create a
+     * WinDialogFragment
+     *
+     * @param time      time of the winning game
+     * @param moveCount move count of the winning game
+     * @return Intent suitable for setResult(int requestCode, Intent data)
      */
-    private final static String MESSAGE_KEY = "message";
+    public static Intent createDataIntent(CharSequence time, int moveCount) {
+        Intent data = new Intent();
+        data.putExtra(GAME_WIN_TIME, time);
+        data.putExtra(GAME_WIN_MOVE_COUNT, moveCount);
+        return data;
+    }
+
     /**
-     * Cached message to restore on screen rotation or other configuration changes
+     * Create a new instance of WinDialogFragment given the Intent created by createDataIntent
+     *
+     * @param data Intent created by createDataIntent()
+     * @return A valid instance of WinDialogFragment
      */
-    private String cachedMessage = null;
+    public static WinDialogFragment createInstance(final Intent data) {
+        WinDialogFragment winDialogFragment = new WinDialogFragment();
+        Bundle args = new Bundle();
+        args.putCharSequence(GAME_WIN_TIME, data.getCharSequenceExtra(GAME_WIN_TIME));
+        args.putInt(GAME_WIN_MOVE_COUNT, data.getIntExtra(GAME_WIN_MOVE_COUNT, 0));
+        winDialogFragment.setArguments(args);
+        return winDialogFragment;
+    }
 
     @Override
     public Dialog onCreateDialog(final Bundle savedInstanceState) {
-        final GameActivity activity = (GameActivity) getActivity();
-        if (savedInstanceState != null)
-            cachedMessage = savedInstanceState.getString(MESSAGE_KEY, null);
-        if (cachedMessage == null) {
-            final String messageFormat = getString(R.string.win_dialog);
-            final CharSequence time = activity.getGameTime();
-            final int moveCount = activity.getMoveCount();
-            cachedMessage = String.format(messageFormat, time, moveCount);
-        }
+        final TripleSolitaireActivity activity = (TripleSolitaireActivity) getActivity();
+        final CharSequence time = getArguments().getCharSequence(GAME_WIN_TIME);
+        final int moveCount = getArguments().getInt(GAME_WIN_MOVE_COUNT);
+        final String message = getString(R.string.win_dialog, time, moveCount);
         final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setMessage(cachedMessage).setCancelable(false)
+        builder.setMessage(message).setCancelable(false)
                 .setPositiveButton(getString(R.string.new_game), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(final DialogInterface dialog, final int dialogId) {
@@ -45,11 +65,5 @@ public class WinDialogFragment extends DialogFragment {
             }
         });
         return builder.create();
-    }
-
-    @Override
-    public void onSaveInstanceState(final Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putString(MESSAGE_KEY, cachedMessage);
     }
 }
