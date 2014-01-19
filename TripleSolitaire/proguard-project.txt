@@ -36,7 +36,7 @@
 
 -keepnames @com.google.android.gms.common.annotation.KeepName class *
 -keepclassmembernames class * {
-    @ccom.google.android.gms.common.annotation.KeepName *;
+    @com.google.android.gms.common.annotation.KeepName *;
 }
 
 -keepnames class * implements android.os.Parcelable {
