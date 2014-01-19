@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.Loader;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.text.format.DateUtils;
@@ -50,6 +51,30 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
     private boolean mPendingUpdateState = false;
     private StatsState stats = new StatsState();
     private AsyncQueryHandler mAsyncQueryHandler;
+    private AsyncTask<Void, Void, Void> mPersistStatsAsyncTask = new AsyncTask<Void, Void, Void>() {
+        @Override
+        protected Void doInBackground(final Void... params) {
+            final ArrayList<ContentProviderOperation> operations = stats.getLocalSaveOperations();
+            if (BuildConfig.DEBUG)
+                Log.d(TripleSolitaireActivity.TAG, "Persisting stats: " + operations.size() + " operations");
+            try {
+                getContentResolver().applyBatch(GameContract.AUTHORITY, operations);
+            } catch (final RemoteException e) {
+                Log.e(StatsState.class.getSimpleName(), "Failed persisting stats", e);
+            } catch (final OperationApplicationException e) {
+                Log.e(StatsState.class.getSimpleName(), "Failed persisting stats", e);
+            }
+            if (BuildConfig.DEBUG)
+                Log.d(TripleSolitaireActivity.TAG, "Persisting stats completed");
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(final Void aVoid) {
+            if (mPendingUpdateState)
+                saveToCloud();
+        }
+    };
 
     /**
      * Constructs a new TripleSolitaireActivity that uses all Google Play Services
@@ -281,9 +306,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
                 // Data was successfully loaded from the cloud: merge with local data.
                 stats = stats.unionWith(new StatsState(localData));
                 mAlreadyLoadedState = true;
-                persistStats();
-                if (mPendingUpdateState)
-                    saveToCloud();
+                mPersistStatsAsyncTask.execute();
                 break;
             case AppStateClient.STATUS_STATE_KEY_NOT_FOUND:
                 if (BuildConfig.DEBUG)
@@ -316,17 +339,6 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
             default:
                 // TODO warn about generic error
                 break;
-        }
-    }
-
-    private void persistStats() {
-        final ArrayList<ContentProviderOperation> operations = stats.getLocalSaveOperations();
-        try {
-            getContentResolver().applyBatch(GameContract.AUTHORITY, operations);
-        } catch (final RemoteException e) {
-            Log.e(StatsState.class.getSimpleName(), "Failed persisting stats", e);
-        } catch (final OperationApplicationException e) {
-            Log.e(StatsState.class.getSimpleName(), "Failed persisting stats", e);
         }
     }
 

@@ -47,7 +47,8 @@ public class GameProvider extends ContentProvider {
             db.execSQL("CREATE TABLE " + GameContract.Games.TABLE_NAME + " (" + BaseColumns._ID
                     + " INTEGER PRIMARY KEY AUTOINCREMENT," + GameContract.Games.COLUMN_NAME_START_TIME + " INTEGER,"
                     + GameContract.Games.COLUMN_NAME_DURATION + " INTEGER," + GameContract.Games.COLUMN_NAME_MOVES
-                    + " INTEGER," + GameContract.Games.COLUMN_NAME_SYNCED + " INTEGER);");
+                    + " INTEGER," + GameContract.Games.COLUMN_NAME_SYNCED + " INTEGER, "
+                    + "UNIQUE(" + GameContract.Games.COLUMN_NAME_START_TIME + ")" + ");");
         }
 
         /**
@@ -58,9 +59,33 @@ public class GameProvider extends ContentProvider {
         public void onUpgrade(final SQLiteDatabase db, final int oldVersion, final int newVersion) {
             Log.w(GameProvider.TAG, "Upgrading database from version " + oldVersion + " to " + newVersion);
             if (oldVersion == 1) {
-                // New column added in version 2
-                db.execSQL("ALTER TABLE " + GameContract.Games.TABLE_NAME + " ADD COLUMN " + GameContract.Games
-                        .COLUMN_NAME_SYNCED + " INTEGER");
+                String tempTableName = "temp";
+                db.execSQL("ALTER TABLE " + GameContract.Games.TABLE_NAME + " RENAME TO " + tempTableName);
+                // Adds SYNCED column and UNIQUE on START_TIME
+                db.execSQL("CREATE TABLE " + GameContract.Games.TABLE_NAME + " (" + BaseColumns._ID
+                        + " INTEGER PRIMARY KEY AUTOINCREMENT," + GameContract.Games.COLUMN_NAME_START_TIME
+                        + " INTEGER," + GameContract.Games.COLUMN_NAME_DURATION + " INTEGER, "
+                        + GameContract.Games.COLUMN_NAME_MOVES + " INTEGER," + GameContract.Games.COLUMN_NAME_SYNCED
+                        + " INTEGER, " + "UNIQUE(" + GameContract.Games.COLUMN_NAME_START_TIME + ")" + ");");
+                Cursor tempCursor = db.query(tempTableName, null, null, null, null, null,
+                        GameContract.Games.COLUMN_NAME_START_TIME);
+                while (tempCursor.moveToNext()) {
+                    ContentValues values = new ContentValues();
+                    final long startTime = tempCursor.getLong(tempCursor.getColumnIndex(
+                            GameContract.Games.COLUMN_NAME_START_TIME));
+                    values.put(GameContract.Games.COLUMN_NAME_START_TIME, startTime);
+                    final int duration = tempCursor.getInt(tempCursor.getColumnIndex(
+                            GameContract.Games.COLUMN_NAME_DURATION));
+                    values.put(GameContract.Games.COLUMN_NAME_DURATION, duration);
+                    final int moves = tempCursor.getInt(tempCursor.getColumnIndex(
+                            GameContract.Games.COLUMN_NAME_MOVES));
+                    values.put(GameContract.Games.COLUMN_NAME_MOVES, moves);
+                    values.put(GameContract.Games.COLUMN_NAME_SYNCED, 0);
+                    db.insertWithOnConflict(GameContract.Games.TABLE_NAME, GameContract.Games.COLUMN_NAME_START_TIME,
+                            values, SQLiteDatabase.CONFLICT_REPLACE);
+                }
+                tempCursor.close();
+                db.execSQL("DROP TABLE " + tempTableName);
             }
         }
     }
