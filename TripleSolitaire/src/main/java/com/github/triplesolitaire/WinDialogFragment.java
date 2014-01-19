@@ -58,10 +58,10 @@ public class WinDialogFragment extends DialogFragment {
                         dialog.dismiss();
                         activity.newGame();
                     }
-                }).setNegativeButton(getString(R.string.exit), new DialogInterface.OnClickListener() {
+                }).setNegativeButton(getString(R.string.main_menu), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(final DialogInterface dialog, final int dialogId) {
-                activity.finish();
+                dialog.dismiss();
             }
         });
         return builder.create();
