@@ -6,6 +6,8 @@
     <string name="time">Time:</string>
     <string name="move_count">Moves:</string>
     <string name="undo">Undo</string>
+    <string name="pause">Pause</string>
+    <string name="resume">Resume</string>
     <string name="new_game">New Game</string>
     <string name="win_dialog">You won in %1$s and %2$d moves!</string>
     <string name="main_menu">Main Menu</string>

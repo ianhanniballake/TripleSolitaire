@@ -750,6 +750,7 @@ public class GameState {
     public void pauseGame() {
         gameInProgress = false;
         postHandler.removeCallbacks(gameTimerIncrement);
+        activity.invalidateOptionsMenu();
     }
 
     /**
@@ -761,6 +762,7 @@ public class GameState {
             postHandler.removeCallbacks(gameTimerIncrement);
             postHandler.postDelayed(gameTimerIncrement, 1000);
         }
+        activity.invalidateOptionsMenu();
     }
 
     /**

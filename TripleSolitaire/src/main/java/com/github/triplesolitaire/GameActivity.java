@@ -318,7 +318,8 @@ public class GameActivity extends Activity {
 
     @Override
     public void onBackPressed() {
-        if (!gameState.gameInProgress) {
+        final boolean gameStarted = gameState.getTimeInSeconds() > 0;
+        if (!gameStarted && !gameState.gameInProgress) {
             super.onBackPressed();
             return;
         }
@@ -444,6 +445,12 @@ public class GameActivity extends Activity {
             case R.id.undo:
                 gameState.undo();
                 return true;
+            case R.id.pause:
+                gameState.pauseGame();
+                return true;
+            case R.id.resume:
+                gameState.resumeGame();
+                return true;
             case R.id.new_game:
                 gameState.newGame();
                 return true;
@@ -451,6 +458,8 @@ public class GameActivity extends Activity {
                 startActivity(new Intent(this, Preferences.class));
                 return true;
             case android.R.id.home:
+                onBackPressed();
+                return true;
             case R.id.about:
                 final AboutDialogFragment aboutDialogFragment = new AboutDialogFragment();
                 aboutDialogFragment.show(getFragmentManager(), "about");
@@ -476,6 +485,12 @@ public class GameActivity extends Activity {
     public boolean onPrepareOptionsMenu(final Menu menu) {
         super.onPrepareOptionsMenu(menu);
         menu.findItem(R.id.undo).setEnabled(gameState.canUndo());
+        final boolean gameStarted = gameState.getTimeInSeconds() > 0;
+        final boolean gameInProgress = gameState.gameInProgress;
+        final MenuItem pause = menu.findItem(R.id.pause);
+        pause.setEnabled(gameStarted || gameInProgress);
+        pause.setVisible(!gameStarted || gameInProgress);
+        menu.findItem(R.id.resume).setVisible(gameStarted && !gameInProgress);
         return true;
     }
 
