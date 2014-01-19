@@ -70,7 +70,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
         }
 
         @Override
-        protected void onPostExecute(final Void aVoid) {
+        protected void onPostExecute(final Void result) {
             if (mPendingUpdateState && isSignedIn())
                 saveToCloud();
         }
@@ -114,19 +114,19 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
                 break;
             case GamesClient.STATUS_NETWORK_ERROR_NO_DATA:
                 if (BuildConfig.DEBUG)
-                    Log.d(TripleSolitaireActivity.TAG, "Achievements not loaded - network error with no data");
+                    Log.w(TripleSolitaireActivity.TAG, "Achievements not loaded - network error with no data");
                 // can't reach cloud, and we have no local state.
                 // TODO warn about network error
                 break;
             case GamesClient.STATUS_NETWORK_ERROR_STALE_DATA:
                 if (BuildConfig.DEBUG)
-                    Log.d(TripleSolitaireActivity.TAG, "Achievements not loaded - network error with stale data");
+                    Log.w(TripleSolitaireActivity.TAG, "Achievements not loaded - network error with stale data");
                 // TODO warn about stale data
                 break;
             case GamesClient.STATUS_CLIENT_RECONNECT_REQUIRED:
                 if (BuildConfig.DEBUG)
-                    Log.d(TripleSolitaireActivity.TAG, "Achievements not loaded - reconnect required");
-                // need to reconnect AppStateClient
+                    Log.w(TripleSolitaireActivity.TAG, "Achievements not loaded - reconnect required");
+                // Need to reconnect GamesClient
                 reconnectClients(BaseGameActivity.CLIENT_GAMES);
                 break;
             default:

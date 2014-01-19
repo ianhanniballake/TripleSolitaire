@@ -309,13 +309,6 @@ public class GameActivity extends Activity {
         return new Point((int) x, (int) y);
     }
 
-    /**
-     * Starts a new game, resetting the game state and UI to match
-     */
-    public void newGame() {
-        gameState.newGame();
-    }
-
     @Override
     public void onBackPressed() {
         final boolean gameStarted = gameState.getTimeInSeconds() > 0;

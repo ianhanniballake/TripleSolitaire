@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
- * Represents the player's progress in the game. The player's progress is how many stars they got on each level.
+ * Represents the player's stats associated with all the games they have played
  */
 public class StatsState {
     private static class GameStats {

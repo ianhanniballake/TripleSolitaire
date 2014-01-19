@@ -54,7 +54,7 @@ public class Lane extends RelativeLayout implements OnDragListener {
     /**
      * Logging tag
      */
-    private static final String TAG = "TripleSolitaireActivity";
+    private static final String TAG = "GameActivity";
     /**
      * Current size of the cascade
      */
