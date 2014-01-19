@@ -18,11 +18,21 @@ android {
         targetSdkVersion 19
     }
 
+    signingConfigs {
+        releaseConfig {
+            storeFile file(System.getenv("KEYSTORE"))
+            storePassword System.getenv("KEYSTORE_PASSWORD")
+            keyAlias System.getenv("TRIPLE_SOLITAIRE_ALIAS")
+            keyPassword System.getenv("TRIPLE_SOLITAIRE_PASSWORD")
+        }
+    }
+
     buildTypes {
         release {
             runProguard true
             proguardFile getDefaultProguardFile('proguard-android.txt')
             proguardFile 'proguard-project.txt'
+            signingConfig signingConfigs.releaseConfig
         }
     }
 }
