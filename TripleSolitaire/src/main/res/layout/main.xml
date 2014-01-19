@@ -11,8 +11,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:paddingBottom="8dp"
-        android:paddingTop="24dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="24dp"
         android:fontFamily="serif"
         android:text="@string/app_name"
         android:textSize="72sp"/>
@@ -41,8 +41,8 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
             android:layout_margin="8dp"
-            android:paddingBottom="8dp"
-            android:measureAllChildren="true">
+            android:measureAllChildren="true"
+            android:paddingBottom="8dp">
 
             <View
                 android:layout_width="0dp"

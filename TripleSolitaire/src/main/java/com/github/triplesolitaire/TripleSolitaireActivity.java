@@ -132,6 +132,8 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
         mAsyncQueryHandler = new AsyncQueryHandler(getContentResolver()) {
         };
         setContentView(R.layout.main);
+        View title = findViewById(R.id.title);
+        getGamesClient().setViewForPopups(title);
         googlePlayGamesViewFlipper = (ViewFlipper) findViewById(R.id.google_play_games);
         final Button newGameBtn = (Button) findViewById(R.id.new_game);
         newGameBtn.setOnClickListener(new OnClickListener() {
