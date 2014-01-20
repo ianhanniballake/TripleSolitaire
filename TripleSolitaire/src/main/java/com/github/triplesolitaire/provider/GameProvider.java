@@ -1,9 +1,12 @@
 package com.github.triplesolitaire.provider;
 
 import android.content.ContentProvider;
+import android.content.ContentProviderOperation;
+import android.content.ContentProviderResult;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.OperationApplicationException;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
@@ -18,7 +21,9 @@ import android.util.Log;
 
 import com.github.triplesolitaire.BuildConfig;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 
 /**
  * Provides access to a database of games.
@@ -80,7 +85,7 @@ public class GameProvider extends ContentProvider {
                     final int moves = tempCursor.getInt(tempCursor.getColumnIndex(
                             GameContract.Games.COLUMN_NAME_MOVES));
                     values.put(GameContract.Games.COLUMN_NAME_MOVES, moves);
-                    values.put(GameContract.Games.COLUMN_NAME_SYNCED, 0);
+                    values.put(GameContract.Games.COLUMN_NAME_SYNCED, false);
                     db.insertWithOnConflict(GameContract.Games.TABLE_NAME, GameContract.Games.COLUMN_NAME_START_TIME,
                             values, SQLiteDatabase.CONFLICT_REPLACE);
                 }
@@ -114,6 +119,26 @@ public class GameProvider extends ContentProvider {
      * A UriMatcher instance
      */
     private static final UriMatcher uriMatcher = GameProvider.buildUriMatcher();
+    /**
+     * Flag to disable change notifications during a batch operation
+     */
+    private boolean mBatchOperationOngoing = false;
+    /**
+     * Set of pending notification URIs to send out at the end of the current batch operation
+     */
+    private LinkedHashSet<Uri> mPendingNotificationUris = new LinkedHashSet<Uri>();
+
+    @Override
+    public ContentProviderResult[] applyBatch(final ArrayList<ContentProviderOperation> operations)
+            throws OperationApplicationException {
+        mBatchOperationOngoing = true;
+        mPendingNotificationUris.clear();
+        ContentProviderResult[] results = super.applyBatch(operations);
+        for (Uri uri : mPendingNotificationUris) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        return results;
+    }
 
     /**
      * Creates and initializes a column project for all columns
@@ -176,8 +201,12 @@ public class GameProvider extends ContentProvider {
             default:
                 throw new IllegalArgumentException("Unknown URI " + uri);
         }
-        if (count > 0)
-            getContext().getContentResolver().notifyChange(uri, null);
+        if (count > 0) {
+            if (mBatchOperationOngoing)
+                mPendingNotificationUris.add(uri);
+            else
+                getContext().getContentResolver().notifyChange(uri, null);
+        }
         return count;
     }
 
@@ -220,18 +249,23 @@ public class GameProvider extends ContentProvider {
                 GameContract.Games.COLUMN_NAME_START_TIME, values, SQLiteDatabase.CONFLICT_IGNORE);
         // If the insert succeeded, the row ID exists.
         if (rowId > 0) {
-            // Creates a URI with the game ID pattern and the new row ID
-            // appended to it.
+            // Creates a URI with the game ID pattern and the new row ID appended to it.
             final Uri contractionUri = ContentUris.withAppendedId(GameContract.Games.CONTENT_ID_URI_BASE, rowId);
-            getContext().getContentResolver().notifyChange(contractionUri, null);
+            if (mBatchOperationOngoing)
+                mPendingNotificationUris.add(uri);
+            else
+                getContext().getContentResolver().notifyChange(uri, null);
             return contractionUri;
         }
         final String startTime = values.getAsString(GameContract.Games.COLUMN_NAME_START_TIME);
         final Cursor existingRow = query(GameContract.Games.CONTENT_ID_URI_BASE, new String[]{BaseColumns._ID},
                 GameContract.Games.COLUMN_NAME_START_TIME + "=?", new String[]{startTime}, null);
-        if (existingRow.moveToFirst())
-            return ContentUris.withAppendedId(GameContract.Games.CONTENT_ID_URI_BASE,
+        if (existingRow.moveToFirst()) {
+            Uri gameUri = ContentUris.withAppendedId(GameContract.Games.CONTENT_ID_URI_BASE,
                     existingRow.getLong(existingRow.getColumnIndex(BaseColumns._ID)));
+            update(gameUri, values, null, null);
+            return gameUri;
+        }
         // If the insert didn't succeed and we didn't find an existing row, then something went terribly wrong
         throw new SQLException("Failed to insert row into " + uri);
     }
@@ -296,8 +330,12 @@ public class GameProvider extends ContentProvider {
             default:
                 throw new IllegalArgumentException("Unknown URI " + uri);
         }
-        if (count > 0)
-            getContext().getContentResolver().notifyChange(uri, null);
+        if (count > 0) {
+            if (mBatchOperationOngoing)
+                mPendingNotificationUris.add(uri);
+            else
+                getContext().getContentResolver().notifyChange(uri, null);
+        }
         return count;
     }
 }
