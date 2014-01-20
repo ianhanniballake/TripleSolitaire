@@ -235,16 +235,17 @@ public class StatsState {
     }
 
     /**
-     * Gets the minimum number of moves in any won game that has not yet been synced
+     * Gets the minimum number of moves in any won game
      *
-     * @return The minimum number of moves used to win a game that has not yet been synced
+     * @param onlyUnsycned If only unsynced games should be considered
+     * @return The minimum number of moves used to win a game
      */
-    public int getMinimumMovesUnsynced() {
+    public int getMinimumMoves(final boolean onlyUnsycned) {
         int minimumMoves = Integer.MAX_VALUE;
         final int size = gameStats.size();
         for (int index = 0; index < size; index++) {
             final GameStats stats = gameStats.get(gameStats.keyAt(index));
-            if (stats.loss || stats.synced)
+            if (stats.loss || (onlyUnsycned && stats.synced))
                 continue;
             minimumMoves = Math.min(minimumMoves, stats.moves);
         }
@@ -252,16 +253,17 @@ public class StatsState {
     }
 
     /**
-     * Gets the shortest time (duration) in any won game that has not yet been synced
+     * Gets the shortest time (duration) in any won game
      *
-     * @return The shortest time (in seconds) in any won game that has not yet been synced
+     * @param onlyUnsycned If only unsynced games should be considered
+     * @return The shortest time (in seconds) in any won game
      */
-    public int getShortestTimeUnsynced() {
+    public int getShortestTime(final boolean onlyUnsycned) {
         int shortestDuration = Integer.MAX_VALUE;
         final int size = gameStats.size();
         for (int index = 0; index < size; index++) {
             final GameStats stats = gameStats.get(gameStats.keyAt(index));
-            if (stats.loss || stats.synced)
+            if (stats.loss || (onlyUnsycned && stats.synced))
                 continue;
             shortestDuration = Math.min(shortestDuration, stats.duration);
         }

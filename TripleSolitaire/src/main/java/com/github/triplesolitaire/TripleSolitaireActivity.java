@@ -358,23 +358,31 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
         if (longestWinStreak > 10)
             gamesClient.unlockAchievement(getString(R.string.achievement_master_streaker));
         // Check minimum moves achievements
-        final int minimumMoves = stats.getMinimumMovesUnsynced();
-        if (minimumMoves < Integer.MAX_VALUE) {
+        final int minimumMovesUnsynced = stats.getMinimumMoves(true);
+        if (minimumMovesUnsynced < Integer.MAX_VALUE) {
             if (BuildConfig.DEBUG)
-                Log.d(TripleSolitaireActivity.TAG, "Minimum Moves: " + minimumMoves);
-            gamesClient.submitScore(getString(R.string.leaderboard_moves), minimumMoves);
+                Log.d(TripleSolitaireActivity.TAG, "Minimum Moves Unsynced: " + minimumMovesUnsynced);
+            gamesClient.submitScore(getString(R.string.leaderboard_moves), minimumMovesUnsynced);
         }
+        final int minimumMoves = stats.getMinimumMoves(false);
+        if (BuildConfig.DEBUG)
+            Log.d(TripleSolitaireActivity.TAG, "Minimum Moves: " + minimumMoves);
         if (minimumMoves < 400)
             gamesClient.unlockAchievement(getString(R.string.achievement_figured_it_out));
         if (minimumMoves < 300)
             gamesClient.unlockAchievement(getString(R.string.achievement_no_mistakes));
         // Check shortest time achievements
-        final int shortestTime = stats.getShortestTimeUnsynced();
-        if (shortestTime < Integer.MAX_VALUE) {
+        final int shortestTimeUnsynced = stats.getShortestTime(true);
+        if (shortestTimeUnsynced < Integer.MAX_VALUE) {
             if (BuildConfig.DEBUG)
-                Log.d(TripleSolitaireActivity.TAG, "Shortest Time (minutes): " + (double) shortestTime / 60);
-            gamesClient.submitScore(getString(R.string.leaderboard_time), shortestTime * DateUtils.SECOND_IN_MILLIS);
+                Log.d(TripleSolitaireActivity.TAG, "Shortest Time Unsynced (minutes): " +
+                        (double) shortestTimeUnsynced / 60);
+            gamesClient.submitScore(getString(R.string.leaderboard_time),
+                    shortestTimeUnsynced * DateUtils.SECOND_IN_MILLIS);
         }
+        final int shortestTime = stats.getShortestTime(false);
+        if (BuildConfig.DEBUG)
+            Log.d(TripleSolitaireActivity.TAG, "Shortest Time (minutes): " + (double) shortestTime / 60);
         if (shortestTime < 15 * 60)
             gamesClient.unlockAchievement(getString(R.string.achievement_quarter_hour));
         if (shortestTime < 10 * 60)
