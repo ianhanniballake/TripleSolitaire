@@ -12,12 +12,6 @@
         android:showAsAction="ifRoom|withText"
         android:title="@string/pause"/>
     <item
-        android:id="@+id/resume"
-        android:icon="@drawable/ic_action_play"
-        android:showAsAction="ifRoom|withText"
-        android:title="@string/resume"
-        android:visible="false"/>
-    <item
         android:id="@+id/new_game"
         android:title="@string/new_game"/>
     <item

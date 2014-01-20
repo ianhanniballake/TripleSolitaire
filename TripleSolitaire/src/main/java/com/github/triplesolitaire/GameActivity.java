@@ -432,10 +432,7 @@ public class GameActivity extends Activity {
                 gameState.undo();
                 return true;
             case R.id.pause:
-                gameState.pauseGame();
-                return true;
-            case R.id.resume:
-                gameState.resumeGame();
+                new GamePauseDialogFragment().show(getFragmentManager(), "pause");
                 return true;
             case R.id.new_game:
                 gameState.newGame();
@@ -473,10 +470,7 @@ public class GameActivity extends Activity {
         menu.findItem(R.id.undo).setEnabled(gameState.canUndo());
         final boolean gameStarted = gameState.getTimeInSeconds() > 0;
         final boolean gameInProgress = gameState.gameInProgress;
-        final MenuItem pause = menu.findItem(R.id.pause);
-        pause.setEnabled(gameStarted || gameInProgress);
-        pause.setVisible(!gameStarted || gameInProgress);
-        menu.findItem(R.id.resume).setVisible(gameStarted && !gameInProgress);
+        menu.findItem(R.id.pause).setEnabled(gameStarted || gameInProgress);
         return true;
     }
 
