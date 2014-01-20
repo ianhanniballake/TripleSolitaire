@@ -230,6 +230,8 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
 
     @Override
     public void onLoadFinished(final Loader<Cursor> loader, final Cursor data) {
+        if (BuildConfig.DEBUG)
+            Log.d(TAG, "onLoadFinished found " + data.getCount() + " rows");
         stats = stats.unionWith(new StatsState(data));
         if (isSignedIn())
             saveToCloud();
@@ -289,6 +291,8 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
         googlePlayGamesViewFlipper.setDisplayedChild(2);
         if (!mAlreadyLoadedState)
             getAppStateClient().loadState(this, OUR_STATE_KEY);
+        else if (mPendingUpdateState)
+            saveToCloud();
     }
 
     @Override
