@@ -129,11 +129,12 @@ public class GameProvider extends ContentProvider {
     private LinkedHashSet<Uri> mPendingNotificationUris = new LinkedHashSet<Uri>();
 
     @Override
-    public ContentProviderResult[] applyBatch(final ArrayList<ContentProviderOperation> operations)
-            throws OperationApplicationException {
+    public synchronized ContentProviderResult[] applyBatch(final ArrayList<ContentProviderOperation> operations)
+    throws OperationApplicationException {
         mBatchOperationOngoing = true;
         mPendingNotificationUris.clear();
         ContentProviderResult[] results = super.applyBatch(operations);
+        mBatchOperationOngoing = false;
         for (Uri uri : mPendingNotificationUris) {
             getContext().getContentResolver().notifyChange(uri, null);
         }
