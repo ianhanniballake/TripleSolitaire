@@ -359,11 +359,11 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
         final int longestWinStreak = stats.getLongestWinStreak();
         if (BuildConfig.DEBUG)
             Log.d(TripleSolitaireActivity.TAG, "Longest Win Streak: " + longestWinStreak);
-        if (longestWinStreak > 0)
+        if (longestWinStreak >= 1)
             gamesClient.unlockAchievement(getString(R.string.achievement_youre_a_winner));
-        if (longestWinStreak > 5)
+        if (longestWinStreak >= 5)
             gamesClient.unlockAchievement(getString(R.string.achievement_streaker));
-        if (longestWinStreak > 10)
+        if (longestWinStreak >= 10)
             gamesClient.unlockAchievement(getString(R.string.achievement_master_streaker));
         // Check minimum moves achievements
         final int minimumMovesUnsynced = stats.getMinimumMoves(true);
