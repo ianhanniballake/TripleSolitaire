@@ -2,6 +2,7 @@ package com.github.triplesolitaire;
 
 import android.content.ClipData;
 import android.content.Context;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.DragEvent;
@@ -206,13 +207,15 @@ public class Lane extends RelativeLayout implements OnDragListener {
             return cascadeSize == 0 ? GameState.acceptLaneDrop(laneId, card) : gameState
                     .acceptCascadeDrop(laneId, card);
         } else if (event.getAction() == DragEvent.ACTION_DROP && !isMyCascade) {
-            System.gc();
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT)
+                System.gc();
             final String card = event.getClipData().getItemAt(0).getText().toString();
             final int from = (Integer) event.getLocalState();
             gameState.move(new Move(Move.Type.PLAYER_MOVE, laneId, from, card));
             return true;
         } else if (event.getAction() == DragEvent.ACTION_DROP && isMyCascade) {
-            System.gc();
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT)
+                System.gc();
             post(new Runnable() {
                 @Override
                 public void run() {
