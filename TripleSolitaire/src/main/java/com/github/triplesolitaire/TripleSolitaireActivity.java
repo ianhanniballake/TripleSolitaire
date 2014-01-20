@@ -91,6 +91,24 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
         startActivityForResult(new Intent(this, GameActivity.class), REQUEST_GAME);
     }
 
+    private synchronized void incrementAchievements(final AchievementBuffer buffer) {
+        final String win10 = getString(R.string.achievement_getting_good);
+        final String win100 = getString(R.string.achievement_so_youve_played_triple_solitaire);
+        final String win250 = getString(R.string.achievement_stop_playing_never);
+        for (final Achievement achievement : buffer) {
+            final String achievementId = achievement.getAchievementId();
+            if (achievement.getType() != Achievement.TYPE_INCREMENTAL)
+                continue;
+            final int increment = stats.getGamesWon() - achievement.getCurrentSteps();
+            if (achievementId.equals(win10) && increment > 0)
+                getGamesClient().incrementAchievement(win10, increment);
+            if (achievementId.equals(win100) && increment > 0)
+                getGamesClient().incrementAchievement(win100, increment);
+            if (achievementId.equals(win250) && increment > 0)
+                getGamesClient().incrementAchievement(win250, increment);
+        }
+    }
+
     @Override
     public void onAchievementsLoaded(final int statusCode, final AchievementBuffer buffer) {
         switch (statusCode) {
@@ -98,21 +116,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
                 if (BuildConfig.DEBUG)
                     Log.d(TripleSolitaireActivity.TAG, "Achievements loaded successfully");
                 // Data was successfully loaded from the cloud, update incremental achievements
-                final String win10 = getString(R.string.achievement_getting_good);
-                final String win100 = getString(R.string.achievement_so_youve_played_triple_solitaire);
-                final String win250 = getString(R.string.achievement_stop_playing_never);
-                for (final Achievement achievement : buffer) {
-                    final String achievementId = achievement.getAchievementId();
-                    if (achievement.getType() != Achievement.TYPE_INCREMENTAL)
-                        continue;
-                    final int increment = stats.getGamesWon() - achievement.getCurrentSteps();
-                    if (achievementId.equals(win10) && increment > 0)
-                        getGamesClient().incrementAchievement(win10, increment);
-                    if (achievementId.equals(win100) && increment > 0)
-                        getGamesClient().incrementAchievement(win100, increment);
-                    if (achievementId.equals(win250) && increment > 0)
-                        getGamesClient().incrementAchievement(win250, increment);
-                }
+                incrementAchievements(buffer);
                 break;
             case GamesClient.STATUS_NETWORK_ERROR_NO_DATA:
                 if (BuildConfig.DEBUG)
@@ -344,7 +348,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
         }
     }
 
-    private void saveToCloud() {
+    private synchronized void saveToCloud() {
         getAppStateClient().updateState(OUR_STATE_KEY, stats.toBytes());
         final GamesClient gamesClient = getGamesClient();
         // Check win streak achievements
