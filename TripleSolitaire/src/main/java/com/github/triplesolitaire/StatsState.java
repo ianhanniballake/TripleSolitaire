@@ -241,6 +241,7 @@ public class StatsState {
      * @return The minimum number of moves used to win a game
      */
     public int getMinimumMoves(final boolean onlyUnsycned) {
+        int numConsidered = 0;
         int minimumMoves = Integer.MAX_VALUE;
         final int size = gameStats.size();
         for (int index = 0; index < size; index++) {
@@ -248,7 +249,11 @@ public class StatsState {
             if (stats.loss || (onlyUnsycned && stats.synced))
                 continue;
             minimumMoves = Math.min(minimumMoves, stats.moves);
+            numConsidered++;
         }
+        if (BuildConfig.DEBUG)
+            Log.d(StatsState.class.getSimpleName(), "Get Minimum Moves" + (onlyUnsycned ? " (Unsynced)" : "")
+                    + ": considered " + numConsidered);
         return minimumMoves;
     }
 
@@ -259,6 +264,7 @@ public class StatsState {
      * @return The shortest time (in seconds) in any won game
      */
     public int getShortestTime(final boolean onlyUnsycned) {
+        int numConsidered = 0;
         int shortestDuration = Integer.MAX_VALUE;
         final int size = gameStats.size();
         for (int index = 0; index < size; index++) {
@@ -266,7 +272,11 @@ public class StatsState {
             if (stats.loss || (onlyUnsycned && stats.synced))
                 continue;
             shortestDuration = Math.min(shortestDuration, stats.duration);
+            numConsidered++;
         }
+        if (BuildConfig.DEBUG)
+            Log.d(StatsState.class.getSimpleName(), "Get Shorted Time" + (onlyUnsycned ? " (Unsynced)" : "")
+                    + ": considered " + numConsidered);
         return shortestDuration;
     }
 
