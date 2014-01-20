@@ -326,13 +326,6 @@ public class GameActivity extends Activity {
                         GameActivity.super.onBackPressed();
                     }
                 }).setNegativeButton(R.string.quit_negative, null);
-        dialogBuilder.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @SuppressWarnings("synthetic-access")
-            @Override
-            public void onCancel(final DialogInterface dialog) {
-                GameActivity.super.onBackPressed();
-            }
-        });
         dialogBuilder.show();
     }
 
