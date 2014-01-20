@@ -82,7 +82,9 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
     public TripleSolitaireActivity() {
         // request that superclass initialize and manage the Google Play Services for us
         super(BaseGameActivity.CLIENT_GAMES | BaseGameActivity.CLIENT_APPSTATE);
-        enableDebugLog(BuildConfig.DEBUG, TripleSolitaireActivity.TAG);
+        if (BuildConfig.DEBUG) {
+            enableDebugLog(BuildConfig.DEBUG, TripleSolitaireActivity.TAG);
+        }
     }
 
     public void newGame() {
