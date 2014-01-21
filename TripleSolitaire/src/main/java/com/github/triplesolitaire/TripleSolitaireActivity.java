@@ -1,17 +1,21 @@
 package com.github.triplesolitaire;
 
+import android.annotation.TargetApi;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.AsyncQueryHandler;
 import android.content.ContentProviderOperation;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.RemoteException;
+import android.os.UserManager;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -280,7 +284,22 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
         if (BuildConfig.DEBUG)
             Log.d(TripleSolitaireActivity.TAG, "onSignInFailed");
         invalidateOptionsMenu();
-        googlePlayGamesViewFlipper.setDisplayedChild(1);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            onSignInFailedCheckRestricted();
+        } else {
+            googlePlayGamesViewFlipper.setDisplayedChild(1);
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+    private void onSignInFailedCheckRestricted() {
+        UserManager um = (UserManager) getSystemService(Context.USER_SERVICE);
+        Bundle restrictions = um.getUserRestrictions();
+        if (restrictions.getBoolean(UserManager.DISALLOW_MODIFY_ACCOUNTS, false)) {
+            googlePlayGamesViewFlipper.setDisplayedChild(0);
+        } else {
+            googlePlayGamesViewFlipper.setDisplayedChild(1);
+        }
     }
 
     @Override
