@@ -28,23 +28,24 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
 
-import com.google.android.gms.appstate.AppStateClient;
+import com.google.android.gms.appstate.AppStateManager;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.Scopes;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.games.Games;
 import com.google.android.gms.games.GamesActivityResultCodes;
-import com.google.android.gms.games.GamesClient;
 import com.google.android.gms.games.multiplayer.Invitation;
+import com.google.android.gms.games.multiplayer.Multiplayer;
 import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch;
-import com.google.android.gms.plus.PlusClient;
+import com.google.android.gms.plus.Plus;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Vector;
 
-public class GameHelper implements GooglePlayServicesClient.ConnectionCallbacks,
-        GooglePlayServicesClient.OnConnectionFailedListener {
+public class GameHelper implements GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener {
     /**
      * Listener for sign-in success or failure events.
      */
@@ -94,10 +95,9 @@ public class GameHelper implements GooglePlayServicesClient.ConnectionCallbacks,
     final static int RC_RESOLVE = 9001;
     // Request code when invoking Activities whose result we don't care about.
     final static int RC_UNUSED = 9002;
-    // Client objects we manage. If a given client is not enabled, it is null.
-    GamesClient mGamesClient = null;
-    PlusClient mPlusClient = null;
-    AppStateClient mAppStateClient = null;
+    // Client object we manage
+    GoogleApiClient.Builder mApiClientBuilder = null;
+    GoogleApiClient mApiClient = null;
     // What clients we manage (OR-able values, can be combined as flags)
     public final static int CLIENT_NONE = 0x00;
     public final static int CLIENT_GAMES = 0x01;
@@ -108,8 +108,6 @@ public class GameHelper implements GooglePlayServicesClient.ConnectionCallbacks,
     int mRequestedClients = CLIENT_NONE;
     // What clients are currently connected? (bit flags)
     int mConnectedClients = CLIENT_NONE;
-    // What client are we currently connecting?
-    int mClientCurrentlyConnecting = CLIENT_NONE;
     // Whether to automatically try to sign in on onStart().
     boolean mAutoSignIn = true;
     /*
@@ -245,26 +243,25 @@ public class GameHelper implements GooglePlayServicesClient.ConnectionCallbacks,
         for (String scope : mScopes) {
             debugLog("  - " + scope);
         }
+        mApiClientBuilder = new GoogleApiClient.Builder(getContext(), this, this);
         if (0 != (clientsToUse & CLIENT_GAMES)) {
             debugLog("setup: creating GamesClient");
             // If you want to suppress the signin interstitial, set setShowConnectingPopup to false.
-            mGamesClient = new GamesClient.Builder(getContext(), this, this)
+            Games.GamesOptions.Builder gamesBuilder = Games.GamesOptions.builder()
+                    .setShowConnectingPopup(true);
+            mApiClientBuilder.addApi(Games.API, gamesBuilder.build())
                     .setGravityForPopups(Gravity.TOP | Gravity.CENTER_HORIZONTAL)
-                    .setScopes(mScopes)
-                    .setShowConnectingPopup(true)
-                    .create();
+                    .addScope(Games.SCOPE_GAMES);
         }
         if (0 != (clientsToUse & CLIENT_PLUS)) {
             debugLog("setup: creating GamesPlusClient");
-            mPlusClient = new PlusClient.Builder(getContext(), this, this)
-                    .setScopes(mScopes)
-                    .build();
+            mApiClientBuilder.addApi(Plus.API)
+                    .addScope(Plus.SCOPE_PLUS_LOGIN);
         }
         if (0 != (clientsToUse & CLIENT_APPSTATE)) {
             debugLog("setup: creating AppStateClient");
-            mAppStateClient = new AppStateClient.Builder(getContext(), this, this)
-                    .setScopes(mScopes)
-                    .create();
+            mApiClientBuilder.addApi(AppStateManager.API)
+                    .addScope(AppStateManager.SCOPE_APP_STATE);
         }
         setState(STATE_DISCONNECTED);
     }
@@ -277,36 +274,23 @@ public class GameHelper implements GooglePlayServicesClient.ConnectionCallbacks,
     }
 
     /**
-     * Returns the GamesClient object. In order to call this method, you must have
-     * called @link{setup} with a set of clients that includes CLIENT_GAMES.
+     * Returns the GoogleApiClient.Builder objec
      */
-    public GamesClient getGamesClient() {
-        if (mGamesClient == null) {
-            throw new IllegalStateException("No GamesClient. Did you request it at setup?");
+    public GoogleApiClient.Builder getApiClientBuilder() {
+        if (mApiClientBuilder == null) {
+            throw new IllegalStateException("No GoogleApiClient.Builder");
         }
-        return mGamesClient;
+        return mApiClientBuilder;
     }
 
     /**
-     * Returns the AppStateClient object. In order to call this method, you must have
-     * called @link{#setup} with a set of clients that includes CLIENT_APPSTATE.
+     * Returns the GoogleApiClient objec
      */
-    public AppStateClient getAppStateClient() {
-        if (mAppStateClient == null) {
-            throw new IllegalStateException("No AppStateClient. Did you request it at setup?");
+    public GoogleApiClient getApiClient() {
+        if (mApiClient == null) {
+            throw new IllegalStateException("No GoogleApiClient");
         }
-        return mAppStateClient;
-    }
-
-    /**
-     * Returns the PlusClient object. In order to call this method, you must have
-     * called @link{#setup} with a set of clients that includes CLIENT_PLUS.
-     */
-    public PlusClient getPlusClient() {
-        if (mPlusClient == null) {
-            throw new IllegalStateException("No PlusClient. Did you request it at setup?");
-        }
-        return mPlusClient;
+        return mApiClient;
     }
 
     /**
@@ -488,14 +472,16 @@ public class GameHelper implements GooglePlayServicesClient.ConnectionCallbacks,
         }
         // for the PlusClient, "signing out" means clearing the default account and
         // then disconnecting
-        if (mPlusClient != null && mPlusClient.isConnected()) {
-            debugLog("Clearing default account on PlusClient.");
-            mPlusClient.clearDefaultAccount();
+        if (mApiClient != null && mApiClient.isConnected() && 0 != (mConnectedClients & CLIENT_PLUS)) {
+            Plus.AccountApi.clearDefaultAccount(mApiClient);
         }
         // For the games client, signing out means calling signOut and disconnecting
-        if (mGamesClient != null && mGamesClient.isConnected()) {
-            debugLog("Signing out from GamesClient.");
-            mGamesClient.signOut();
+        if (mApiClient != null && mApiClient.isConnected() && 0 != (mConnectedClients & CLIENT_GAMES)) {
+            Games.signOut(mApiClient);
+        }
+        // For the appstate client, signing out means calling signOut and disconnecting
+        if (mApiClient != null && mApiClient.isConnected() && 0 != (mConnectedClients & CLIENT_APPSTATE)) {
+            AppStateManager.signOut(mApiClient);
         }
         // Ready to disconnect
         debugLog("Proceeding with disconnection.");
@@ -510,18 +496,7 @@ public class GameHelper implements GooglePlayServicesClient.ConnectionCallbacks,
         debugLog("killConnections: killing connections.");
         mConnectionResult = null;
         mSignInFailureReason = null;
-        if (mGamesClient != null && mGamesClient.isConnected()) {
-            debugLog("Disconnecting GamesClient.");
-            mGamesClient.disconnect();
-        }
-        if (mPlusClient != null && mPlusClient.isConnected()) {
-            debugLog("Disconnecting PlusClient.");
-            mPlusClient.disconnect();
-        }
-        if (mAppStateClient != null && mAppStateClient.isConnected()) {
-            debugLog("Disconnecting AppStateClient.");
-            mAppStateClient.disconnect();
-        }
+        mApiClient.disconnect();
         mConnectedClients = CLIENT_NONE;
         debugLog("killConnections: all clients disconnected.");
         setState(STATE_DISCONNECTED);
@@ -573,10 +548,10 @@ public class GameHelper implements GooglePlayServicesClient.ConnectionCallbacks,
         if (responseCode == Activity.RESULT_OK) {
             // Ready to try to connect again.
             debugLog("onAR: Resolution was RESULT_OK, so connecting current client again.");
-            connectCurrentClient();
+            mApiClient.connect();
         } else if (responseCode == GamesActivityResultCodes.RESULT_RECONNECT_REQUIRED) {
             debugLog("onAR: Resolution was RECONNECT_REQUIRED, so reconnecting.");
-            connectCurrentClient();
+            mApiClient.connect();
         } else if (responseCode == Activity.RESULT_CANCELED) {
             // User cancelled.
             debugLog("onAR: Got a cancellation result, so disconnecting.");
@@ -679,75 +654,10 @@ public class GameHelper implements GooglePlayServicesClient.ConnectionCallbacks,
         debugLog("Starting connections.");
         setState(STATE_CONNECTING);
         mInvitationId = null;
-        connectNextClient();
-    }
-
-    void connectNextClient() {
-        // do we already have all the clients we need?
-        debugLog("connectNextClient: requested clients: " + mRequestedClients +
-                ", connected clients: " + mConnectedClients);
-        // failsafe, in case we somehow lost track of what clients are connected or not.
-        if (mGamesClient != null && mGamesClient.isConnected() &&
-                (0 == (mConnectedClients & CLIENT_GAMES))) {
-            logWarn("GamesClient was already connected. Fixing.");
-            mConnectedClients |= CLIENT_GAMES;
+        if (mApiClient == null) {
+            mApiClient = mApiClientBuilder.build();
         }
-        if (mPlusClient != null && mPlusClient.isConnected() &&
-                (0 == (mConnectedClients & CLIENT_PLUS))) {
-            logWarn("PlusClient was already connected. Fixing.");
-            mConnectedClients |= CLIENT_PLUS;
-        }
-        if (mAppStateClient != null && mAppStateClient.isConnected() &&
-                (0 == (mConnectedClients & CLIENT_APPSTATE))) {
-            logWarn("AppStateClient was already connected. Fixing");
-            mConnectedClients |= CLIENT_APPSTATE;
-        }
-        int pendingClients = mRequestedClients & ~mConnectedClients;
-        debugLog("Pending clients: " + pendingClients);
-        if (pendingClients == 0) {
-            debugLog("All clients now connected. Sign-in successful!");
-            succeedSignIn();
-            return;
-        }
-        // which client should be the next one to connect?
-        if (mGamesClient != null && (0 != (pendingClients & CLIENT_GAMES))) {
-            debugLog("Connecting GamesClient.");
-            mClientCurrentlyConnecting = CLIENT_GAMES;
-        } else if (mPlusClient != null && (0 != (pendingClients & CLIENT_PLUS))) {
-            debugLog("Connecting PlusClient.");
-            mClientCurrentlyConnecting = CLIENT_PLUS;
-        } else if (mAppStateClient != null && (0 != (pendingClients & CLIENT_APPSTATE))) {
-            debugLog("Connecting AppStateClient.");
-            mClientCurrentlyConnecting = CLIENT_APPSTATE;
-        } else {
-            // hmmm, getting here would be a bug.
-            throw new AssertionError("Not all clients connected, yet no one is next. R="
-                    + mRequestedClients + ", C=" + mConnectedClients);
-        }
-        connectCurrentClient();
-    }
-
-    void connectCurrentClient() {
-        if (mState == STATE_DISCONNECTED) {
-            // we got disconnected during the connection process, so abort
-            logWarn("GameHelper got disconnected during connection process. Aborting.");
-            return;
-        }
-        if (!checkState(TYPE_GAMEHELPER_BUG, "connectCurrentClient", "connectCurrentClient " +
-                "should only get called when connecting.", STATE_CONNECTING)) {
-            return;
-        }
-        switch (mClientCurrentlyConnecting) {
-            case CLIENT_GAMES:
-                mGamesClient.connect();
-                break;
-            case CLIENT_APPSTATE:
-                mAppStateClient.connect();
-                break;
-            case CLIENT_PLUS:
-                mPlusClient.connect();
-                break;
-        }
+        mApiClient.connect();
     }
 
     /**
@@ -758,35 +668,8 @@ public class GameHelper implements GooglePlayServicesClient.ConnectionCallbacks,
     public void reconnectClients(int whatClients) {
         checkState(TYPE_DEVELOPER_ERROR, "reconnectClients", "reconnectClients should " +
                 "only be called when connected. Proceeding anyway.", STATE_CONNECTED);
-        boolean actuallyReconnecting = false;
-        if ((whatClients & CLIENT_GAMES) != 0 && mGamesClient != null
-                && mGamesClient.isConnected()) {
-            debugLog("Reconnecting GamesClient.");
-            actuallyReconnecting = true;
-            mConnectedClients &= ~CLIENT_GAMES;
-            mGamesClient.reconnect();
-        }
-        if ((whatClients & CLIENT_APPSTATE) != 0 && mAppStateClient != null
-                && mAppStateClient.isConnected()) {
-            debugLog("Reconnecting AppStateClient.");
-            actuallyReconnecting = true;
-            mConnectedClients &= ~CLIENT_APPSTATE;
-            mAppStateClient.reconnect();
-        }
-        if ((whatClients & CLIENT_PLUS) != 0 && mPlusClient != null
-                && mPlusClient.isConnected()) {
-            // PlusClient doesn't need reconnections.
-            logWarn("GameHelper is ignoring your request to reconnect " +
-                    "PlusClient because this is unnecessary.");
-        }
-        if (actuallyReconnecting) {
-            setState(STATE_CONNECTING);
-        } else {
-            // No reconnections are to take place, so for consistency we call the listener
-            // as if sign in had just succeeded.
-            debugLog("No reconnections needed, so behaving as if sign in just succeeded");
-            notifyListener(true);
-        }
+        mApiClient.reconnect();
+        setState(STATE_CONNECTING);
     }
 
     /**
@@ -796,17 +679,16 @@ public class GameHelper implements GooglePlayServicesClient.ConnectionCallbacks,
     public void onConnected(Bundle connectionHint) {
         // Don't retain references to old matches.
         mTurnBasedMatch = null;
-        debugLog("onConnected: connected! client=" + mClientCurrentlyConnecting);
-        // Mark the current client as connected
-        mConnectedClients |= mClientCurrentlyConnecting;
+        debugLog("onConnected: connected!");
+        mConnectedClients = mRequestedClients;
         debugLog("Connected clients updated to: " + mConnectedClients);
         // If this was the games client and it came with an invite, store it for
         // later retrieval.
-        if (mClientCurrentlyConnecting == CLIENT_GAMES
+        if (0 != (mConnectedClients & CLIENT_GAMES)
                 && connectionHint != null) {
             debugLog("onConnected: connection hint provided. Checking for invite.");
             Invitation inv = connectionHint
-                    .getParcelable(GamesClient.EXTRA_INVITATION);
+                    .getParcelable(Multiplayer.EXTRA_INVITATION);
             if (inv != null && inv.getInvitationId() != null) {
                 // accept invitation
                 debugLog("onConnected: connection hint has a room invite!");
@@ -815,13 +697,13 @@ public class GameHelper implements GooglePlayServicesClient.ConnectionCallbacks,
             }
             debugLog("onConnected: connection hint provided. Checking for TBMP game.");
             TurnBasedMatch match = connectionHint
-                    .getParcelable(GamesClient.EXTRA_TURN_BASED_MATCH);
+                    .getParcelable(Multiplayer.EXTRA_TURN_BASED_MATCH);
             if (match != null) {
                 mTurnBasedMatch = match;
             }
         }
-        // connect the next client in line, if any.
-        connectNextClient();
+        debugLog("All clients now connected. Sign-in successful!");
+        succeedSignIn();
     }
 
     void succeedSignIn() {
@@ -896,7 +778,7 @@ public class GameHelper implements GooglePlayServicesClient.ConnectionCallbacks,
             } catch (SendIntentException e) {
                 // Try connecting again
                 debugLog("SendIntentException, so connecting again.");
-                connectCurrentClient();
+                mApiClient.connect();
             }
         } else {
             // It's not a problem what we can solve, so give up and show an
@@ -927,7 +809,7 @@ public class GameHelper implements GooglePlayServicesClient.ConnectionCallbacks,
      * Called when we are disconnected from a client.
      */
     @Override
-    public void onDisconnected() {
+    public void onConnectionSuspended(final int cause) {
         debugLog("onDisconnected.");
         if (mState == STATE_DISCONNECTED) {
             // This is expected.

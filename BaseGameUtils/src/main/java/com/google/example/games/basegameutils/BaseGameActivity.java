@@ -20,6 +20,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
 import com.google.android.gms.appstate.AppStateClient;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.games.GamesClient;
 import com.google.android.gms.plus.PlusClient;
 
@@ -120,16 +121,12 @@ public abstract class BaseGameActivity extends FragmentActivity implements
         mHelper.onActivityResult(request, response, data);
     }
 
-    protected GamesClient getGamesClient() {
-        return mHelper.getGamesClient();
+    protected GoogleApiClient.Builder getApiClientBuilder() {
+        return mHelper.getApiClientBuilder();
     }
 
-    protected AppStateClient getAppStateClient() {
-        return mHelper.getAppStateClient();
-    }
-
-    protected PlusClient getPlusClient() {
-        return mHelper.getPlusClient();
+    protected GoogleApiClient getApiClient() {
+        return mHelper.getApiClient();
     }
 
     protected boolean isSignedIn() {

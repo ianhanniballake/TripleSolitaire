@@ -26,13 +26,15 @@ import android.widget.Button;
 import android.widget.ViewFlipper;
 
 import com.github.triplesolitaire.provider.GameContract;
-import com.google.android.gms.appstate.AppStateClient;
-import com.google.android.gms.appstate.OnStateLoadedListener;
+import com.google.android.gms.appstate.AppStateManager;
+import com.google.android.gms.appstate.AppStateStatusCodes;
 import com.google.android.gms.common.SignInButton;
-import com.google.android.gms.games.GamesClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.games.Games;
+import com.google.android.gms.games.GamesStatusCodes;
 import com.google.android.gms.games.achievement.Achievement;
 import com.google.android.gms.games.achievement.AchievementBuffer;
-import com.google.android.gms.games.achievement.OnAchievementsLoadedListener;
+import com.google.android.gms.games.achievement.Achievements;
 import com.google.example.games.basegameutils.BaseGameActivity;
 
 import java.util.ArrayList;
@@ -41,7 +43,7 @@ import java.util.ArrayList;
  * Main class which controls the UI of the Triple Solitaire game
  */
 public class TripleSolitaireActivity extends BaseGameActivity implements LoaderCallbacks<Cursor>,
-        OnStateLoadedListener, OnAchievementsLoadedListener {
+        ResultCallback<AppStateManager.StateResult> {
     private static final int OUR_STATE_KEY = 0;
     private static final int REQUEST_ACHIEVEMENTS = 0;
     private static final int REQUEST_LEADERBOARDS = 1;
@@ -105,35 +107,36 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
                 continue;
             final int increment = stats.getGamesWon() - achievement.getCurrentSteps();
             if (achievementId.equals(win10) && increment > 0)
-                getGamesClient().incrementAchievement(win10, increment);
+                Games.Achievements.increment(getApiClient(), win10, increment);
             if (achievementId.equals(win100) && increment > 0)
-                getGamesClient().incrementAchievement(win100, increment);
+                Games.Achievements.increment(getApiClient(), win100, increment);
             if (achievementId.equals(win250) && increment > 0)
-                getGamesClient().incrementAchievement(win250, increment);
+                Games.Achievements.increment(getApiClient(), win250, increment);
         }
     }
 
-    @Override
-    public void onAchievementsLoaded(final int statusCode, final AchievementBuffer buffer) {
+    public void onAchievementsLoaded(final Achievements.LoadAchievementsResult loadAchievementsResult) {
+        final int statusCode = loadAchievementsResult.getStatus().getStatusCode();
+        final AchievementBuffer buffer = loadAchievementsResult.getAchievements();
         switch (statusCode) {
-            case GamesClient.STATUS_OK:
+            case GamesStatusCodes.STATUS_OK:
                 if (BuildConfig.DEBUG)
                     Log.d(TripleSolitaireActivity.TAG, "Achievements loaded successfully");
                 // Data was successfully loaded from the cloud, update incremental achievements
                 incrementAchievements(buffer);
                 break;
-            case GamesClient.STATUS_NETWORK_ERROR_NO_DATA:
+            case GamesStatusCodes.STATUS_NETWORK_ERROR_NO_DATA:
                 if (BuildConfig.DEBUG)
                     Log.w(TripleSolitaireActivity.TAG, "Achievements not loaded - network error with no data");
                 // can't reach cloud, and we have no local state.
                 // TODO warn about network error
                 break;
-            case GamesClient.STATUS_NETWORK_ERROR_STALE_DATA:
+            case GamesStatusCodes.STATUS_NETWORK_ERROR_STALE_DATA:
                 if (BuildConfig.DEBUG)
                     Log.w(TripleSolitaireActivity.TAG, "Achievements not loaded - network error with stale data");
                 // TODO warn about stale data
                 break;
-            case GamesClient.STATUS_CLIENT_RECONNECT_REQUIRED:
+            case GamesStatusCodes.STATUS_CLIENT_RECONNECT_REQUIRED:
                 if (BuildConfig.DEBUG)
                     Log.w(TripleSolitaireActivity.TAG, "Achievements not loaded - reconnect required");
                 // Need to reconnect GamesClient
@@ -168,7 +171,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
         };
         setContentView(R.layout.main);
         View title = findViewById(R.id.title);
-        getGamesClient().setViewForPopups(title);
+        getApiClientBuilder().setViewForPopups(title);
         googlePlayGamesViewFlipper = (ViewFlipper) findViewById(R.id.google_play_games);
         final Button newGameBtn = (Button) findViewById(R.id.new_game);
         newGameBtn.setOnClickListener(new OnClickListener() {
@@ -198,14 +201,16 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
         achievementsBtn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(final View v) {
-                startActivityForResult(getGamesClient().getAchievementsIntent(), REQUEST_ACHIEVEMENTS);
+                Intent achievementsIntent = Games.Achievements.getAchievementsIntent(getApiClient());
+                startActivityForResult(achievementsIntent, REQUEST_ACHIEVEMENTS);
             }
         });
         final Button leaderboardsBtn = (Button) findViewById(R.id.leaderboards);
         leaderboardsBtn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(final View v) {
-                startActivityForResult(getGamesClient().getAllLeaderboardsIntent(), REQUEST_LEADERBOARDS);
+                Intent allLeaderboardsIntent = Games.Leaderboards.getAllLeaderboardsIntent(getApiClient());
+                startActivityForResult(allLeaderboardsIntent, REQUEST_LEADERBOARDS);
             }
         });
         getLoaderManager().initLoader(0, null, this);
@@ -309,27 +314,42 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
         invalidateOptionsMenu();
         googlePlayGamesViewFlipper.setDisplayedChild(2);
         if (!mAlreadyLoadedState)
-            getAppStateClient().loadState(this, OUR_STATE_KEY);
+            AppStateManager.load(getApiClient(), OUR_STATE_KEY).setResultCallback(this);
         else if (mPendingUpdateState)
             saveToCloud();
     }
 
     @Override
-    public void onStateConflict(final int stateKey, final String resolvedVersion, final byte[] localData,
-                                final byte[] serverData) {
+    public void onResult(final AppStateManager.StateResult stateResult) {
+        final AppStateManager.StateLoadedResult loadedResult = stateResult.getLoadedResult();
+        if (loadedResult != null) {
+            onStateLoaded(loadedResult);
+        }
+        final AppStateManager.StateConflictResult conflictResult = stateResult.getConflictResult();
+        if (conflictResult != null) {
+            onStateConflict(conflictResult);
+        }
+    }
+
+    private void onStateConflict(final AppStateManager.StateConflictResult conflictResult) {
+        final String resolvedVersion = conflictResult.getResolvedVersion();
+        final byte[] localData = conflictResult.getLocalData();
+        final byte[] serverData = conflictResult.getServerData();
         if (BuildConfig.DEBUG)
             Log.d(TripleSolitaireActivity.TAG, "onStateConflict");
         // Union the two sets of data together to form a resolved, consistent set of stats
         final StatsState localStats = new StatsState(localData);
         final StatsState serverStats = new StatsState(serverData);
         final StatsState resolvedGame = localStats.unionWith(serverStats);
-        getAppStateClient().resolveState(this, OUR_STATE_KEY, resolvedVersion, resolvedGame.toBytes());
+        AppStateManager.resolve(getApiClient(), OUR_STATE_KEY, resolvedVersion, resolvedGame.toBytes())
+                .setResultCallback(this);
     }
 
-    @Override
-    public void onStateLoaded(final int statusCode, final int stateKey, final byte[] localData) {
+    private void onStateLoaded(final AppStateManager.StateLoadedResult loadedResult) {
+        final int statusCode = loadedResult.getStatus().getStatusCode();
+        final byte[] localData = loadedResult.getLocalData();
         switch (statusCode) {
-            case AppStateClient.STATUS_OK:
+            case AppStateStatusCodes.STATUS_OK:
                 if (BuildConfig.DEBUG)
                     Log.d(TripleSolitaireActivity.TAG, "State loaded successfully");
                 // Data was successfully loaded from the cloud: merge with local data.
@@ -337,7 +357,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
                 mAlreadyLoadedState = true;
                 mPersistStatsAsyncTask.execute();
                 break;
-            case AppStateClient.STATUS_STATE_KEY_NOT_FOUND:
+            case AppStateStatusCodes.STATUS_STATE_KEY_NOT_FOUND:
                 if (BuildConfig.DEBUG)
                     Log.d(TripleSolitaireActivity.TAG, "State loaded, no key found");
                 // key not found means there is no saved data. To us, this is the same as
@@ -346,20 +366,20 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
                 if (mPendingUpdateState)
                     saveToCloud();
                 break;
-            case AppStateClient.STATUS_NETWORK_ERROR_NO_DATA:
+            case AppStateStatusCodes.STATUS_NETWORK_ERROR_NO_DATA:
                 if (BuildConfig.DEBUG)
                     Log.d(TripleSolitaireActivity.TAG, "State not loaded - network error with no data");
                 // can't reach cloud, and we have no local state. Warn user that
                 // they may not see their existing progress, but any new progress won't be lost.
                 // TODO warn about network error
                 break;
-            case AppStateClient.STATUS_NETWORK_ERROR_STALE_DATA:
+            case AppStateStatusCodes.STATUS_NETWORK_ERROR_STALE_DATA:
                 if (BuildConfig.DEBUG)
                     Log.d(TripleSolitaireActivity.TAG, "State not loaded - network error with stale data");
                 // can't reach cloud, but we have locally cached data.
                 // TODO warn about stale data
                 break;
-            case AppStateClient.STATUS_CLIENT_RECONNECT_REQUIRED:
+            case AppStateStatusCodes.STATUS_CLIENT_RECONNECT_REQUIRED:
                 if (BuildConfig.DEBUG)
                     Log.d(TripleSolitaireActivity.TAG, "State not loaded - reconnect required");
                 // need to reconnect AppStateClient
@@ -372,56 +392,62 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
     }
 
     private synchronized void saveToCloud() {
-        getAppStateClient().updateState(OUR_STATE_KEY, stats.toBytes());
-        final GamesClient gamesClient = getGamesClient();
+        AppStateManager.update(getApiClient(), OUR_STATE_KEY, stats.toBytes());
         // Check win streak achievements
         final int longestWinStreak = stats.getLongestWinStreak();
         if (BuildConfig.DEBUG)
             Log.d(TripleSolitaireActivity.TAG, "Longest Win Streak: " + longestWinStreak);
         if (longestWinStreak >= 1)
-            gamesClient.unlockAchievement(getString(R.string.achievement_youre_a_winner));
+            Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_youre_a_winner));
         if (longestWinStreak >= 5)
-            gamesClient.unlockAchievement(getString(R.string.achievement_streaker));
+            Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_streaker));
         if (longestWinStreak >= 10)
-            gamesClient.unlockAchievement(getString(R.string.achievement_master_streaker));
+            Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_master_streaker));
         // Check minimum moves achievements
         final int minimumMovesUnsynced = stats.getMinimumMoves(true);
         if (minimumMovesUnsynced < Integer.MAX_VALUE) {
             if (BuildConfig.DEBUG)
                 Log.d(TripleSolitaireActivity.TAG, "Minimum Moves Unsynced: " + minimumMovesUnsynced);
-            gamesClient.submitScore(getString(R.string.leaderboard_moves), minimumMovesUnsynced);
+            Games.Leaderboards.submitScore(getApiClient(), getString(R.string.leaderboard_moves),
+                    minimumMovesUnsynced);
         }
         final int minimumMoves = stats.getMinimumMoves(false);
         if (BuildConfig.DEBUG)
             Log.d(TripleSolitaireActivity.TAG, "Minimum Moves: " + minimumMoves);
         if (minimumMoves < 400)
-            gamesClient.unlockAchievement(getString(R.string.achievement_figured_it_out));
+            Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_figured_it_out));
         if (minimumMoves < 300)
-            gamesClient.unlockAchievement(getString(R.string.achievement_no_mistakes));
+            Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_no_mistakes));
         // Check shortest time achievements
         final int shortestTimeUnsynced = stats.getShortestTime(true);
         if (shortestTimeUnsynced < Integer.MAX_VALUE) {
             if (BuildConfig.DEBUG)
                 Log.d(TripleSolitaireActivity.TAG, "Shortest Time Unsynced (minutes): " +
                         (double) shortestTimeUnsynced / 60);
-            gamesClient.submitScore(getString(R.string.leaderboard_time),
+            Games.Leaderboards.submitScore(getApiClient(), getString(R.string.leaderboard_time),
                     shortestTimeUnsynced * DateUtils.SECOND_IN_MILLIS);
         }
         final int shortestTime = stats.getShortestTime(false);
         if (BuildConfig.DEBUG)
             Log.d(TripleSolitaireActivity.TAG, "Shortest Time (minutes): " + (double) shortestTime / 60);
         if (shortestTime < 15 * 60)
-            gamesClient.unlockAchievement(getString(R.string.achievement_quarter_hour));
+            Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_quarter_hour));
         if (shortestTime < 10 * 60)
-            gamesClient.unlockAchievement(getString(R.string.achievement_single_digits));
+            Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_single_digits));
         if (shortestTime < 8 * 60)
-            gamesClient.unlockAchievement(getString(R.string.achievement_speed_demon));
+            Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_speed_demon));
         ContentValues values = new ContentValues();
         values.put(GameContract.Games.COLUMN_NAME_SYNCED, true);
         mAsyncQueryHandler.startUpdate(0, null, GameContract.Games.CONTENT_URI, values,
                 GameContract.Games.COLUMN_NAME_SYNCED + "=0", null);
         // Load achievements to handle incremental achievements
-        gamesClient.loadAchievements(this, false);
+        Games.Achievements.load(getApiClient(), false)
+                .setResultCallback(new ResultCallback<Achievements.LoadAchievementsResult>() {
+                    @Override
+                    public void onResult(final Achievements.LoadAchievementsResult loadAchievementsResult) {
+                        onAchievementsLoaded(loadAchievementsResult);
+                    }
+                });
         mPendingUpdateState = false;
     }
 }
