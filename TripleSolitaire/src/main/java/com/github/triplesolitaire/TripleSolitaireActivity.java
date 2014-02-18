@@ -10,12 +10,14 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.content.OperationApplicationException;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.os.UserManager;
+import android.preference.PreferenceManager;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -52,6 +54,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
      * Logging tag
      */
     private static final String TAG = "TripleSolitaireActivity";
+    private static final String AUTO_SIGN_IN__PREFERENCE_KEY = "auto_sign_in";
     private ViewFlipper googlePlayGamesViewFlipper;
     private boolean mAlreadyLoadedState = false;
     private boolean mPendingUpdateState = false;
@@ -261,6 +264,8 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
                 return true;
             case R.id.sign_out:
                 signOut();
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+                sharedPreferences.edit().putBoolean(AUTO_SIGN_IN__PREFERENCE_KEY, false).apply();
                 googlePlayGamesViewFlipper.setDisplayedChild(1);
                 return true;
             case R.id.about:
@@ -285,26 +290,38 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
     }
 
     @Override
+    protected void onStart() {
+        if (BuildConfig.DEBUG)
+            Log.d(TripleSolitaireActivity.TAG, "onStart");
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        final boolean autoSignIn = sharedPreferences.getBoolean(AUTO_SIGN_IN__PREFERENCE_KEY, true);
+        final boolean signInUnavailable = Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2 &&
+                isAccountAccessRestricted();
+        if (autoSignIn && !signInUnavailable) {
+            beginUserInitiatedSignIn();
+        }
+        super.onStart();
+    }
+
+    @Override
     public void onSignInFailed() {
         if (BuildConfig.DEBUG)
             Log.d(TripleSolitaireActivity.TAG, "onSignInFailed");
         invalidateOptionsMenu();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-            onSignInFailedCheckRestricted();
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences.edit().putBoolean(AUTO_SIGN_IN__PREFERENCE_KEY, false).apply();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2 && isAccountAccessRestricted()) {
+            googlePlayGamesViewFlipper.setDisplayedChild(0);
         } else {
             googlePlayGamesViewFlipper.setDisplayedChild(1);
         }
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-    private void onSignInFailedCheckRestricted() {
+    private boolean isAccountAccessRestricted() {
         UserManager um = (UserManager) getSystemService(Context.USER_SERVICE);
         Bundle restrictions = um.getUserRestrictions();
-        if (restrictions.getBoolean(UserManager.DISALLOW_MODIFY_ACCOUNTS, false)) {
-            googlePlayGamesViewFlipper.setDisplayedChild(0);
-        } else {
-            googlePlayGamesViewFlipper.setDisplayedChild(1);
-        }
+        return restrictions.getBoolean(UserManager.DISALLOW_MODIFY_ACCOUNTS, false);
     }
 
     @Override
