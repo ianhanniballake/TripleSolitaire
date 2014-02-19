@@ -13,16 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.example.games.basegameutils;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 
-import com.google.android.gms.appstate.AppStateClient;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.games.GamesClient;
-import com.google.android.gms.plus.PlusClient;
 
 /**
  * Example base class for games. This implementation takes care of setting up
@@ -36,41 +35,39 @@ import com.google.android.gms.plus.PlusClient;
  * PlusClient and GamesClient, use BaseGameActivity(CLIENT_GAMES | CLIENT_PLUS).
  * To request all available clients, use BaseGameActivity(CLIENT_ALL).
  * Alternatively, you can also specify the requested clients via
- *
- * @author Bruno Oliveira (Google)
  * @link{#setRequestedClients}, but you must do so before @link{#onCreate}
  * gets called, otherwise the call will have no effect.
+ *
+ * @author Bruno Oliveira (Google)
  */
 public abstract class BaseGameActivity extends FragmentActivity implements
         GameHelper.GameHelperListener {
+
     // The game helper object. This class is mainly a wrapper around this object.
     protected GameHelper mHelper;
+
     // We expose these constants here because we don't want users of this class
     // to have to know about GameHelper at all.
     public static final int CLIENT_GAMES = GameHelper.CLIENT_GAMES;
     public static final int CLIENT_APPSTATE = GameHelper.CLIENT_APPSTATE;
     public static final int CLIENT_PLUS = GameHelper.CLIENT_PLUS;
     public static final int CLIENT_ALL = GameHelper.CLIENT_ALL;
+
     // Requested clients. By default, that's just the games client.
     protected int mRequestedClients = CLIENT_GAMES;
-    // stores any additional scopes.
-    private String[] mAdditionalScopes;
-    protected String mDebugTag = "BaseGameActivity";
+
+    private final static String TAG = "BaseGameActivity";
     protected boolean mDebugLog = false;
 
-    /**
-     * Constructs a BaseGameActivity with default client (GamesClient).
-     */
+    /** Constructs a BaseGameActivity with default client (GamesClient). */
     protected BaseGameActivity() {
         super();
-        mHelper = new GameHelper(this);
     }
 
     /**
      * Constructs a BaseGameActivity with the requested clients.
-     *
      * @param requestedClients The requested clients (a combination of CLIENT_GAMES,
-     *                         CLIENT_PLUS and CLIENT_APPSTATE).
+     *         CLIENT_PLUS and CLIENT_APPSTATE).
      */
     protected BaseGameActivity(int requestedClients) {
         super();
@@ -80,27 +77,32 @@ public abstract class BaseGameActivity extends FragmentActivity implements
     /**
      * Sets the requested clients. The preferred way to set the requested clients is
      * via the constructor, but this method is available if for some reason your code
-     * cannot do this in the constructor. This must be called before onCreate in order to
-     * have any effect. If called after onCreate, this method is a no-op.
+     * cannot do this in the constructor. This must be called before onCreate or getGameHelper()
+     * in order to have any effect. If called after onCreate()/getGameHelper(), this method
+     * is a no-op.
      *
-     * @param requestedClients  A combination of the flags CLIENT_GAMES, CLIENT_PLUS
-     *                          and CLIENT_APPSTATE, or CLIENT_ALL to request all available clients.
-     * @param additionalScopes. Scopes that should also be requested when the auth
-     *                          request is made.
+     * @param requestedClients A combination of the flags CLIENT_GAMES, CLIENT_PLUS
+     *         and CLIENT_APPSTATE, or CLIENT_ALL to request all available clients.
      */
-    protected void setRequestedClients(int requestedClients, String... additionalScopes) {
+    protected void setRequestedClients(int requestedClients) {
         mRequestedClients = requestedClients;
-        mAdditionalScopes = additionalScopes;
+    }
+
+    public GameHelper getGameHelper() {
+        if (mHelper == null) {
+            mHelper = new GameHelper(this, mRequestedClients);
+            mHelper.enableDebugLog(mDebugLog);
+        }
+        return mHelper;
     }
 
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
-        mHelper = new GameHelper(this);
-        if (mDebugLog) {
-            mHelper.enableDebugLog(mDebugLog, mDebugTag);
+        if (mHelper == null) {
+            getGameHelper();
         }
-        mHelper.setup(this, mRequestedClients, mAdditionalScopes);
+        mHelper.setup(this);
     }
 
     @Override
@@ -121,10 +123,6 @@ public abstract class BaseGameActivity extends FragmentActivity implements
         mHelper.onActivityResult(request, response, data);
     }
 
-    protected GoogleApiClient.Builder getApiClientBuilder() {
-        return mHelper.getApiClientBuilder();
-    }
-
     protected GoogleApiClient getApiClient() {
         return mHelper.getApiClient();
     }
@@ -141,36 +139,34 @@ public abstract class BaseGameActivity extends FragmentActivity implements
         mHelper.signOut();
     }
 
-    protected void showAlert(String title, String message) {
-        mHelper.showAlert(title, message);
-    }
-
     protected void showAlert(String message) {
-        mHelper.showAlert(message);
+        mHelper.makeSimpleDialog(message).show();
     }
 
-    protected void enableDebugLog(boolean enabled, String tag) {
+    protected void showAlert(String title, String message) {
+        mHelper.makeSimpleDialog(title, message).show();
+    }
+
+    protected void enableDebugLog(boolean enabled) {
         mDebugLog = true;
-        mDebugTag = tag;
         if (mHelper != null) {
-            mHelper.enableDebugLog(enabled, tag);
+            mHelper.enableDebugLog(enabled);
         }
+    }
+
+    @Deprecated
+    protected void enableDebugLog(boolean enabled, String tag) {
+        Log.w(TAG, "BaseGameActivity.enabledDebugLog(bool,String) is " +
+                "deprecated. Use enableDebugLog(boolean)");
+        enableDebugLog(enabled);
     }
 
     protected String getInvitationId() {
         return mHelper.getInvitationId();
     }
 
-    protected void reconnectClients(int whichClients) {
-        mHelper.reconnectClients(whichClients);
-    }
-
-    protected String getScopes() {
-        return mHelper.getScopes();
-    }
-
-    protected String[] getScopesArray() {
-        return mHelper.getScopesArray();
+    protected void reconnectClient() {
+        mHelper.reconnectClient();
     }
 
     protected boolean hasSignInError() {

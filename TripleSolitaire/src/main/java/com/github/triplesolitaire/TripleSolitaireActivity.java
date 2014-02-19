@@ -10,14 +10,12 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.content.OperationApplicationException;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.os.UserManager;
-import android.preference.PreferenceManager;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -54,7 +52,6 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
      * Logging tag
      */
     private static final String TAG = "TripleSolitaireActivity";
-    private static final String AUTO_SIGN_IN__PREFERENCE_KEY = "auto_sign_in";
     private ViewFlipper googlePlayGamesViewFlipper;
     private boolean mAlreadyLoadedState = false;
     private boolean mPendingUpdateState = false;
@@ -92,7 +89,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
         // request that superclass initialize and manage the Google Play Services for us
         super(BaseGameActivity.CLIENT_GAMES | BaseGameActivity.CLIENT_APPSTATE);
         if (BuildConfig.DEBUG) {
-            enableDebugLog(BuildConfig.DEBUG, TripleSolitaireActivity.TAG);
+            enableDebugLog(BuildConfig.DEBUG);
         }
     }
 
@@ -143,7 +140,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
                 if (BuildConfig.DEBUG)
                     Log.w(TripleSolitaireActivity.TAG, "Achievements not loaded - reconnect required");
                 // Need to reconnect GamesClient
-                reconnectClients(BaseGameActivity.CLIENT_GAMES);
+                reconnectClient();
                 break;
             default:
                 // TODO warn about generic error
@@ -169,12 +166,13 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
      */
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
+        setContentView(R.layout.main);
+        View title = findViewById(R.id.title);
+        // The GoogleApiClient is created in super.onCreate so any builder changes must be done beforehand
+        getGameHelper().createApiClientBuilder().setViewForPopups(title);
         super.onCreate(savedInstanceState);
         mAsyncQueryHandler = new AsyncQueryHandler(getContentResolver()) {
         };
-        setContentView(R.layout.main);
-        View title = findViewById(R.id.title);
-        getApiClientBuilder().setViewForPopups(title);
         googlePlayGamesViewFlipper = (ViewFlipper) findViewById(R.id.google_play_games);
         final Button newGameBtn = (Button) findViewById(R.id.new_game);
         newGameBtn.setOnClickListener(new OnClickListener() {
@@ -264,8 +262,6 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
                 return true;
             case R.id.sign_out:
                 signOut();
-                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-                sharedPreferences.edit().putBoolean(AUTO_SIGN_IN__PREFERENCE_KEY, false).apply();
                 googlePlayGamesViewFlipper.setDisplayedChild(1);
                 return true;
             case R.id.about:
@@ -290,26 +286,10 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
     }
 
     @Override
-    protected void onStart() {
-        if (BuildConfig.DEBUG)
-            Log.d(TripleSolitaireActivity.TAG, "onStart");
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        final boolean autoSignIn = sharedPreferences.getBoolean(AUTO_SIGN_IN__PREFERENCE_KEY, true);
-        final boolean signInUnavailable = Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2 &&
-                isAccountAccessRestricted();
-        if (autoSignIn && !signInUnavailable) {
-            beginUserInitiatedSignIn();
-        }
-        super.onStart();
-    }
-
-    @Override
     public void onSignInFailed() {
         if (BuildConfig.DEBUG)
             Log.d(TripleSolitaireActivity.TAG, "onSignInFailed");
         invalidateOptionsMenu();
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        sharedPreferences.edit().putBoolean(AUTO_SIGN_IN__PREFERENCE_KEY, false).apply();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2 && isAccountAccessRestricted()) {
             googlePlayGamesViewFlipper.setDisplayedChild(0);
         } else {
@@ -400,7 +380,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
                 if (BuildConfig.DEBUG)
                     Log.d(TripleSolitaireActivity.TAG, "State not loaded - reconnect required");
                 // need to reconnect AppStateClient
-                reconnectClients(BaseGameActivity.CLIENT_APPSTATE);
+                reconnectClient();
                 break;
             default:
                 // TODO warn about generic error
