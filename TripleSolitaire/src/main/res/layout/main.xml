@@ -101,6 +101,16 @@
                     android:drawablePadding="8dp"
                     android:padding="16dp"
                     android:text="@string/leaderboards"/>
+
+                <Button
+                    android:id="@+id/share"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:drawableLeft="@drawable/google_plus"
+                    android:drawablePadding="8dp"
+                    android:padding="16dp"
+                    android:text="@string/share"/>
             </LinearLayout>
         </ViewFlipper>
 

@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.Loader;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -35,6 +36,7 @@ import com.google.android.gms.games.GamesStatusCodes;
 import com.google.android.gms.games.achievement.Achievement;
 import com.google.android.gms.games.achievement.AchievementBuffer;
 import com.google.android.gms.games.achievement.Achievements;
+import com.google.android.gms.plus.PlusShare;
 import com.google.example.games.basegameutils.BaseGameActivity;
 
 import java.util.ArrayList;
@@ -83,11 +85,11 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
     };
 
     /**
-     * Constructs a new TripleSolitaireActivity that uses Games and AppState Google Play Services
+     * Constructs a new TripleSolitaireActivity that uses all (Games, Plus, AppState) Google Play Services
      */
     public TripleSolitaireActivity() {
         // request that superclass initialize and manage the Google Play Services for us
-        super(BaseGameActivity.CLIENT_GAMES | BaseGameActivity.CLIENT_APPSTATE);
+        super(BaseGameActivity.CLIENT_ALL);
         if (BuildConfig.DEBUG) {
             enableDebugLog(BuildConfig.DEBUG);
         }
@@ -212,6 +214,28 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
             public void onClick(final View v) {
                 Intent allLeaderboardsIntent = Games.Leaderboards.getAllLeaderboardsIntent(getApiClient());
                 startActivityForResult(allLeaderboardsIntent, REQUEST_LEADERBOARDS);
+            }
+        });
+        final Button shareBtn = (Button) findViewById(R.id.share);
+        shareBtn.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                PlusShare.Builder builder = new PlusShare.Builder(TripleSolitaireActivity.this);
+                final Uri desktopUrl = Uri.parse("https://play.google.com/store/apps/details?id=" + getPackageName());
+                final String deepLink = "/share/";
+                builder.setContentUrl(desktopUrl).setContentDeepLinkId(deepLink)
+                        .addCallToAction("PLAY", desktopUrl, deepLink);
+                final double bestTime = stats.getShortestTime(false);
+                final int minutes = (int) (bestTime / 60);
+                final int seconds = (int) (bestTime % 60);
+                final StringBuilder sb = new StringBuilder();
+                sb.append(minutes);
+                sb.append(':');
+                if (seconds < 10)
+                    sb.append(0);
+                sb.append(seconds);
+                builder.setText(getString(R.string.share_text, sb));
+                startActivityForResult(builder.getIntent(), 0);
             }
         });
         getLoaderManager().initLoader(0, null, this);
