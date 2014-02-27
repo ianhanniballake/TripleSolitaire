@@ -225,16 +225,20 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
                 final String deepLink = "/share/";
                 builder.setContentUrl(desktopUrl).setContentDeepLinkId(deepLink)
                         .addCallToAction("PLAY", desktopUrl, deepLink);
-                final double bestTime = stats.getShortestTime(false);
-                final int minutes = (int) (bestTime / 60);
-                final int seconds = (int) (bestTime % 60);
-                final StringBuilder sb = new StringBuilder();
-                sb.append(minutes);
-                sb.append(':');
-                if (seconds < 10)
-                    sb.append(0);
-                sb.append(seconds);
-                builder.setText(getString(R.string.share_text, sb));
+                if (stats.getGamesWon() == 0) {
+                    builder.setText(getString(R.string.share_text_no_wins));
+                } else {
+                    final double bestTime = stats.getShortestTime(false);
+                    final int minutes = (int) (bestTime / 60);
+                    final int seconds = (int) (bestTime % 60);
+                    final StringBuilder sb = new StringBuilder();
+                    sb.append(minutes);
+                    sb.append(':');
+                    if (seconds < 10)
+                        sb.append(0);
+                    sb.append(seconds);
+                    builder.setText(getString(R.string.share_text, sb));
+                }
                 startActivityForResult(builder.getIntent(), 0);
             }
         });
