@@ -4,4 +4,6 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:drawableLeft="@drawable/google_plus"
-    android:padding="16dp"/>
+    android:drawablePadding="8dp"
+    android:padding="16dp"
+    android:text="@string/share"/>

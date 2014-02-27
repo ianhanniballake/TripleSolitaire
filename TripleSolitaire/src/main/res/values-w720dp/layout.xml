@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="progress_bar" type="layout">@layout/progress_bar_wide</item>
+    <item name="share_button" type="layout">@layout/share_button_wide</item>
+</resources>
