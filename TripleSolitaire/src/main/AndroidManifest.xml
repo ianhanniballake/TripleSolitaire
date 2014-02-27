@@ -3,8 +3,8 @@
     package="com.github.triplesolitaire"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:installLocation="auto"
-    android:versionCode="1244210"
-    android:versionName="2.1">
+    android:versionCode="1244211"
+    android:versionName="2.1.1">
 
     <supports-screens
         android:largeScreens="true"
