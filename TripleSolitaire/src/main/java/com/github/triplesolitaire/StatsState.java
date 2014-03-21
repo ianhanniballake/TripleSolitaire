@@ -80,6 +80,9 @@ public class StatsState {
      * @param data Cursor data to parse
      */
     public StatsState(final Cursor data) {
+        if (data == null) {
+            return;
+        }
         final int startTimeColumnIndex = data.getColumnIndex(GameContract.Games.COLUMN_NAME_START_TIME);
         final int durationColumnIndex = data.getColumnIndex(GameContract.Games.COLUMN_NAME_DURATION);
         final int movesColumnIndex = data.getColumnIndex(GameContract.Games.COLUMN_NAME_MOVES);

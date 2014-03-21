@@ -268,12 +268,13 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
 
     @Override
     public void onLoadFinished(final Loader<Cursor> loader, final Cursor data) {
+        final int rowCount = data == null ? 0 : data.getCount();
         if (BuildConfig.DEBUG)
-            Log.d(TAG, "onLoadFinished found " + data.getCount() + " rows");
+            Log.d(TAG, "onLoadFinished found " + rowCount + " rows");
         stats = stats.unionWith(new StatsState(data));
         if (isSignedIn())
             saveToCloud();
-        else if (data.getCount() > 0)
+        else if (rowCount > 0)
             mPendingUpdateState = true;
     }
 
