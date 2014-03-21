@@ -36,7 +36,7 @@ public class StatsState {
         }
 
         public GameStats(final JSONObject jsonObject) throws JSONException {
-            if (!jsonObject.has("loss")) {
+            if (!jsonObject.has("loss") && jsonObject.getInt("duration") != 0) {
                 loss = false;
                 duration = jsonObject.getInt("duration");
                 moves = jsonObject.getInt("moves");
@@ -87,7 +87,7 @@ public class StatsState {
         while (data.moveToNext()) {
             final int startTime = data.getInt(startTimeColumnIndex);
             final boolean synced = data.getInt(syncedColumnIndex) != 0;
-            if (data.isNull(durationColumnIndex))
+            if (data.isNull(durationColumnIndex) || data.getInt(durationColumnIndex) == 0)
                 gameStats.put(startTime, new GameStats(synced));
             else {
                 final int duration = data.getInt(durationColumnIndex);
@@ -202,7 +202,10 @@ public class StatsState {
             final GameStats stats = gameStats.get(startTime);
             final ContentValues values = new ContentValues();
             values.put(GameContract.Games.COLUMN_NAME_START_TIME, startTime);
-            if (!stats.loss) {
+            if (stats.loss) {
+                values.putNull(GameContract.Games.COLUMN_NAME_DURATION);
+                values.putNull(GameContract.Games.COLUMN_NAME_MOVES);
+            } else {
                 values.put(GameContract.Games.COLUMN_NAME_DURATION, stats.duration);
                 values.put(GameContract.Games.COLUMN_NAME_MOVES, stats.moves);
             }

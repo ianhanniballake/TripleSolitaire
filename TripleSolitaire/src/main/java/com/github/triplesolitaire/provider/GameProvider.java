@@ -79,12 +79,17 @@ public class GameProvider extends ContentProvider {
                     final long startTime = tempCursor.getLong(tempCursor.getColumnIndex(
                             GameContract.Games.COLUMN_NAME_START_TIME));
                     values.put(GameContract.Games.COLUMN_NAME_START_TIME, startTime);
-                    final int duration = tempCursor.getInt(tempCursor.getColumnIndex(
-                            GameContract.Games.COLUMN_NAME_DURATION));
-                    values.put(GameContract.Games.COLUMN_NAME_DURATION, duration);
-                    final int moves = tempCursor.getInt(tempCursor.getColumnIndex(
-                            GameContract.Games.COLUMN_NAME_MOVES));
-                    values.put(GameContract.Games.COLUMN_NAME_MOVES, moves);
+                    final int durationColumnIndex = tempCursor.getColumnIndex(GameContract.Games.COLUMN_NAME_DURATION);
+                    if (tempCursor.isNull(durationColumnIndex) || tempCursor.getInt(durationColumnIndex) == 0 ) {
+                        values.putNull(GameContract.Games.COLUMN_NAME_DURATION);
+                        values.putNull(GameContract.Games.COLUMN_NAME_MOVES);
+                    } else {
+                        final int duration = tempCursor.getInt(durationColumnIndex);
+                        values.put(GameContract.Games.COLUMN_NAME_DURATION, duration);
+                        final int moves = tempCursor.getInt(tempCursor.getColumnIndex(
+                                GameContract.Games.COLUMN_NAME_MOVES));
+                        values.put(GameContract.Games.COLUMN_NAME_MOVES, moves);
+                    }
                     values.put(GameContract.Games.COLUMN_NAME_SYNCED, false);
                     db.insertWithOnConflict(GameContract.Games.TABLE_NAME, GameContract.Games.COLUMN_NAME_START_TIME,
                             values, SQLiteDatabase.CONFLICT_REPLACE);
