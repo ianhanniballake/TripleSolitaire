@@ -28,7 +28,7 @@
         android:src="@drawable/title"/>
 
     <RelativeLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
@@ -106,6 +106,7 @@
                 <include
                     layout="@layout/share_button"/>
             </LinearLayout>
+
         </ViewFlipper>
 
         <Button
