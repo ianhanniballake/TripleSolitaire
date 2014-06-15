@@ -24,7 +24,7 @@
         android:minSdkVersion="9"
         android:targetSdkVersion="19" />
 
-    <application android:allowBackup="true" android:label="BaseGameUtils" >
+    <application android:allowBackup="true" >
     </application>
 
 </manifest>
