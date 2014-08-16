@@ -18,4 +18,5 @@ Save this file as res/values/games-ids.xml in your project.
     <string name="achievement_no_mistakes">CgkIv9607bgPEAIQCw</string>
     <string name="leaderboard_moves">CgkIv9607bgPEAIQDA</string>
     <string name="leaderboard_time">CgkIv9607bgPEAIQDg</string>
+    <string name="event_games_won">CgkIv9607bgPEAIQEA</string>
 </resources>

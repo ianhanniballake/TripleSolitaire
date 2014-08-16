@@ -175,6 +175,10 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
         getGameHelper().createApiClientBuilder().setViewForPopups(title);
         super.onCreate(savedInstanceState);
         mAsyncQueryHandler = new AsyncQueryHandler(getContentResolver()) {
+            @Override
+            protected void onUpdateComplete(final int token, final Object cookie, final int result) {
+                Games.Events.increment(getApiClient(), getString(R.string.event_games_won), result);
+            }
         };
         googlePlayGamesViewFlipper = (ViewFlipper) findViewById(R.id.google_play_games);
         final Button newGameBtn = (Button) findViewById(R.id.new_game);
