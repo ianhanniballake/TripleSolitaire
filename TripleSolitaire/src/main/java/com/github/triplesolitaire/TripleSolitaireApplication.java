@@ -1,9 +1,7 @@
 package com.github.triplesolitaire;
 
 import android.app.Application;
-import android.content.SharedPreferences;
 import android.os.StrictMode;
-import android.preference.PreferenceManager;
 
 /**
  * Creates the Triple Solitaire application, setting strict mode in debug mode

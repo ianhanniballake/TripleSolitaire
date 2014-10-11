@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 dependencies {
-    compile 'com.google.android.gms:play-services:5.0.+'
+    compile 'com.google.android.gms:play-services:6.1.11'
     compile project(':BaseGameUtils')
 }
 
@@ -11,18 +11,18 @@ def versionPatch = 0
 def versionBuild = 1
 
 android {
-    compileSdkVersion 19
+    compileSdkVersion 20
     buildToolsVersion "20.0.0"
 
     defaultConfig {
         minSdkVersion 12
-        targetSdkVersion 19
+        targetSdkVersion 20
         versionCode versionMajor * 10000000 + versionMinor * 1000000 + versionPatch * 1000 + versionBuild
         versionName "${versionMajor}.${versionMinor}.${versionPatch}"
     }
 
     signingConfigs {
-        releaseConfig {
+        release {
             storeFile System.getenv("KEYSTORE") != null ? file(System.getenv("KEYSTORE")) : null
             storePassword System.getenv("KEYSTORE_PASSWORD")
             keyAlias System.getenv("TRIPLE_SOLITAIRE_ALIAS")
@@ -35,7 +35,7 @@ android {
             runProguard true
             proguardFile getDefaultProguardFile('proguard-android.txt')
             proguardFile 'proguard-project.txt'
-            signingConfig signingConfigs.releaseConfig
+            signingConfig signingConfigs.release
         }
     }
 }
