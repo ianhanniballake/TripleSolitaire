@@ -1,11 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <dimen name="between_card_dim">8dp</dimen>
-    <dimen name="card_width_dim">48dp</dimen>
-    <dimen name="card_height_dim">74dp</dimen>
-    <dimen name="card_horz_overlap_dim">12dp</dimen>
-    <dimen name="card_vert_overlap_dim">16dp</dimen>
     <dimen name="sign_in_padding">8dp</dimen>
-
 </resources>
