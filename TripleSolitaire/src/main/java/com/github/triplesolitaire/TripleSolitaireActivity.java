@@ -1,6 +1,9 @@
 package com.github.triplesolitaire;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.AsyncQueryHandler;
 import android.content.ContentProviderOperation;
@@ -8,6 +11,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.Loader;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
@@ -17,6 +21,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.os.UserManager;
+import android.preference.PreferenceManager;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -29,35 +34,45 @@ import android.widget.ViewFlipper;
 import com.github.triplesolitaire.provider.GameContract;
 import com.google.android.gms.appstate.AppStateManager;
 import com.google.android.gms.appstate.AppStateStatusCodes;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.GamesStatusCodes;
 import com.google.android.gms.games.achievement.Achievement;
 import com.google.android.gms.games.achievement.AchievementBuffer;
 import com.google.android.gms.games.achievement.Achievements;
+import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.PlusShare;
-import com.google.example.games.basegameutils.BaseGameActivity;
 
 import java.util.ArrayList;
 
 /**
  * Main class which controls the UI of the Triple Solitaire game
  */
-public class TripleSolitaireActivity extends BaseGameActivity implements LoaderCallbacks<Cursor>,
+public class TripleSolitaireActivity extends Activity implements LoaderCallbacks<Cursor>,
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
         ResultCallback<AppStateManager.StateResult> {
     private static final int OUR_STATE_KEY = 0;
-    private static final int REQUEST_ACHIEVEMENTS = 0;
-    private static final int REQUEST_LEADERBOARDS = 1;
-    private static final int REQUEST_GAME = 2;
+    private static final int REQUEST_SIGN_IN = 0;
+    private static final int REQUEST_ACHIEVEMENTS = 1;
+    private static final int REQUEST_LEADERBOARDS = 2;
+    private static final int REQUEST_GAME = 3;
     /**
      * Logging tag
      */
     private static final String TAG = "TripleSolitaireActivity";
+    private static final String AUTO_START_SIGN_IN = "AUTO_START_SIGN_IN";
     private ViewFlipper googlePlayGamesViewFlipper;
+    private boolean mResolvingConnectionFailure = false;
+    private boolean mSignInClicked = false;
+    private boolean mAutoStartSignInFlow;
     private boolean mAlreadyLoadedState = false;
     private boolean mPendingUpdateState = false;
     private StatsState stats = new StatsState();
+    private GoogleApiClient mGoogleApiClient;
     private AsyncQueryHandler mAsyncQueryHandler;
     private AsyncTask<Void, Void, Void> mPersistStatsAsyncTask = new AsyncTask<Void, Void, Void>() {
         @Override
@@ -67,9 +82,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
                 Log.d(TripleSolitaireActivity.TAG, "Persisting stats: " + operations.size() + " operations");
             try {
                 getContentResolver().applyBatch(GameContract.AUTHORITY, operations);
-            } catch (final RemoteException e) {
-                Log.e(StatsState.class.getSimpleName(), "Failed persisting stats", e);
-            } catch (final OperationApplicationException e) {
+            } catch (final OperationApplicationException | RemoteException e) {
                 Log.e(StatsState.class.getSimpleName(), "Failed persisting stats", e);
             }
             if (BuildConfig.DEBUG)
@@ -79,22 +92,10 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
 
         @Override
         protected void onPostExecute(final Void result) {
-            if (mPendingUpdateState && isSignedIn())
+            if (mPendingUpdateState && mGoogleApiClient.isConnected())
                 saveToCloud();
         }
     };
-
-    /**
-     * Constructs a new TripleSolitaireActivity that uses all (Games, Plus, AppState) Google Play Services
-     */
-    public TripleSolitaireActivity() {
-        // request that superclass initialize and manage the Google Play Services for us
-        super(BaseGameActivity.CLIENT_GAMES | BaseGameActivity.CLIENT_PLUS
-                | BaseGameActivity.CLIENT_APPSTATE);
-        if (BuildConfig.DEBUG) {
-            enableDebugLog(BuildConfig.DEBUG);
-        }
-    }
 
     public void newGame() {
         startActivityForResult(new Intent(this, GameActivity.class), REQUEST_GAME);
@@ -110,11 +111,11 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
                 continue;
             final int increment = stats.getGamesWon() - achievement.getCurrentSteps();
             if (achievementId.equals(win10) && increment > 0)
-                Games.Achievements.increment(getApiClient(), win10, increment);
+                Games.Achievements.increment(mGoogleApiClient, win10, increment);
             if (achievementId.equals(win100) && increment > 0)
-                Games.Achievements.increment(getApiClient(), win100, increment);
+                Games.Achievements.increment(mGoogleApiClient, win100, increment);
             if (achievementId.equals(win250) && increment > 0)
-                Games.Achievements.increment(getApiClient(), win250, increment);
+                Games.Achievements.increment(mGoogleApiClient, win250, increment);
         }
     }
 
@@ -142,8 +143,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
             case GamesStatusCodes.STATUS_CLIENT_RECONNECT_REQUIRED:
                 if (BuildConfig.DEBUG)
                     Log.w(TripleSolitaireActivity.TAG, "Achievements not loaded - reconnect required");
-                // Need to reconnect GamesClient
-                reconnectClient();
+                mGoogleApiClient.reconnect();
                 break;
             default:
                 // TODO warn about generic error
@@ -156,6 +156,23 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
     @Override
     protected void onActivityResult(int request, int response, Intent data) {
         super.onActivityResult(request, response, data);
+        if (request == REQUEST_SIGN_IN) {
+            if (BuildConfig.DEBUG) {
+                Log.d(TAG, "onActivityResult with requestCode == REQUEST_SIGN_IN, responseCode="
+                        + response + ", intent=" + data);
+            }
+            mSignInClicked = false;
+            mResolvingConnectionFailure = false;
+            if (response == RESULT_OK) {
+                mGoogleApiClient.connect();
+            } else {
+                final int errorCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+                Dialog dialog = GooglePlayServicesUtil.getErrorDialog(errorCode, this, REQUEST_SIGN_IN);
+                if (dialog != null) {
+                    dialog.show();
+                }
+            }
+        }
         if (request == REQUEST_GAME && response == RESULT_OK) {
             WinDialogFragment winDialogFragment = WinDialogFragment.createInstance(data);
             winDialogFragment.show(getFragmentManager(), "win");
@@ -169,15 +186,20 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
      */
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
-        setContentView(R.layout.main);
-        View title = findViewById(R.id.title);
-        // The GoogleApiClient is created in super.onCreate so any builder changes must be done beforehand
-        getGameHelper().createApiClientBuilder().setViewForPopups(title);
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+        mAutoStartSignInFlow = PreferenceManager.getDefaultSharedPreferences(this).getBoolean(AUTO_START_SIGN_IN, true);
+        View title = findViewById(R.id.title);
+        mGoogleApiClient = new GoogleApiClient.Builder(this, this, this)
+                .setViewForPopups(title)
+                .addApi(Games.API).addScope(Games.SCOPE_GAMES)
+                .addApi(Plus.API).addScope(Plus.SCOPE_PLUS_LOGIN)
+                .addApi(AppStateManager.API).addScope(AppStateManager.SCOPE_APP_STATE)
+                .build();
         mAsyncQueryHandler = new AsyncQueryHandler(getContentResolver()) {
             @Override
             protected void onUpdateComplete(final int token, final Object cookie, final int result) {
-                Games.Events.increment(getApiClient(), getString(R.string.event_games_won), result);
+                Games.Events.increment(mGoogleApiClient, getString(R.string.event_games_won), result);
             }
         };
         googlePlayGamesViewFlipper = (ViewFlipper) findViewById(R.id.google_play_games);
@@ -201,7 +223,8 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
             @SuppressWarnings("synthetic-access")
             @Override
             public void onClick(final View v) {
-                beginUserInitiatedSignIn();
+                mSignInClicked = true;
+                mGoogleApiClient.connect();
             }
         });
         // Set up Google Play Games buttons
@@ -209,7 +232,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
         achievementsBtn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(final View v) {
-                Intent achievementsIntent = Games.Achievements.getAchievementsIntent(getApiClient());
+                Intent achievementsIntent = Games.Achievements.getAchievementsIntent(mGoogleApiClient);
                 startActivityForResult(achievementsIntent, REQUEST_ACHIEVEMENTS);
             }
         });
@@ -217,7 +240,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
         leaderboardsBtn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(final View v) {
-                Intent allLeaderboardsIntent = Games.Leaderboards.getAllLeaderboardsIntent(getApiClient());
+                Intent allLeaderboardsIntent = Games.Leaderboards.getAllLeaderboardsIntent(mGoogleApiClient);
                 startActivityForResult(allLeaderboardsIntent, REQUEST_LEADERBOARDS);
             }
         });
@@ -267,6 +290,20 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.disconnect();
+        }
+    }
+
+    @Override
     public void onLoaderReset(final Loader<Cursor> loader) {
         // Nothing to do
     }
@@ -277,7 +314,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
         if (BuildConfig.DEBUG)
             Log.d(TAG, "onLoadFinished found " + rowCount + " rows");
         stats = stats.unionWith(new StatsState(data));
-        if (isSignedIn())
+        if (mGoogleApiClient.isConnected())
             saveToCloud();
         else if (rowCount > 0)
             mPendingUpdateState = true;
@@ -295,7 +332,9 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
                 startActivity(new Intent(this, Preferences.class));
                 return true;
             case R.id.sign_out:
-                signOut();
+                mSignInClicked = false;
+                Games.signOut(mGoogleApiClient);
+                mGoogleApiClient.disconnect();
                 googlePlayGamesViewFlipper.setDisplayedChild(1);
                 return true;
             case R.id.about:
@@ -315,14 +354,45 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
     @Override
     public boolean onPrepareOptionsMenu(final Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        menu.findItem(R.id.sign_out).setVisible(isSignedIn());
+        menu.findItem(R.id.sign_out).setVisible(mGoogleApiClient.isConnected());
         return true;
     }
 
     @Override
-    public void onSignInFailed() {
-        if (BuildConfig.DEBUG)
-            Log.d(TripleSolitaireActivity.TAG, "onSignInFailed");
+    public void onConnectionFailed(final ConnectionResult connectionResult) {
+        if (mResolvingConnectionFailure) {
+            if (BuildConfig.DEBUG) {
+                Log.d(TAG, "onConnectionFailed() ignoring connection failure; already resolving.");
+            }
+            return;
+        }
+        if (mSignInClicked || mAutoStartSignInFlow) {
+            // Only try auto sign in once
+            PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean(AUTO_START_SIGN_IN, false).apply();
+            mAutoStartSignInFlow = false;
+            mSignInClicked = false;
+            if (connectionResult.hasResolution()) {
+                try {
+                    connectionResult.startResolutionForResult(this, REQUEST_SIGN_IN);
+                    mResolvingConnectionFailure = true;
+                } catch (IntentSender.SendIntentException e) {
+                    // The intent was canceled before it was sent.  Return to the default
+                    // state and attempt to connect to get an updated ConnectionResult.
+                    mGoogleApiClient.connect();
+                    mResolvingConnectionFailure = false;
+                }
+            } else {
+                // not resolvable... so show an error message
+                int errorCode = connectionResult.getErrorCode();
+                Dialog dialog = GooglePlayServicesUtil.getErrorDialog(errorCode, this, REQUEST_SIGN_IN);
+                if (dialog == null) {
+                    dialog = new AlertDialog.Builder(this).setMessage(getString(R.string.sign_in_error, errorCode))
+                            .setNeutralButton(android.R.string.ok, null).create();
+                }
+                dialog.show();
+                mResolvingConnectionFailure = false;
+            }
+        }
         invalidateOptionsMenu();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2 && isAccountAccessRestricted()) {
             googlePlayGamesViewFlipper.setDisplayedChild(0);
@@ -339,15 +409,20 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
     }
 
     @Override
-    public void onSignInSucceeded() {
+    public void onConnected(final Bundle bundle) {
         if (BuildConfig.DEBUG)
             Log.d(TripleSolitaireActivity.TAG, "onSignInSucceeded");
         invalidateOptionsMenu();
         googlePlayGamesViewFlipper.setDisplayedChild(2);
         if (!mAlreadyLoadedState)
-            AppStateManager.load(getApiClient(), OUR_STATE_KEY).setResultCallback(this);
+            AppStateManager.load(mGoogleApiClient, OUR_STATE_KEY).setResultCallback(this);
         else if (mPendingUpdateState)
             saveToCloud();
+    }
+
+    @Override
+    public void onConnectionSuspended(final int cause) {
+        mGoogleApiClient.connect();
     }
 
     @Override
@@ -372,7 +447,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
         final StatsState localStats = new StatsState(localData);
         final StatsState serverStats = new StatsState(serverData);
         final StatsState resolvedGame = localStats.unionWith(serverStats);
-        AppStateManager.resolve(getApiClient(), OUR_STATE_KEY, resolvedVersion, resolvedGame.toBytes())
+        AppStateManager.resolve(mGoogleApiClient, OUR_STATE_KEY, resolvedVersion, resolvedGame.toBytes())
                 .setResultCallback(this);
     }
 
@@ -414,7 +489,7 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
                 if (BuildConfig.DEBUG)
                     Log.d(TripleSolitaireActivity.TAG, "State not loaded - reconnect required");
                 // need to reconnect AppStateClient
-                reconnectClient();
+                mGoogleApiClient.reconnect();
                 break;
             default:
                 // TODO warn about generic error
@@ -423,56 +498,56 @@ public class TripleSolitaireActivity extends BaseGameActivity implements LoaderC
     }
 
     private synchronized void saveToCloud() {
-        AppStateManager.update(getApiClient(), OUR_STATE_KEY, stats.toBytes());
+        AppStateManager.update(mGoogleApiClient, OUR_STATE_KEY, stats.toBytes());
         // Check win streak achievements
         final int longestWinStreak = stats.getLongestWinStreak();
         if (BuildConfig.DEBUG)
             Log.d(TripleSolitaireActivity.TAG, "Longest Win Streak: " + longestWinStreak);
         if (longestWinStreak >= 1)
-            Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_youre_a_winner));
+            Games.Achievements.unlock(mGoogleApiClient, getString(R.string.achievement_youre_a_winner));
         if (longestWinStreak >= 5)
-            Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_streaker));
+            Games.Achievements.unlock(mGoogleApiClient, getString(R.string.achievement_streaker));
         if (longestWinStreak >= 10)
-            Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_master_streaker));
+            Games.Achievements.unlock(mGoogleApiClient, getString(R.string.achievement_master_streaker));
         // Check minimum moves achievements
         final int minimumMovesUnsynced = stats.getMinimumMoves(true);
         if (minimumMovesUnsynced < Integer.MAX_VALUE) {
             if (BuildConfig.DEBUG)
                 Log.d(TripleSolitaireActivity.TAG, "Minimum Moves Unsynced: " + minimumMovesUnsynced);
-            Games.Leaderboards.submitScore(getApiClient(), getString(R.string.leaderboard_moves),
+            Games.Leaderboards.submitScore(mGoogleApiClient, getString(R.string.leaderboard_moves),
                     minimumMovesUnsynced);
         }
         final int minimumMoves = stats.getMinimumMoves(false);
         if (BuildConfig.DEBUG)
             Log.d(TripleSolitaireActivity.TAG, "Minimum Moves: " + minimumMoves);
         if (minimumMoves < 400)
-            Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_figured_it_out));
+            Games.Achievements.unlock(mGoogleApiClient, getString(R.string.achievement_figured_it_out));
         if (minimumMoves < 300)
-            Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_no_mistakes));
+            Games.Achievements.unlock(mGoogleApiClient, getString(R.string.achievement_no_mistakes));
         // Check shortest time achievements
         final int shortestTimeUnsynced = stats.getShortestTime(true);
         if (shortestTimeUnsynced < Integer.MAX_VALUE) {
             if (BuildConfig.DEBUG)
                 Log.d(TripleSolitaireActivity.TAG, "Shortest Time Unsynced (minutes): " +
                         (double) shortestTimeUnsynced / 60);
-            Games.Leaderboards.submitScore(getApiClient(), getString(R.string.leaderboard_time),
+            Games.Leaderboards.submitScore(mGoogleApiClient, getString(R.string.leaderboard_time),
                     shortestTimeUnsynced * DateUtils.SECOND_IN_MILLIS);
         }
         final int shortestTime = stats.getShortestTime(false);
         if (BuildConfig.DEBUG)
             Log.d(TripleSolitaireActivity.TAG, "Shortest Time (minutes): " + (double) shortestTime / 60);
         if (shortestTime < 15 * 60)
-            Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_quarter_hour));
+            Games.Achievements.unlock(mGoogleApiClient, getString(R.string.achievement_quarter_hour));
         if (shortestTime < 10 * 60)
-            Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_single_digits));
+            Games.Achievements.unlock(mGoogleApiClient, getString(R.string.achievement_single_digits));
         if (shortestTime < 8 * 60)
-            Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_speed_demon));
+            Games.Achievements.unlock(mGoogleApiClient, getString(R.string.achievement_speed_demon));
         ContentValues values = new ContentValues();
         values.put(GameContract.Games.COLUMN_NAME_SYNCED, true);
         mAsyncQueryHandler.startUpdate(0, null, GameContract.Games.CONTENT_URI, values,
                 GameContract.Games.COLUMN_NAME_SYNCED + "=0", null);
         // Load achievements to handle incremental achievements
-        Games.Achievements.load(getApiClient(), false)
+        Games.Achievements.load(mGoogleApiClient, false)
                 .setResultCallback(new ResultCallback<Achievements.LoadAchievementsResult>() {
                     @Override
                     public void onResult(final Achievements.LoadAchievementsResult loadAchievementsResult) {
