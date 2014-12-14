@@ -2,7 +2,7 @@
 <resources>
 
     <!-- Main Menu theme -->
-    <style name="Theme.TripleSolitaire.Main" parent="Theme.TripleSolitaire">
+    <style name="Theme.TripleSolitaire.Main">
         <item name="android:actionBarStyle">@style/ActionBar.TripleSolitaire.Main</item>
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowTranslucentNavigation">true</item>

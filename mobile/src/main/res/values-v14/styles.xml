@@ -6,12 +6,12 @@
     </style>
 
     <!-- Main Menu theme -->
-    <style name="ActionBar.TripleSolitaire.Main" parent="ActionBar.TripleSolitaire">
+    <style name="ActionBar.TripleSolitaire.Main">
         <item name="android:displayOptions">none</item>
     </style>
 
     <!-- Game theme -->
-    <style name="ActionBar.TripleSolitaire.Game" parent="ActionBar.TripleSolitaire">
+    <style name="ActionBar.TripleSolitaire.Game">
         <item name="android:background">@drawable/ab_solid_triplesolitaire</item>
     </style>
 </resources>

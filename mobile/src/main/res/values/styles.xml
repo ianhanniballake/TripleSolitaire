@@ -10,20 +10,20 @@
     </style>
 
     <!-- Main Menu theme -->
-    <style name="Theme.TripleSolitaire.Main" parent="Theme.TripleSolitaire">
+    <style name="Theme.TripleSolitaire.Main">
         <item name="android:actionBarStyle">@style/ActionBar.TripleSolitaire.Main</item>
     </style>
 
-    <style name="ActionBar.TripleSolitaire.Main" parent="ActionBar.TripleSolitaire">
+    <style name="ActionBar.TripleSolitaire.Main">
         <item name="android:displayOptions">none</item>
     </style>
 
     <!-- Game theme -->
-    <style name="Theme.TripleSolitaire.Game" parent="Theme.TripleSolitaire">
+    <style name="Theme.TripleSolitaire.Game">
         <item name="android:actionBarStyle">@style/ActionBar.TripleSolitaire.Game</item>
     </style>
 
-    <style name="ActionBar.TripleSolitaire.Game" parent="ActionBar.TripleSolitaire">
+    <style name="ActionBar.TripleSolitaire.Game">
     </style>
 
 </resources>
