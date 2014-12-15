@@ -109,7 +109,7 @@ public class TripleSolitaireActivity extends Activity implements LoaderCallbacks
             final String achievementId = achievement.getAchievementId();
             if (achievement.getType() != Achievement.TYPE_INCREMENTAL)
                 continue;
-            final int increment = stats.getGamesWon() - achievement.getCurrentSteps();
+            final int increment = stats.getGamesWon(false) - achievement.getCurrentSteps();
             if (achievementId.equals(win10) && increment > 0)
                 Games.Achievements.increment(mGoogleApiClient, win10, increment);
             if (achievementId.equals(win100) && increment > 0)
@@ -197,10 +197,6 @@ public class TripleSolitaireActivity extends Activity implements LoaderCallbacks
                 .addApi(AppStateManager.API).addScope(AppStateManager.SCOPE_APP_STATE)
                 .build();
         mAsyncQueryHandler = new AsyncQueryHandler(getContentResolver()) {
-            @Override
-            protected void onUpdateComplete(final int token, final Object cookie, final int result) {
-                Games.Events.increment(mGoogleApiClient, getString(R.string.event_games_won), result);
-            }
         };
         googlePlayGamesViewFlipper = (ViewFlipper) findViewById(R.id.google_play_games);
         final Button newGameBtn = (Button) findViewById(R.id.new_game);
@@ -253,7 +249,7 @@ public class TripleSolitaireActivity extends Activity implements LoaderCallbacks
                 final String deepLink = "/share/";
                 builder.setContentUrl(desktopUrl).setContentDeepLinkId(deepLink)
                         .addCallToAction("PLAY", desktopUrl, deepLink);
-                if (stats.getGamesWon() == 0) {
+                if (stats.getGamesWon(false) == 0) {
                     builder.setText(getString(R.string.share_text_no_wins));
                 } else {
                     final double bestTime = stats.getShortestTime(false);
@@ -542,6 +538,11 @@ public class TripleSolitaireActivity extends Activity implements LoaderCallbacks
             Games.Achievements.unlock(mGoogleApiClient, getString(R.string.achievement_single_digits));
         if (shortestTime < 8 * 60)
             Games.Achievements.unlock(mGoogleApiClient, getString(R.string.achievement_speed_demon));
+        // Send events for newly won games
+        final int gamesWonUnsynced = stats.getGamesWon(true);
+        if (BuildConfig.DEBUG)
+            Log.d(TripleSolitaireActivity.TAG, "Games Won Unsynced: " + gamesWonUnsynced);
+        Games.Events.increment(mGoogleApiClient, getString(R.string.event_games_won), gamesWonUnsynced);
         ContentValues values = new ContentValues();
         values.put(GameContract.Games.COLUMN_NAME_SYNCED, true);
         mAsyncQueryHandler.startUpdate(0, null, GameContract.Games.CONTENT_URI, values,

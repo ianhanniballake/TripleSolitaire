@@ -34,7 +34,7 @@ public class StatsDialogFragment extends DialogFragment {
     public Dialog onCreateDialog(final Bundle savedInstanceState) {
         final StatsState stats = new StatsState(getArguments().getString(STATS_STATE));
         final int gamesPlayed = stats.getGamesPlayed();
-        final int gamesWon = stats.getGamesWon();
+        final int gamesWon = stats.getGamesWon(false);
         final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         final LayoutInflater inflater = getActivity().getLayoutInflater();
         final View layout = inflater.inflate(R.layout.stats_dialog, null);

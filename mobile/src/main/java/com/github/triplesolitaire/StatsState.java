@@ -153,7 +153,7 @@ public class StatsState {
         final int size = gameStats.size();
         for (int index = 0; index < size; index++)
             durationSum += gameStats.get(gameStats.keyAt(index)).duration;
-        return durationSum / getGamesWon();
+        return durationSum / getGamesWon(false);
     }
 
     /**
@@ -166,7 +166,7 @@ public class StatsState {
         final int size = gameStats.size();
         for (int index = 0; index < size; index++)
             moveSum += gameStats.get(gameStats.keyAt(index)).moves;
-        return moveSum / getGamesWon();
+        return moveSum / getGamesWon(false);
     }
 
     /**
@@ -181,13 +181,17 @@ public class StatsState {
     /**
      * Gets the total number of games won
      *
+     * @param onlyUnsycned If only unsynced games should be considered
      * @return The number of games won
      */
-    public int getGamesWon() {
+    public int getGamesWon(final boolean onlyUnsycned) {
         int gamesWon = 0;
-        for (int index = 0; index < gameStats.size(); index++)
-            if (!gameStats.valueAt(index).loss)
-                gamesWon++;
+        for (int index = 0; index < gameStats.size(); index++) {
+            final GameStats stats = gameStats.get(gameStats.keyAt(index));
+            if (stats.loss || (onlyUnsycned && stats.synced))
+                continue;
+            gamesWon++;
+        }
         return gamesWon;
     }
 
