@@ -117,7 +117,7 @@
             android:layout_marginLeft="8dp"
             android:padding="16dp"
             android:text="@string/new_game"
-            android:textSize="24sp"/>
+            android:textSize="@dimen/button_large_text_size"/>
 
         <Button
             android:id="@+id/stats"
@@ -128,7 +128,7 @@
             android:layout_toRightOf="@id/new_game"
             android:padding="16dp"
             android:text="@string/stats"
-            android:textSize="24sp"/>
+            android:textSize="@dimen/button_large_text_size"/>
 
     </RelativeLayout>
 
