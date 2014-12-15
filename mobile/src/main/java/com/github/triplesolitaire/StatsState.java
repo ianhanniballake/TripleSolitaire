@@ -3,6 +3,7 @@ package com.github.triplesolitaire;
 import android.content.ContentProviderOperation;
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.util.SparseArray;
 
@@ -181,19 +182,49 @@ public class StatsState {
     /**
      * Gets the total number of games won
      *
-     * @param onlyUnsycned If only unsynced games should be considered
+     * @param onlyUnsynced If only unsynced games should be considered
      * @return The number of games won
      */
-    public int getGamesWon(final boolean onlyUnsycned) {
+    public int getGamesWon(final boolean onlyUnsynced) {
         int gamesWon = 0;
         for (int index = 0; index < gameStats.size(); index++) {
             final GameStats stats = gameStats.get(gameStats.keyAt(index));
-            if (stats.loss || (onlyUnsycned && stats.synced))
+            if (stats.loss || (onlyUnsynced && stats.synced))
                 continue;
             gamesWon++;
         }
         return gamesWon;
     }
+
+    /**
+     * Gets the number of unsynced games
+     * @return The number of unsynced games
+     */
+    public int getGamesUnsynced() {
+        int gamesUnsynced = 0;
+        for (int index = 0; index < gameStats.size(); index++) {
+            final GameStats stats = gameStats.get(gameStats.keyAt(index));
+            if (!stats.synced) {
+                gamesUnsynced++;
+            }
+        }
+        return gamesUnsynced;
+    }
+
+    /**
+     * Gets the total time played across all games
+     *
+     * @return The time played across all games in milliseconds
+     */
+    public long getTotalPlayedTimeMillis() {
+        long playedTimeMillis = 0;
+        for (int index = 0; index < gameStats.size(); index++) {
+            final GameStats stats = gameStats.get(gameStats.keyAt(index));
+            playedTimeMillis += stats.duration * DateUtils.SECOND_IN_MILLIS;
+        }
+        return playedTimeMillis;
+    }
+
 
     /**
      * Gets a list of ContentProviderOperations that save all of the current game stats to the local ContentProvider.
@@ -247,22 +278,22 @@ public class StatsState {
     /**
      * Gets the minimum number of moves in any won game
      *
-     * @param onlyUnsycned If only unsynced games should be considered
+     * @param onlyUnsynced If only unsynced games should be considered
      * @return The minimum number of moves used to win a game
      */
-    public int getMinimumMoves(final boolean onlyUnsycned) {
+    public int getMinimumMoves(final boolean onlyUnsynced) {
         int numConsidered = 0;
         int minimumMoves = Integer.MAX_VALUE;
         final int size = gameStats.size();
         for (int index = 0; index < size; index++) {
             final GameStats stats = gameStats.get(gameStats.keyAt(index));
-            if (stats.loss || (onlyUnsycned && stats.synced))
+            if (stats.loss || (onlyUnsynced && stats.synced))
                 continue;
             minimumMoves = Math.min(minimumMoves, stats.moves);
             numConsidered++;
         }
         if (BuildConfig.DEBUG)
-            Log.d(StatsState.class.getSimpleName(), "Get Minimum Moves" + (onlyUnsycned ? " (Unsynced)" : "")
+            Log.d(StatsState.class.getSimpleName(), "Get Minimum Moves" + (onlyUnsynced ? " (Unsynced)" : "")
                     + ": considered " + numConsidered);
         return minimumMoves;
     }
@@ -270,22 +301,22 @@ public class StatsState {
     /**
      * Gets the shortest time (duration) in any won game
      *
-     * @param onlyUnsycned If only unsynced games should be considered
+     * @param onlyUnsynced If only unsynced games should be considered
      * @return The shortest time (in seconds) in any won game
      */
-    public int getShortestTime(final boolean onlyUnsycned) {
+    public int getShortestTime(final boolean onlyUnsynced) {
         int numConsidered = 0;
         int shortestDuration = Integer.MAX_VALUE;
         final int size = gameStats.size();
         for (int index = 0; index < size; index++) {
             final GameStats stats = gameStats.get(gameStats.keyAt(index));
-            if (stats.loss || (onlyUnsycned && stats.synced))
+            if (stats.loss || (onlyUnsynced && stats.synced))
                 continue;
             shortestDuration = Math.min(shortestDuration, stats.duration);
             numConsidered++;
         }
         if (BuildConfig.DEBUG)
-            Log.d(StatsState.class.getSimpleName(), "Get Shorted Time" + (onlyUnsycned ? " (Unsynced)" : "")
+            Log.d(StatsState.class.getSimpleName(), "Get Shorted Time" + (onlyUnsynced ? " (Unsynced)" : "")
                     + ": considered " + numConsidered);
         return shortestDuration;
     }

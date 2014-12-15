@@ -39,14 +39,20 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.drive.Drive;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.GamesStatusCodes;
 import com.google.android.gms.games.achievement.Achievement;
 import com.google.android.gms.games.achievement.AchievementBuffer;
 import com.google.android.gms.games.achievement.Achievements;
+import com.google.android.gms.games.snapshot.Snapshot;
+import com.google.android.gms.games.snapshot.SnapshotContents;
+import com.google.android.gms.games.snapshot.SnapshotMetadataChange;
+import com.google.android.gms.games.snapshot.Snapshots;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.PlusShare;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -54,8 +60,9 @@ import java.util.ArrayList;
  */
 public class TripleSolitaireActivity extends Activity implements LoaderCallbacks<Cursor>,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
-        ResultCallback<AppStateManager.StateResult> {
+        ResultCallback<Snapshots.OpenSnapshotResult> {
     private static final int OUR_STATE_KEY = 0;
+    private static final String OUR_SNAPSHOT_ID = "stats.json";
     private static final int REQUEST_SIGN_IN = 0;
     private static final int REQUEST_ACHIEVEMENTS = 1;
     private static final int REQUEST_LEADERBOARDS = 2;
@@ -73,6 +80,7 @@ public class TripleSolitaireActivity extends Activity implements LoaderCallbacks
     private boolean mPendingUpdateState = false;
     private StatsState stats = new StatsState();
     private GoogleApiClient mGoogleApiClient;
+    private Snapshot mSnapshot;
     private AsyncQueryHandler mAsyncQueryHandler;
     private AsyncTask<Void, Void, Void> mPersistStatsAsyncTask = new AsyncTask<Void, Void, Void>() {
         @Override
@@ -94,6 +102,19 @@ public class TripleSolitaireActivity extends Activity implements LoaderCallbacks
         protected void onPostExecute(final Void result) {
             if (mPendingUpdateState && mGoogleApiClient.isConnected())
                 saveToCloud();
+        }
+    };
+    private ResultCallback<AppStateManager.StateResult> mAppStateResult = new ResultCallback<AppStateManager.StateResult>() {
+        @Override
+        public void onResult(final AppStateManager.StateResult stateResult) {
+            final AppStateManager.StateLoadedResult loadedResult = stateResult.getLoadedResult();
+            if (loadedResult != null) {
+                onStateLoaded(loadedResult);
+            }
+            final AppStateManager.StateConflictResult conflictResult = stateResult.getConflictResult();
+            if (conflictResult != null) {
+                onStateConflict(conflictResult);
+            }
         }
     };
 
@@ -195,6 +216,7 @@ public class TripleSolitaireActivity extends Activity implements LoaderCallbacks
                 .addApi(Games.API).addScope(Games.SCOPE_GAMES)
                 .addApi(Plus.API).addScope(Plus.SCOPE_PLUS_LOGIN)
                 .addApi(AppStateManager.API).addScope(AppStateManager.SCOPE_APP_STATE)
+                .addApi(Drive.API).addScope(Drive.SCOPE_APPFOLDER)
                 .build();
         mAsyncQueryHandler = new AsyncQueryHandler(getContentResolver()) {
         };
@@ -310,7 +332,7 @@ public class TripleSolitaireActivity extends Activity implements LoaderCallbacks
         if (BuildConfig.DEBUG)
             Log.d(TAG, "onLoadFinished found " + rowCount + " rows");
         stats = stats.unionWith(new StatsState(data));
-        if (mGoogleApiClient.isConnected())
+        if (mAlreadyLoadedState && mGoogleApiClient.isConnected())
             saveToCloud();
         else if (rowCount > 0)
             mPendingUpdateState = true;
@@ -411,7 +433,7 @@ public class TripleSolitaireActivity extends Activity implements LoaderCallbacks
         invalidateOptionsMenu();
         googlePlayGamesViewFlipper.setDisplayedChild(2);
         if (!mAlreadyLoadedState)
-            AppStateManager.load(mGoogleApiClient, OUR_STATE_KEY).setResultCallback(this);
+            Games.Snapshots.open(mGoogleApiClient, OUR_SNAPSHOT_ID, false).setResultCallback(this);
         else if (mPendingUpdateState)
             saveToCloud();
     }
@@ -422,14 +444,74 @@ public class TripleSolitaireActivity extends Activity implements LoaderCallbacks
     }
 
     @Override
-    public void onResult(final AppStateManager.StateResult stateResult) {
-        final AppStateManager.StateLoadedResult loadedResult = stateResult.getLoadedResult();
-        if (loadedResult != null) {
-            onStateLoaded(loadedResult);
+    public void onResult(final Snapshots.OpenSnapshotResult openSnapshotResult) {
+        final int statusCode = openSnapshotResult.getStatus().getStatusCode();
+        mSnapshot = openSnapshotResult.getSnapshot();
+        switch (statusCode) {
+            case GamesStatusCodes.STATUS_OK:
+                if (BuildConfig.DEBUG)
+                    Log.d(TripleSolitaireActivity.TAG, "Snapshot loaded successfully");
+                // Data was successfully loaded from the cloud: merge with local data.
+                try {
+                    stats = stats.unionWith(new StatsState(mSnapshot.getSnapshotContents().readFully()));
+                    mAlreadyLoadedState = true;
+                    mPersistStatsAsyncTask.execute();
+                } catch (IOException e) {
+                    Log.e(TAG, "Error reading snapshot contents", e);
+                }
+                break;
+            case GamesStatusCodes.STATUS_SNAPSHOT_NOT_FOUND:
+                if (BuildConfig.DEBUG)
+                    Log.d(TripleSolitaireActivity.TAG, "Snapshot loaded, no key found");
+                // key not found means there is no saved data. Fall back to see if there is any legacy AppState data
+                AppStateManager.load(mGoogleApiClient, OUR_STATE_KEY).setResultCallback(mAppStateResult);
+                break;
+            case GamesStatusCodes.STATUS_SNAPSHOT_CONFLICT:
+                onSnapshotConflict(openSnapshotResult);
+                break;
+            case GamesStatusCodes.STATUS_NETWORK_ERROR_NO_DATA:
+                if (BuildConfig.DEBUG)
+                    Log.d(TripleSolitaireActivity.TAG, "Snapshot not loaded - network error with no data");
+                // can't reach cloud, and we have no local state. Warn user that
+                // they may not see their existing progress, but any new progress won't be lost.
+                // TODO warn about network error
+                break;
+            case GamesStatusCodes.STATUS_NETWORK_ERROR_STALE_DATA:
+                if (BuildConfig.DEBUG)
+                    Log.d(TripleSolitaireActivity.TAG, "Snapshot not loaded - network error with stale data");
+                // can't reach cloud, but we have locally cached data.
+                // TODO warn about stale data
+                break;
+            case GamesStatusCodes.STATUS_CLIENT_RECONNECT_REQUIRED:
+                if (BuildConfig.DEBUG)
+                    Log.d(TripleSolitaireActivity.TAG, "Snapshot not loaded - reconnect required");
+                // need to reconnect AppStateClient
+                mGoogleApiClient.reconnect();
+                break;
+            default:
+                // TODO warn about generic error
+                break;
         }
-        final AppStateManager.StateConflictResult conflictResult = stateResult.getConflictResult();
-        if (conflictResult != null) {
-            onStateConflict(conflictResult);
+    }
+
+    private void onSnapshotConflict(final Snapshots.OpenSnapshotResult openSnapshotResult) {
+        final String conflictId = openSnapshotResult.getConflictId();
+        SnapshotContents resolvedSnapshotContents = openSnapshotResult.getResolutionSnapshotContents();
+        try {
+            final byte[] localData = resolvedSnapshotContents.readFully();
+            final byte[] serverData = openSnapshotResult.getSnapshot().getSnapshotContents().readFully();
+            if (BuildConfig.DEBUG)
+                Log.d(TripleSolitaireActivity.TAG, "onSnapshotConflict");
+            // Union the two sets of data together to form a resolved, consistent set of stats
+            final StatsState localStats = new StatsState(localData);
+            final StatsState serverStats = new StatsState(serverData);
+            final StatsState resolvedGame = localStats.unionWith(serverStats);
+            SnapshotMetadataChange metadataChange = getUpdatedMetadata(resolvedGame);
+            resolvedSnapshotContents.writeBytes(resolvedGame.toBytes());
+            Games.Snapshots.resolveConflict(mGoogleApiClient, conflictId, OUR_SNAPSHOT_ID, metadataChange,
+                    resolvedSnapshotContents).setResultCallback(this);
+        } catch (IOException e) {
+            Log.e(TAG, "Error reading snapshot conflict contents", e);
         }
     }
 
@@ -444,7 +526,7 @@ public class TripleSolitaireActivity extends Activity implements LoaderCallbacks
         final StatsState serverStats = new StatsState(serverData);
         final StatsState resolvedGame = localStats.unionWith(serverStats);
         AppStateManager.resolve(mGoogleApiClient, OUR_STATE_KEY, resolvedVersion, resolvedGame.toBytes())
-                .setResultCallback(this);
+                .setResultCallback(mAppStateResult);
     }
 
     private void onStateLoaded(final AppStateManager.StateLoadedResult loadedResult) {
@@ -456,17 +538,14 @@ public class TripleSolitaireActivity extends Activity implements LoaderCallbacks
                     Log.d(TripleSolitaireActivity.TAG, "State loaded successfully");
                 // Data was successfully loaded from the cloud: merge with local data.
                 stats = stats.unionWith(new StatsState(localData));
-                mAlreadyLoadedState = true;
-                mPersistStatsAsyncTask.execute();
+                Games.Snapshots.open(mGoogleApiClient, OUR_SNAPSHOT_ID, true).setResultCallback(this);
                 break;
             case AppStateStatusCodes.STATUS_STATE_KEY_NOT_FOUND:
                 if (BuildConfig.DEBUG)
                     Log.d(TripleSolitaireActivity.TAG, "State loaded, no key found");
                 // key not found means there is no saved data. To us, this is the same as
                 // having empty data, so we treat this as a success.
-                mAlreadyLoadedState = true;
-                if (mPendingUpdateState)
-                    saveToCloud();
+                Games.Snapshots.open(mGoogleApiClient, OUR_SNAPSHOT_ID, true).setResultCallback(this);
                 break;
             case AppStateStatusCodes.STATUS_NETWORK_ERROR_NO_DATA:
                 if (BuildConfig.DEBUG)
@@ -493,8 +572,24 @@ public class TripleSolitaireActivity extends Activity implements LoaderCallbacks
         }
     }
 
+    private SnapshotMetadataChange getUpdatedMetadata(StatsState statsState) {
+        final int gamesWon = statsState.getGamesWon(false);
+        final int gamesPlayed = statsState.getGamesPlayed();
+        String description = getResources().getQuantityString(R.plurals.snapshot_description, gamesWon,
+                gamesWon, gamesPlayed);
+        return new SnapshotMetadataChange.Builder()
+                .setPlayedTimeMillis(stats.getTotalPlayedTimeMillis())
+                .setDescription(description)
+                .build();
+    }
+
     private synchronized void saveToCloud() {
-        AppStateManager.update(mGoogleApiClient, OUR_STATE_KEY, stats.toBytes());
+        if (stats.getGamesUnsynced() > 0) {
+            mSnapshot.getSnapshotContents().writeBytes(stats.toBytes());
+            SnapshotMetadataChange metadataChange = getUpdatedMetadata(stats);
+            Games.Snapshots.commitAndClose(mGoogleApiClient, mSnapshot, metadataChange);
+            Games.Snapshots.open(mGoogleApiClient, OUR_SNAPSHOT_ID, true).setResultCallback(this);
+        }
         // Check win streak achievements
         final int longestWinStreak = stats.getLongestWinStreak();
         if (BuildConfig.DEBUG)
