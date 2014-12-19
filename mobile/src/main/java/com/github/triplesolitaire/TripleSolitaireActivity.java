@@ -16,9 +16,10 @@ import android.content.Loader;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.RemoteException;
 import android.os.UserManager;
 import android.preference.PreferenceManager;
@@ -82,9 +83,11 @@ public class TripleSolitaireActivity extends Activity implements LoaderCallbacks
     private GoogleApiClient mGoogleApiClient;
     private Snapshot mSnapshot;
     private AsyncQueryHandler mAsyncQueryHandler;
-    private AsyncTask<Void, Void, Void> mPersistStatsAsyncTask = new AsyncTask<Void, Void, Void>() {
+    private HandlerThread mPersistStateHandlerThread;
+    private Handler mPersistStateHandler;
+    private Runnable mPersistStateRunnable = new Runnable() {
         @Override
-        protected Void doInBackground(final Void... params) {
+        public void run() {
             final ArrayList<ContentProviderOperation> operations = stats.getLocalSaveOperations();
             if (BuildConfig.DEBUG)
                 Log.d(TripleSolitaireActivity.TAG, "Persisting stats: " + operations.size() + " operations");
@@ -95,13 +98,14 @@ public class TripleSolitaireActivity extends Activity implements LoaderCallbacks
             }
             if (BuildConfig.DEBUG)
                 Log.d(TripleSolitaireActivity.TAG, "Persisting stats completed");
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(final Void result) {
-            if (mPendingUpdateState && mGoogleApiClient.isConnected())
-                saveToCloud();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (mPendingUpdateState && mGoogleApiClient.isConnected()) {
+                        saveToCloud();
+                    }
+                }
+            });
         }
     };
     private ResultCallback<AppStateManager.StateResult> mAppStateResult = new ResultCallback<AppStateManager.StateResult>() {
@@ -220,6 +224,9 @@ public class TripleSolitaireActivity extends Activity implements LoaderCallbacks
                 .build();
         mAsyncQueryHandler = new AsyncQueryHandler(getContentResolver()) {
         };
+        mPersistStateHandlerThread = new HandlerThread(TAG);
+        mPersistStateHandlerThread.start();
+        mPersistStateHandler = new Handler(mPersistStateHandlerThread.getLooper());
         googlePlayGamesViewFlipper = (ViewFlipper) findViewById(R.id.google_play_games);
         final Button newGameBtn = (Button) findViewById(R.id.new_game);
         newGameBtn.setOnClickListener(new OnClickListener() {
@@ -319,6 +326,12 @@ public class TripleSolitaireActivity extends Activity implements LoaderCallbacks
         if (mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mPersistStateHandlerThread.quit();
     }
 
     @Override
@@ -455,7 +468,7 @@ public class TripleSolitaireActivity extends Activity implements LoaderCallbacks
                 try {
                     stats = stats.unionWith(new StatsState(mSnapshot.getSnapshotContents().readFully()));
                     mAlreadyLoadedState = true;
-                    mPersistStatsAsyncTask.execute();
+                    mPersistStateHandler.post(mPersistStateRunnable);
                 } catch (IOException e) {
                     Log.e(TAG, "Error reading snapshot contents", e);
                 }
