@@ -14,7 +14,7 @@ public class GamePauseDialogFragment extends DialogFragment {
     public Dialog onCreateDialog(final Bundle savedInstanceState) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            builder.setIcon(R.drawable.icon);
+            builder.setIcon(R.drawable.ic_launcher);
         }
         builder.setTitle(R.string.app_name).setMessage(R.string.game_paused)
                 .setNegativeButton(getText(R.string.resume), null);

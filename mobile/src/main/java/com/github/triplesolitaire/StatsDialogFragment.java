@@ -75,7 +75,7 @@ public class StatsDialogFragment extends DialogFragment {
             averageMovesView.setText(integerFormat.format(averageMoves));
         }
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            builder.setIcon(R.drawable.icon);
+            builder.setIcon(R.drawable.ic_launcher);
         }
         builder.setTitle(R.string.stats).setView(layout)
                 .setNegativeButton(getText(R.string.close), null);
