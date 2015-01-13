@@ -601,6 +601,7 @@ public class TripleSolitaireActivity extends Activity implements LoaderCallbacks
             mSnapshot.getSnapshotContents().writeBytes(stats.toBytes());
             SnapshotMetadataChange metadataChange = getUpdatedMetadata(stats);
             Games.Snapshots.commitAndClose(mGoogleApiClient, mSnapshot, metadataChange);
+            mAlreadyLoadedState = false;
             Games.Snapshots.open(mGoogleApiClient, OUR_SNAPSHOT_ID, true).setResultCallback(this);
         }
         // Check win streak achievements
