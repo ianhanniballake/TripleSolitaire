@@ -40,7 +40,7 @@ public class Move {
     /**
      * Cascade of cards. May contain only a single card.
      */
-    private final LinkedList<String> cascade = new LinkedList<String>();
+    private final LinkedList<String> cascade = new LinkedList<>();
     /**
      * Source location in the following format:
      * <ul>
@@ -222,15 +222,7 @@ public class Move {
      */
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder();
-        sb.append(type.toString());
-        sb.append(':');
-        sb.append(fromIndex);
-        sb.append('>');
-        sb.append(toIndex);
-        sb.append(':');
-        sb.append(getCascadeAsString());
-        return sb.toString();
+        return type.toString() + ':' + fromIndex + '>' + toIndex + ':' + getCascadeAsString();
     }
 
     /**

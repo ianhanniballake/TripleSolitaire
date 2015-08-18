@@ -23,8 +23,8 @@ public class LaneData {
      * Creates a new empty LaneData
      */
     public LaneData() {
-        stack = new Stack<String>();
-        cascade = new LinkedList<String>();
+        stack = new Stack<>();
+        cascade = new LinkedList<>();
     }
 
     /**
@@ -34,10 +34,10 @@ public class LaneData {
      * @param cascade    Cards to set as the cascade
      */
     public LaneData(final List<String> arrayStack, final List<String> cascade) {
-        stack = new Stack<String>();
+        stack = new Stack<>();
         for (final String card : arrayStack)
             stack.push(card);
-        this.cascade = new LinkedList<String>(cascade);
+        this.cascade = new LinkedList<>(cascade);
     }
 
     /**

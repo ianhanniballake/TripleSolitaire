@@ -14,6 +14,7 @@ public class TripleSolitaireApplication extends Application {
      */
     @Override
     public void onCreate() {
+        super.onCreate();
         if (BuildConfig.DEBUG) {
             StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectDiskReads().detectDiskWrites()
                     .detectNetwork().penaltyLog().penaltyFlashScreen().build());

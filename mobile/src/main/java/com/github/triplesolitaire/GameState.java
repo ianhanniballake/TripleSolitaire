@@ -641,7 +641,7 @@ public class GameState {
      * Starts a new game, resetting the game state and updating the UI to match
      */
     public void newGame() {
-        final ArrayList<String> fullDeck = new ArrayList<String>();
+        final ArrayList<String> fullDeck = new ArrayList<>();
         final String[] suitList = {"clubs", "diamonds", "hearts", "spades"};
         for (int deckNum = 0; deckNum < 3; deckNum++)
             for (final String suit : suitList)
@@ -694,17 +694,17 @@ public class GameState {
         activity.updateMoveCount();
         autoplayLaneIndexLocked = savedInstanceState.getBooleanArray("autoplayLaneIndexLocked");
         final ArrayList<String> arrayMoves = savedInstanceState.getStringArrayList("moves");
-        moves = new Stack<Move>();
+        moves = new Stack<>();
         for (final String move : arrayMoves)
             moves.push(new Move(move));
         // Restore the stack
         final ArrayList<String> arrayCardStock = savedInstanceState.getStringArrayList("stock");
-        stock = new Stack<String>();
+        stock = new Stack<>();
         for (final String card : arrayCardStock)
             stock.push(card);
         activity.updateStockUI();
         // Restore the waste data
-        waste = new LinkedList<String>(savedInstanceState.getStringArrayList("waste"));
+        waste = new LinkedList<>(savedInstanceState.getStringArrayList("waste"));
         activity.updateWasteUI();
         // Restore the foundation data
         foundation = savedInstanceState.getStringArray("foundation");
@@ -735,8 +735,8 @@ public class GameState {
         for (final Move move : moves)
             arrayMoves.add(move.toString());
         outState.putStringArrayList("moves", arrayMoves);
-        outState.putStringArrayList("stock", new ArrayList<String>(stock));
-        outState.putStringArrayList("waste", new ArrayList<String>(waste));
+        outState.putStringArrayList("stock", new ArrayList<>(stock));
+        outState.putStringArrayList("waste", new ArrayList<>(waste));
         outState.putStringArray("foundation", foundation);
         for (int laneIndex = 0; laneIndex < 13; laneIndex++) {
             outState.putStringArrayList("laneStack" + laneIndex, new ArrayList<String>(lane[laneIndex].getStack()));
