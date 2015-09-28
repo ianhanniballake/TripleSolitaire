@@ -33,8 +33,6 @@ import android.widget.Button;
 import android.widget.ViewFlipper;
 
 import com.github.triplesolitaire.provider.GameContract;
-import com.google.android.gms.appstate.AppStateManager;
-import com.google.android.gms.appstate.AppStateStatusCodes;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.SignInButton;
@@ -62,7 +60,6 @@ import java.util.ArrayList;
 public class TripleSolitaireActivity extends Activity implements LoaderCallbacks<Cursor>,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
         ResultCallback<Snapshots.OpenSnapshotResult> {
-    private static final int OUR_STATE_KEY = 0;
     private static final String OUR_SNAPSHOT_ID = "stats.json";
     private static final int REQUEST_SIGN_IN = 0;
     private static final int REQUEST_ACHIEVEMENTS = 1;
@@ -106,19 +103,6 @@ public class TripleSolitaireActivity extends Activity implements LoaderCallbacks
                     }
                 }
             });
-        }
-    };
-    private ResultCallback<AppStateManager.StateResult> mAppStateResult = new ResultCallback<AppStateManager.StateResult>() {
-        @Override
-        public void onResult(final AppStateManager.StateResult stateResult) {
-            final AppStateManager.StateLoadedResult loadedResult = stateResult.getLoadedResult();
-            if (loadedResult != null) {
-                onStateLoaded(loadedResult);
-            }
-            final AppStateManager.StateConflictResult conflictResult = stateResult.getConflictResult();
-            if (conflictResult != null) {
-                onStateConflict(conflictResult);
-            }
         }
     };
 
@@ -219,7 +203,6 @@ public class TripleSolitaireActivity extends Activity implements LoaderCallbacks
                 .setViewForPopups(title)
                 .addApi(Games.API).addScope(Games.SCOPE_GAMES)
                 .addApi(Plus.API).addScope(Plus.SCOPE_PLUS_LOGIN)
-                .addApi(AppStateManager.API).addScope(AppStateManager.SCOPE_APP_STATE)
                 .addApi(Drive.API).addScope(Drive.SCOPE_APPFOLDER)
                 .build();
         mAsyncQueryHandler = new AsyncQueryHandler(getContentResolver()) {
@@ -476,8 +459,8 @@ public class TripleSolitaireActivity extends Activity implements LoaderCallbacks
             case GamesStatusCodes.STATUS_SNAPSHOT_NOT_FOUND:
                 if (BuildConfig.DEBUG)
                     Log.d(TripleSolitaireActivity.TAG, "Snapshot loaded, no key found");
-                // key not found means there is no saved data. Fall back to see if there is any legacy AppState data
-                AppStateManager.load(mGoogleApiClient, OUR_STATE_KEY).setResultCallback(mAppStateResult);
+                // key not found means there is no saved data. No problem: it'll get created during the next
+                // saveToCloud() call
                 break;
             case GamesStatusCodes.STATUS_SNAPSHOT_CONFLICT:
                 onSnapshotConflict(openSnapshotResult);
@@ -525,63 +508,6 @@ public class TripleSolitaireActivity extends Activity implements LoaderCallbacks
                     resolvedSnapshotContents).setResultCallback(this);
         } catch (IOException e) {
             Log.e(TAG, "Error reading snapshot conflict contents", e);
-        }
-    }
-
-    private void onStateConflict(final AppStateManager.StateConflictResult conflictResult) {
-        final String resolvedVersion = conflictResult.getResolvedVersion();
-        final byte[] localData = conflictResult.getLocalData();
-        final byte[] serverData = conflictResult.getServerData();
-        if (BuildConfig.DEBUG)
-            Log.d(TripleSolitaireActivity.TAG, "onStateConflict");
-        // Union the two sets of data together to form a resolved, consistent set of stats
-        final StatsState localStats = new StatsState(localData);
-        final StatsState serverStats = new StatsState(serverData);
-        final StatsState resolvedGame = localStats.unionWith(serverStats);
-        AppStateManager.resolve(mGoogleApiClient, OUR_STATE_KEY, resolvedVersion, resolvedGame.toBytes())
-                .setResultCallback(mAppStateResult);
-    }
-
-    private void onStateLoaded(final AppStateManager.StateLoadedResult loadedResult) {
-        final int statusCode = loadedResult.getStatus().getStatusCode();
-        final byte[] localData = loadedResult.getLocalData();
-        switch (statusCode) {
-            case AppStateStatusCodes.STATUS_OK:
-                if (BuildConfig.DEBUG)
-                    Log.d(TripleSolitaireActivity.TAG, "State loaded successfully");
-                // Data was successfully loaded from the cloud: merge with local data.
-                stats = stats.unionWith(new StatsState(localData));
-                Games.Snapshots.open(mGoogleApiClient, OUR_SNAPSHOT_ID, true).setResultCallback(this);
-                break;
-            case AppStateStatusCodes.STATUS_STATE_KEY_NOT_FOUND:
-                if (BuildConfig.DEBUG)
-                    Log.d(TripleSolitaireActivity.TAG, "State loaded, no key found");
-                // key not found means there is no saved data. To us, this is the same as
-                // having empty data, so we treat this as a success.
-                Games.Snapshots.open(mGoogleApiClient, OUR_SNAPSHOT_ID, true).setResultCallback(this);
-                break;
-            case AppStateStatusCodes.STATUS_NETWORK_ERROR_NO_DATA:
-                if (BuildConfig.DEBUG)
-                    Log.d(TripleSolitaireActivity.TAG, "State not loaded - network error with no data");
-                // can't reach cloud, and we have no local state. Warn user that
-                // they may not see their existing progress, but any new progress won't be lost.
-                // TODO warn about network error
-                break;
-            case AppStateStatusCodes.STATUS_NETWORK_ERROR_STALE_DATA:
-                if (BuildConfig.DEBUG)
-                    Log.d(TripleSolitaireActivity.TAG, "State not loaded - network error with stale data");
-                // can't reach cloud, but we have locally cached data.
-                // TODO warn about stale data
-                break;
-            case AppStateStatusCodes.STATUS_CLIENT_RECONNECT_REQUIRED:
-                if (BuildConfig.DEBUG)
-                    Log.d(TripleSolitaireActivity.TAG, "State not loaded - reconnect required");
-                // need to reconnect AppStateClient
-                mGoogleApiClient.reconnect();
-                break;
-            default:
-                // TODO warn about generic error
-                break;
         }
     }
 

@@ -1,9 +1,8 @@
 apply plugin: 'com.android.application'
 
 dependencies {
-    compile 'com.google.android.gms:play-services-games:7.8.0'
-    compile 'com.google.android.gms:play-services-plus:7.8.0'
-    compile 'com.google.android.gms:play-services-appstate:7.8.0'
+    compile 'com.google.android.gms:play-services-games:8.1.0'
+    compile 'com.google.android.gms:play-services-plus:8.1.0'
 }
 
 def versionMajor = 2
