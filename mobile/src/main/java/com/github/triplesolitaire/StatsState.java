@@ -58,7 +58,7 @@ public class StatsState {
 
     // serialization format version
     private static final String SERIAL_VERSION = "1.0";
-    private final SparseArray<GameStats> gameStats = new SparseArray<GameStats>();
+    private final SparseArray<GameStats> gameStats = new SparseArray<>();
 
     /**
      * Constructs an empty StatsState (i.e., no games played)
@@ -233,7 +233,7 @@ public class StatsState {
      * @return List of operations needed to save these stats to the local ContentProvider
      */
     public ArrayList<ContentProviderOperation> getLocalSaveOperations() {
-        final ArrayList<ContentProviderOperation> operations = new ArrayList<ContentProviderOperation>();
+        final ArrayList<ContentProviderOperation> operations = new ArrayList<>();
         final int size = gameStats.size();
         for (int index = 0; index < size; index++) {
             final int startTime = gameStats.keyAt(index);

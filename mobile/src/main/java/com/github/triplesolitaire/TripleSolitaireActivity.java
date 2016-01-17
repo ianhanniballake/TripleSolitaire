@@ -22,6 +22,7 @@ import android.os.HandlerThread;
 import android.os.RemoteException;
 import android.os.UserManager;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -344,7 +345,7 @@ public class TripleSolitaireActivity extends Activity implements LoaderCallbacks
     }
 
     @Override
-    public void onConnectionFailed(final ConnectionResult connectionResult) {
+    public void onConnectionFailed(@NonNull final ConnectionResult connectionResult) {
         if (mResolvingConnectionFailure) {
             if (BuildConfig.DEBUG) {
                 Log.d(TAG, "onConnectionFailed() ignoring connection failure; already resolving.");
@@ -411,7 +412,7 @@ public class TripleSolitaireActivity extends Activity implements LoaderCallbacks
     }
 
     @Override
-    public void onResult(final Snapshots.OpenSnapshotResult openSnapshotResult) {
+    public void onResult(@NonNull final Snapshots.OpenSnapshotResult openSnapshotResult) {
         final int statusCode = openSnapshotResult.getStatus().getStatusCode();
         mSnapshot = openSnapshotResult.getSnapshot();
         switch (statusCode) {
@@ -557,7 +558,7 @@ public class TripleSolitaireActivity extends Activity implements LoaderCallbacks
         Games.Achievements.load(mGoogleApiClient, false)
                 .setResultCallback(new ResultCallback<Achievements.LoadAchievementsResult>() {
                     @Override
-                    public void onResult(final Achievements.LoadAchievementsResult loadAchievementsResult) {
+                    public void onResult(@NonNull final Achievements.LoadAchievementsResult loadAchievementsResult) {
                         onAchievementsLoaded(loadAchievementsResult);
                     }
                 });

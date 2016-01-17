@@ -655,15 +655,15 @@ public class GameState {
         activity.updateMoveCount();
         for (int h = 0; h < 13; h++)
             autoplayLaneIndexLocked[h] = false;
-        moves = new Stack<Move>();
+        moves = new Stack<>();
         activity.invalidateOptionsMenu();
         Collections.shuffle(fullDeck, random);
         int currentIndex = 0;
-        stock = new Stack<String>();
+        stock = new Stack<>();
         for (int stockIndex = 0; stockIndex < 65; stockIndex++)
             stock.push(fullDeck.get(currentIndex++));
         activity.updateStockUI();
-        waste = new LinkedList<String>();
+        waste = new LinkedList<>();
         activity.updateWasteUI();
         foundation = new String[12];
         for (int foundationIndex = 0; foundationIndex < 12; foundationIndex++)
@@ -686,6 +686,9 @@ public class GameState {
      * @param savedInstanceState Bundle to restore from
      */
     public void onRestoreInstanceState(final Bundle savedInstanceState) {
+        if (savedInstanceState == null) {
+            return;
+        }
         // Restore the current game information
         gameId = savedInstanceState.getLong("gameId");
         timeInSeconds = savedInstanceState.getInt("timeInSeconds");
@@ -731,7 +734,7 @@ public class GameState {
         outState.putInt("timeInSeconds", timeInSeconds);
         outState.putInt("moveCount", moveCount);
         outState.putBooleanArray("autoplayLaneIndexLocked", autoplayLaneIndexLocked);
-        final ArrayList<String> arrayMoves = new ArrayList<String>();
+        final ArrayList<String> arrayMoves = new ArrayList<>();
         for (final Move move : moves)
             arrayMoves.add(move.toString());
         outState.putStringArrayList("moves", arrayMoves);
@@ -739,8 +742,8 @@ public class GameState {
         outState.putStringArrayList("waste", new ArrayList<>(waste));
         outState.putStringArray("foundation", foundation);
         for (int laneIndex = 0; laneIndex < 13; laneIndex++) {
-            outState.putStringArrayList("laneStack" + laneIndex, new ArrayList<String>(lane[laneIndex].getStack()));
-            outState.putStringArrayList("laneCascade" + laneIndex, new ArrayList<String>(lane[laneIndex].getCascade()));
+            outState.putStringArrayList("laneStack" + laneIndex, new ArrayList<>(lane[laneIndex].getStack()));
+            outState.putStringArrayList("laneCascade" + laneIndex, new ArrayList<>(lane[laneIndex].getCascade()));
         }
     }
 

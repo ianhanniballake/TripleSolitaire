@@ -16,6 +16,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.provider.BaseColumns;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -131,10 +132,11 @@ public class GameProvider extends ContentProvider {
     /**
      * Set of pending notification URIs to send out at the end of the current batch operation
      */
-    private LinkedHashSet<Uri> mPendingNotificationUris = new LinkedHashSet<Uri>();
+    private LinkedHashSet<Uri> mPendingNotificationUris = new LinkedHashSet<>();
+
 
     @Override
-    public synchronized ContentProviderResult[] applyBatch(final ArrayList<ContentProviderOperation> operations)
+    public synchronized @NonNull ContentProviderResult[] applyBatch(@NonNull final ArrayList<ContentProviderOperation> operations)
     throws OperationApplicationException {
         mBatchOperationOngoing = true;
         mPendingNotificationUris.clear();
@@ -152,7 +154,7 @@ public class GameProvider extends ContentProvider {
      * @return The all column projection map
      */
     private static HashMap<String, String> buildAllColumnProjectionMap() {
-        final HashMap<String, String> allColumnProjectionMap = new HashMap<String, String>();
+        final HashMap<String, String> allColumnProjectionMap = new HashMap<>();
         allColumnProjectionMap.put(BaseColumns._ID, BaseColumns._ID);
         allColumnProjectionMap
                 .put(GameContract.Games.COLUMN_NAME_START_TIME, GameContract.Games.COLUMN_NAME_START_TIME);
@@ -184,7 +186,7 @@ public class GameProvider extends ContentProvider {
     private DatabaseHelper databaseHelper;
 
     @Override
-    public int delete(final Uri uri, final String where, final String[] whereArgs) {
+    public int delete(@NonNull final Uri uri, final String where, final String[] whereArgs) {
         // Opens the database object in "write" mode.
         final SQLiteDatabase db = databaseHelper.getWritableDatabase();
         int count;
@@ -217,7 +219,7 @@ public class GameProvider extends ContentProvider {
     }
 
     @Override
-    public String getType(final Uri uri) {
+    public String getType(@NonNull final Uri uri) {
         /**
          * Chooses the MIME type based on the incoming URI pattern
          */
@@ -236,7 +238,7 @@ public class GameProvider extends ContentProvider {
     }
 
     @Override
-    public Uri insert(final Uri uri, final ContentValues initialValues) {
+    public Uri insert(@NonNull final Uri uri, final ContentValues initialValues) {
         // Validates the incoming URI. Only the full provider URI is allowed for
         // inserts.
         if (GameProvider.uriMatcher.match(uri) != GameProvider.GAMES)
@@ -270,6 +272,7 @@ public class GameProvider extends ContentProvider {
             Uri gameUri = ContentUris.withAppendedId(GameContract.Games.CONTENT_ID_URI_BASE,
                     existingRow.getLong(existingRow.getColumnIndex(BaseColumns._ID)));
             update(gameUri, values, null, null);
+            existingRow.close();
             return gameUri;
         }
         // If the insert didn't succeed and we didn't find an existing row, then something went terribly wrong
@@ -288,7 +291,7 @@ public class GameProvider extends ContentProvider {
     }
 
     @Override
-    public Cursor query(final Uri uri, final String[] projection, final String selection, final String[] selectionArgs,
+    public Cursor query(@NonNull final Uri uri, final String[] projection, final String selection, final String[] selectionArgs,
                         final String sortOrder) {
         // Constructs a new query builder and sets its table name
         final SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
@@ -316,7 +319,7 @@ public class GameProvider extends ContentProvider {
     }
 
     @Override
-    public int update(final Uri uri, final ContentValues values, final String selection, final String[] selectionArgs) {
+    public int update(@NonNull final Uri uri, final ContentValues values, final String selection, final String[] selectionArgs) {
         final SQLiteDatabase db = databaseHelper.getWritableDatabase();
         int count;
         switch (GameProvider.uriMatcher.match(uri)) {
