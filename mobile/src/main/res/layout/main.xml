@@ -103,8 +103,6 @@
                     android:padding="16dp"
                     android:text="@string/leaderboards"/>
 
-                <include
-                    layout="@layout/share_button"/>
             </LinearLayout>
 
         </ViewFlipper>

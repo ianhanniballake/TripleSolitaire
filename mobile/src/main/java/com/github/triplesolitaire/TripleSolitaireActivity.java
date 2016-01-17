@@ -15,7 +15,6 @@ import android.content.IntentSender;
 import android.content.Loader;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -34,7 +33,7 @@ import android.widget.ViewFlipper;
 
 import com.github.triplesolitaire.provider.GameContract;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
@@ -48,8 +47,6 @@ import com.google.android.gms.games.snapshot.Snapshot;
 import com.google.android.gms.games.snapshot.SnapshotContents;
 import com.google.android.gms.games.snapshot.SnapshotMetadataChange;
 import com.google.android.gms.games.snapshot.Snapshots;
-import com.google.android.gms.plus.Plus;
-import com.google.android.gms.plus.PlusShare;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -175,8 +172,9 @@ public class TripleSolitaireActivity extends Activity implements LoaderCallbacks
             if (response == RESULT_OK) {
                 mGoogleApiClient.connect();
             } else {
-                final int errorCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-                Dialog dialog = GooglePlayServicesUtil.getErrorDialog(errorCode, this, REQUEST_SIGN_IN);
+                GoogleApiAvailability googleApiAvailability = GoogleApiAvailability.getInstance();
+                final int errorCode = googleApiAvailability.isGooglePlayServicesAvailable(this);
+                Dialog dialog = googleApiAvailability.getErrorDialog(this, errorCode, REQUEST_SIGN_IN);
                 if (dialog != null) {
                     dialog.show();
                 }
@@ -202,7 +200,6 @@ public class TripleSolitaireActivity extends Activity implements LoaderCallbacks
         mGoogleApiClient = new GoogleApiClient.Builder(this, this, this)
                 .setViewForPopups(title)
                 .addApi(Games.API).addScope(Games.SCOPE_GAMES)
-                .addApi(Plus.API).addScope(Plus.SCOPE_PLUS_LOGIN)
                 .addApi(Drive.API).addScope(Drive.SCOPE_APPFOLDER)
                 .build();
         mAsyncQueryHandler = new AsyncQueryHandler(getContentResolver()) {
@@ -250,32 +247,6 @@ public class TripleSolitaireActivity extends Activity implements LoaderCallbacks
             public void onClick(final View v) {
                 Intent allLeaderboardsIntent = Games.Leaderboards.getAllLeaderboardsIntent(mGoogleApiClient);
                 startActivityForResult(allLeaderboardsIntent, REQUEST_LEADERBOARDS);
-            }
-        });
-        final Button shareBtn = (Button) findViewById(R.id.share);
-        shareBtn.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(final View v) {
-                PlusShare.Builder builder = new PlusShare.Builder(TripleSolitaireActivity.this);
-                final Uri desktopUrl = Uri.parse("https://play.google.com/store/apps/details?id=" + getPackageName());
-                final String deepLink = "/share/";
-                builder.setContentUrl(desktopUrl).setContentDeepLinkId(deepLink)
-                        .addCallToAction("PLAY", desktopUrl, deepLink);
-                if (stats.getGamesWon(false) == 0) {
-                    builder.setText(getString(R.string.share_text_no_wins));
-                } else {
-                    final double bestTime = stats.getShortestTime(false);
-                    final int minutes = (int) (bestTime / 60);
-                    final int seconds = (int) (bestTime % 60);
-                    final StringBuilder sb = new StringBuilder();
-                    sb.append(minutes);
-                    sb.append(':');
-                    if (seconds < 10)
-                        sb.append(0);
-                    sb.append(seconds);
-                    builder.setText(getString(R.string.share_text, sb));
-                }
-                startActivityForResult(builder.getIntent(), 0);
             }
         });
         getLoaderManager().initLoader(0, null, this);
@@ -398,7 +369,7 @@ public class TripleSolitaireActivity extends Activity implements LoaderCallbacks
             } else {
                 // not resolvable... so show an error message
                 int errorCode = connectionResult.getErrorCode();
-                Dialog dialog = GooglePlayServicesUtil.getErrorDialog(errorCode, this, REQUEST_SIGN_IN);
+                Dialog dialog = GoogleApiAvailability.getInstance().getErrorDialog(this, errorCode, REQUEST_SIGN_IN);
                 if (dialog == null) {
                     dialog = new AlertDialog.Builder(this).setMessage(getString(R.string.sign_in_error, errorCode))
                             .setNeutralButton(android.R.string.ok, null).create();
