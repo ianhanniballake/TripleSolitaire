@@ -14,6 +14,7 @@
     <application
         android:name="com.github.triplesolitaire.TripleSolitaireApplication"
         android:allowBackup="true"
+        android:fullBackupOnly="true"
         android:backupAgent="com.github.triplesolitaire.TripleSolitaireBackupAgent"
         android:hardwareAccelerated="true"
         android:icon="@drawable/ic_launcher"
