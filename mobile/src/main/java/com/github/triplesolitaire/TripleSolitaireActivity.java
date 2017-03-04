@@ -157,7 +157,7 @@ public class TripleSolitaireActivity extends Activity implements LoaderCallbacks
                 break;
         }
         if (buffer != null)
-            buffer.close();
+            buffer.release();
     }
 
     @Override

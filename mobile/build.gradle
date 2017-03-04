@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 dependencies {
-    compile 'com.google.android.gms:play-services-games:8.4.0'
+    compile 'com.google.android.gms:play-services-games:10.0.1'
 }
 
 def versionMajor = 2
@@ -10,8 +10,8 @@ def versionPatch = 0
 def versionBuild = 0
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.2"
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
 
     defaultConfig {
         minSdkVersion 12

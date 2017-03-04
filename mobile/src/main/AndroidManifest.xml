@@ -23,9 +23,7 @@
         <provider
             android:name="com.github.triplesolitaire.provider.GameProvider"
             android:authorities="com.github.triplesolitaire"
-            android:exported="false">
-            <grant-uri-permission android:pathPattern=".*"/>
-        </provider>
+            android:exported="false"/>
 
         <activity
             android:name="com.github.triplesolitaire.TripleSolitaireActivity"
