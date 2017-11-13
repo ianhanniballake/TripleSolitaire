@@ -177,7 +177,7 @@ public class GameActivity extends Activity {
             toLoc = getCascadeLoc(move.getToIndex() - 1);
         final Card toAnimate = new Card(getBaseContext(), getResources().getIdentifier(move.getCard(), "drawable",
                 getPackageName()));
-        final FrameLayout layout = (FrameLayout) findViewById(R.id.animateLayout);
+        final FrameLayout layout = findViewById(R.id.animateLayout);
         layout.addView(toAnimate);
         layout.setX(fromLoc.x);
         layout.setY(fromLoc.y);
@@ -222,7 +222,7 @@ public class GameActivity extends Activity {
      */
     @TargetApi(14)
     private void cancelAnimation() {
-        final FrameLayout layout = (FrameLayout) findViewById(R.id.animateLayout);
+        final FrameLayout layout = findViewById(R.id.animateLayout);
         layout.animate().cancel();
     }
 
@@ -233,7 +233,7 @@ public class GameActivity extends Activity {
      * @return The exact (x,y) position of the top cascade card in the lane
      */
     private Point getCascadeLoc(final int laneIndex) {
-        final RelativeLayout lane = (RelativeLayout) findViewById(R.id.lane);
+        final RelativeLayout lane = findViewById(R.id.lane);
         final Card cascadeView = getLane(laneIndex).getTopCascadeCard();
         final float x = cascadeView.getX() + cascadeView.getPaddingLeft() + getLane(laneIndex).getX()
                 + getLane(laneIndex).getPaddingLeft() + lane.getX() + lane.getPaddingLeft();
@@ -249,8 +249,8 @@ public class GameActivity extends Activity {
      * @return The exact (x,y) position of the foundation
      */
     private Point getFoundationLoc(final int foundationIndex) {
-        final RelativeLayout foundationLayout = (RelativeLayout) findViewById(R.id.foundation);
-        final ImageView foundationView = (ImageView) findViewById(getResources().getIdentifier(
+        final RelativeLayout foundationLayout = findViewById(R.id.foundation);
+        final ImageView foundationView = findViewById(getResources().getIdentifier(
                 "foundation" + (foundationIndex + 1), "id", getPackageName()));
         final float x = foundationView.getX() + foundationView.getPaddingLeft() + foundationLayout.getX()
                 + foundationLayout.getPaddingLeft();
@@ -302,8 +302,8 @@ public class GameActivity extends Activity {
      * @return The exact (x,y) position of the top card in the waste
      */
     private Point getWasteLoc() {
-        final RelativeLayout waste = (RelativeLayout) findViewById(R.id.waste);
-        final ImageView waste1View = (ImageView) findViewById(R.id.waste1);
+        final RelativeLayout waste = findViewById(R.id.waste);
+        final ImageView waste1View = findViewById(R.id.waste1);
         final float x = waste.getX() + waste.getPaddingLeft() + waste1View.getX() + waste1View.getPaddingLeft();
         final float y = waste.getY() + waste.getPaddingTop() + waste1View.getY() + waste1View.getPaddingTop();
         return new Point((int) x, (int) y);
@@ -349,7 +349,7 @@ public class GameActivity extends Activity {
         layoutParams.gravity = Gravity.LEFT;
         bar.setCustomView(progressBar, layoutParams);
         // Set up game listeners
-        final ImageView stockView = (ImageView) findViewById(R.id.stock);
+        final ImageView stockView = findViewById(R.id.stock);
         stockView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
@@ -357,7 +357,7 @@ public class GameActivity extends Activity {
                     gameState.move(new Move(Move.Type.STOCK));
             }
         });
-        final ImageView wasteTopView = (ImageView) findViewById(R.id.waste1);
+        final ImageView wasteTopView = findViewById(R.id.waste1);
         wasteTopView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(final View v, final MotionEvent event) {
@@ -394,13 +394,13 @@ public class GameActivity extends Activity {
         for (int curFoundation = 0; curFoundation < 12; curFoundation++) {
             final int foundationId = getResources().getIdentifier("foundation" + (curFoundation + 1), "id",
                     getPackageName());
-            final ImageView foundationLayout = (ImageView) findViewById(foundationId);
+            final ImageView foundationLayout = findViewById(foundationId);
             foundationLayout.setOnTouchListener(new OnFoundationTouchListener(-1 * (curFoundation + 1)));
             foundationLayout.setOnDragListener(new OnFoundationDragListener(-1 * (curFoundation + 1)));
         }
         for (int curLane = 0; curLane < 13; curLane++) {
             final int laneId = getResources().getIdentifier("lane" + (curLane + 1), "id", getPackageName());
-            final Lane laneLayout = (Lane) findViewById(laneId);
+            final Lane laneLayout = findViewById(laneId);
             laneLayout.setOnCardFlipListener(new OnCardFlipListener(curLane + 1));
             laneLayout.setLaneId(curLane + 1);
             laneLayout.setGameState(gameState);
@@ -530,7 +530,7 @@ public class GameActivity extends Activity {
         final String foundationCard = gameState.getFoundationCard(-1 * (foundationIndex + 1));
         final int foundationViewId = getResources().getIdentifier("foundation" + (foundationIndex + 1), "id",
                 getPackageName());
-        final ImageView foundationView = (ImageView) findViewById(foundationViewId);
+        final ImageView foundationView = findViewById(foundationViewId);
         if (foundationCard == null) {
             foundationView.setBackgroundResource(R.drawable.foundation);
             foundationView.setOnTouchListener(null);
@@ -545,7 +545,7 @@ public class GameActivity extends Activity {
      * Updates the move count UI
      */
     public void updateMoveCount() {
-        final TextView moveCountView = (TextView) getActionBar().getCustomView().findViewById(R.id.move_count);
+        final TextView moveCountView = getActionBar().getCustomView().findViewById(R.id.move_count);
         moveCountView.setText(Integer.toString(getMoveCount()));
     }
 
@@ -553,7 +553,7 @@ public class GameActivity extends Activity {
      * Updates the stock UI
      */
     public void updateStockUI() {
-        final ImageView stockView = (ImageView) findViewById(R.id.stock);
+        final ImageView stockView = findViewById(R.id.stock);
         if (gameState.isStockEmpty())
             stockView.setBackgroundResource(R.drawable.lane);
         else
@@ -564,7 +564,7 @@ public class GameActivity extends Activity {
      * Updates the current game time UI
      */
     public void updateTime() {
-        final TextView timeView = (TextView) getActionBar().getCustomView().findViewById(R.id.time);
+        final TextView timeView = getActionBar().getCustomView().findViewById(R.id.time);
         timeView.setText(getGameTime());
     }
 
@@ -583,7 +583,7 @@ public class GameActivity extends Activity {
      */
     private void updateWasteUI(final int wasteIndex) {
         final String wasteCard = gameState.getWasteCard(wasteIndex);
-        final ImageView waste = (ImageView) findViewById(getResources().getIdentifier("waste" + (wasteIndex + 1), "id",
+        final ImageView waste = findViewById(getResources().getIdentifier("waste" + (wasteIndex + 1), "id",
                 getPackageName()));
         if (wasteCard == null)
             waste.setBackgroundResource(0);

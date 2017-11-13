@@ -39,11 +39,11 @@ public class StatsDialogFragment extends DialogFragment {
         final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         final LayoutInflater inflater = getActivity().getLayoutInflater();
         final View layout = inflater.inflate(R.layout.stats_dialog, null);
-        final TextView gamesPlayedView = (TextView) layout.findViewById(R.id.games_played);
+        final TextView gamesPlayedView = layout.findViewById(R.id.games_played);
         gamesPlayedView.setText(Integer.toString(gamesPlayed));
-        final TextView gamesWonView = (TextView) layout.findViewById(R.id.games_won);
+        final TextView gamesWonView = layout.findViewById(R.id.games_won);
         gamesWonView.setText(Integer.toString(gamesWon));
-        final TextView winPercentageView = (TextView) layout.findViewById(R.id.win_percentage);
+        final TextView winPercentageView = layout.findViewById(R.id.win_percentage);
         if (gamesPlayed == 0)
             winPercentageView.setText(R.string.stats_na);
         else {
@@ -51,7 +51,7 @@ public class StatsDialogFragment extends DialogFragment {
             percentFormat.setMaximumFractionDigits(1);
             winPercentageView.setText(percentFormat.format((double) gamesWon / gamesPlayed));
         }
-        final TextView averageDurationView = (TextView) layout.findViewById(R.id.average_duration);
+        final TextView averageDurationView = layout.findViewById(R.id.average_duration);
         if (gamesWon == 0)
             averageDurationView.setText(getText(R.string.stats_na));
         else {
@@ -67,7 +67,7 @@ public class StatsDialogFragment extends DialogFragment {
             averageDurationView.setText(sb);
         }
         final NumberFormat integerFormat = NumberFormat.getIntegerInstance();
-        final TextView averageMovesView = (TextView) layout.findViewById(R.id.average_moves);
+        final TextView averageMovesView = layout.findViewById(R.id.average_moves);
         if (gamesWon == 0)
             averageMovesView.setText(getText(R.string.stats_na));
         else {

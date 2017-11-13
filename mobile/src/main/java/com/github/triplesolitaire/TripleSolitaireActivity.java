@@ -208,15 +208,15 @@ public class TripleSolitaireActivity extends Activity implements LoaderCallbacks
         mPersistStateHandlerThread = new HandlerThread(TAG);
         mPersistStateHandlerThread.start();
         mPersistStateHandler = new Handler(mPersistStateHandlerThread.getLooper());
-        googlePlayGamesViewFlipper = (ViewFlipper) findViewById(R.id.google_play_games);
-        final Button newGameBtn = (Button) findViewById(R.id.new_game);
+        googlePlayGamesViewFlipper = findViewById(R.id.google_play_games);
+        final Button newGameBtn = findViewById(R.id.new_game);
         newGameBtn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(final View v) {
                 newGame();
             }
         });
-        final Button statsBtn = (Button) findViewById(R.id.stats);
+        final Button statsBtn = findViewById(R.id.stats);
         statsBtn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(final View v) {
@@ -224,7 +224,7 @@ public class TripleSolitaireActivity extends Activity implements LoaderCallbacks
             }
         });
         // Set up sign in button
-        final SignInButton signInBtn = (SignInButton) findViewById(R.id.sign_in);
+        final SignInButton signInBtn = findViewById(R.id.sign_in);
         signInBtn.setOnClickListener(new OnClickListener() {
             @SuppressWarnings("synthetic-access")
             @Override
@@ -234,7 +234,7 @@ public class TripleSolitaireActivity extends Activity implements LoaderCallbacks
             }
         });
         // Set up Google Play Games buttons
-        final Button achievementsBtn = (Button) findViewById(R.id.achievements);
+        final Button achievementsBtn = findViewById(R.id.achievements);
         achievementsBtn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(final View v) {
@@ -242,7 +242,7 @@ public class TripleSolitaireActivity extends Activity implements LoaderCallbacks
                 startActivityForResult(achievementsIntent, REQUEST_ACHIEVEMENTS);
             }
         });
-        final Button leaderboardsBtn = (Button) findViewById(R.id.leaderboards);
+        final Button leaderboardsBtn = findViewById(R.id.leaderboards);
         leaderboardsBtn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(final View v) {

@@ -118,20 +118,20 @@ public class Lane extends RelativeLayout implements OnDragListener {
             if (stackSize > 0) {
                 // Remove the onCardFlipListener from the top card on the stack
                 // if there is a cascade now
-                final Card topStack = (Card) findViewById(stackSize);
+                final Card topStack = findViewById(stackSize);
                 topStack.setOnClickListener(null);
             } else {
                 // Remove the onDragListener from the base of the stack if there
                 // is a cascade now
-                final Card laneBase = (Card) findViewById(0);
+                final Card laneBase = findViewById(0);
                 laneBase.setOnDragListener(null);
             }
         if (cascadeSize > 0) {
-            final Card oldTopCascade = (Card) findViewById(stackSize + cascadeSize);
+            final Card oldTopCascade = findViewById(stackSize + cascadeSize);
             oldTopCascade.setOnDragListener(null);
         }
         if (!cascadeToAdd.isEmpty()) {
-            final Card newTopCascade = (Card) findViewById(getChildCount() - 1);
+            final Card newTopCascade = findViewById(getChildCount() - 1);
             newTopCascade.setOnDragListener(this);
         }
         cascadeSize += cascadeToAdd.size();
@@ -148,13 +148,13 @@ public class Lane extends RelativeLayout implements OnDragListener {
             cascadeSize -= 1;
         }
         if (stackSize + cascadeSize == 0) {
-            final Card laneBase = (Card) findViewById(0);
+            final Card laneBase = findViewById(0);
             laneBase.setOnDragListener(this);
         } else if (cascadeSize == 0) {
-            final Card topStack = (Card) findViewById(stackSize);
+            final Card topStack = findViewById(stackSize);
             topStack.setOnClickListener(onCardFlipListener);
         } else {
-            final Card topCascade = (Card) findViewById(stackSize + cascadeSize);
+            final Card topCascade = findViewById(stackSize + cascadeSize);
             topCascade.setOnDragListener(this);
         }
     }
@@ -165,7 +165,7 @@ public class Lane extends RelativeLayout implements OnDragListener {
      * @param card The card to show as the newly flipped over card
      */
     public void flipOverTopStack(final String card) {
-        final Card toFlip = (Card) findViewById(stackSize);
+        final Card toFlip = findViewById(stackSize);
         toFlip.setBackgroundResource(getResources().getIdentifier(card, "drawable", getContext().getPackageName()));
         toFlip.invalidate();
         toFlip.setOnClickListener(null);
@@ -264,7 +264,7 @@ public class Lane extends RelativeLayout implements OnDragListener {
         removeViews(1, getChildCount() - 1);
         cascadeSize = 0;
         if (stackSize == 0 && newStackSize > 0) {
-            final Card laneBase = (Card) findViewById(0);
+            final Card laneBase = findViewById(0);
             laneBase.setOnDragListener(null);
         }
         stackSize = newStackSize;
