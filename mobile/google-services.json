@@ -1,0 +1,63 @@
+{
+  "project_info": {
+    "project_number": "530657914687",
+    "firebase_url": "https://api-project-530657914687.firebaseio.com",
+    "project_id": "api-project-530657914687",
+    "storage_bucket": "api-project-530657914687.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:530657914687:android:957eda0260c2fa3d",
+        "android_client_info": {
+          "package_name": "com.github.triplesolitaire"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "530657914687.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.github.triplesolitaire",
+            "certificate_hash": "44b775ff4fc8ec33930220fa4a4e10fe61e1d33f"
+          }
+        },
+        {
+          "client_id": "530657914687-h9m5mmju5k6hfpe5c39589pscd17i9rt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.github.triplesolitaire",
+            "certificate_hash": "d6b37621aff0d4ee8d49296bcf28cc8e58dfa880"
+          }
+        },
+        {
+          "client_id": "530657914687-3jsvd8pvcv0m0gmsm7unh5thjo48h98f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCbG2UKFP0fHNTSqaZFrK-3u29TrLO0E1c"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "530657914687-3jsvd8pvcv0m0gmsm7unh5thjo48h98f.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
