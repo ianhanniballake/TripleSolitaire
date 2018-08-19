@@ -11,11 +11,11 @@ def versionPatch = 0
 def versionBuild = 0
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion 28
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 23
+        targetSdkVersion 28
         versionCode versionMajor * 10000000 + versionMinor * 1000000 + versionPatch * 1000 + versionBuild
         versionName "${versionMajor}.${versionMinor}.${versionPatch}"
     }
