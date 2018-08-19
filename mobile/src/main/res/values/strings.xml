@@ -3,7 +3,6 @@
 
     <string name="app_name">Triple Solitaire</string>
     <string name="sign_in_explanation">Sign to save your stats and keep them synchronized across all your devices.</string>
-    <string name="sign_in_error">Error %d during sign in, check your network connection and try again</string>
     <string name="time">Time:</string>
     <string name="move_count">Moves:</string>
     <string name="undo">Undo</string>
