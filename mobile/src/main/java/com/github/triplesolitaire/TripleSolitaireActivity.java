@@ -19,6 +19,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.RemoteException;
 import android.os.UserManager;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.text.format.DateUtils;
 import android.util.Log;
@@ -71,7 +72,9 @@ public class TripleSolitaireActivity extends Activity implements LoaderCallbacks
      * Logging tag
      */
     private static final String TAG = "TripleSolitaireActivity";
+    private static final String AUTO_START_SIGN_IN = "AUTO_START_SIGN_IN";
     private ViewFlipper googlePlayGamesViewFlipper;
+    private boolean mAutoStartSignInFlow;
     private boolean mAlreadyLoadedState = false;
     private boolean mPendingUpdateState = false;
     private StatsState stats = new StatsState();
@@ -164,6 +167,8 @@ public class TripleSolitaireActivity extends Activity implements LoaderCallbacks
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        mAutoStartSignInFlow = PreferenceManager.getDefaultSharedPreferences(this)
+                .getBoolean(AUTO_START_SIGN_IN, true);
         mGoogleSignInClient = GoogleSignIn.getClient(this,
                 new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN)
                 .requestScopes(Drive.SCOPE_APPFOLDER)
@@ -250,7 +255,9 @@ public class TripleSolitaireActivity extends Activity implements LoaderCallbacks
     @Override
     protected void onResume() {
         super.onResume();
-        mGoogleSignInClient.silentSignIn().addOnCompleteListener(this, this);
+        if (mAutoStartSignInFlow) {
+            mGoogleSignInClient.silentSignIn().addOnCompleteListener(this, this);
+        }
     }
 
     @Override
@@ -317,6 +324,12 @@ public class TripleSolitaireActivity extends Activity implements LoaderCallbacks
         if (signInAccountTask.isSuccessful()) {
             onConnected(signInAccountTask.getResult());
         } else {
+            // Only try auto sign in once
+            PreferenceManager.getDefaultSharedPreferences(this)
+                    .edit()
+                    .putBoolean(AUTO_START_SIGN_IN, false)
+                    .apply();
+            mAutoStartSignInFlow = false;
             invalidateOptionsMenu();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2 && isAccountAccessRestricted()) {
                 googlePlayGamesViewFlipper.setDisplayedChild(0);
