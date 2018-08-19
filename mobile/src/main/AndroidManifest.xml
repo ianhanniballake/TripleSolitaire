@@ -2,6 +2,7 @@
 <manifest
     package="com.github.triplesolitaire"
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:installLocation="auto">
 
     <supports-screens
@@ -19,7 +20,9 @@
         android:hardwareAccelerated="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/Theme.TripleSolitaire">
+        android:theme="@style/Theme.TripleSolitaire"
+        tools:ignore="AllowBackup,GoogleAppIndexingWarning"
+        tools:targetApi="lollipop">
         <provider
             android:name="com.github.triplesolitaire.provider.GameProvider"
             android:authorities="com.github.triplesolitaire"
