@@ -16,7 +16,7 @@ public class AboutDialogFragment extends DialogFragment {
         final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         final LayoutInflater inflater = getActivity().getLayoutInflater();
         final View layout = inflater.inflate(R.layout.about_dialog, null);
-        builder.setTitle(R.string.app_name).setIcon(R.drawable.ic_launcher).setView(layout)
+        builder.setTitle(R.string.app_name).setIcon(R.mipmap.ic_launcher).setView(layout)
                 .setNegativeButton(getText(R.string.close), null);
         return builder.create();
     }

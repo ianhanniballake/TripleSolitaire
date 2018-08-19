@@ -3,7 +3,6 @@ package com.github.triplesolitaire;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -73,9 +72,6 @@ public class StatsDialogFragment extends DialogFragment {
         else {
             final double averageMoves = stats.getAverageMoves();
             averageMovesView.setText(integerFormat.format(averageMoves));
-        }
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            builder.setIcon(R.drawable.ic_launcher);
         }
         builder.setTitle(R.string.stats).setView(layout)
                 .setNegativeButton(getText(R.string.close), null);
