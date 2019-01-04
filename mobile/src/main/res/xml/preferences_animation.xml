@@ -1,18 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory android:title="@string/pref_animation_category">
-        <CheckBoxPreference
+    <PreferenceCategory
+        android:title="@string/pref_animation_category">
+        <SwitchPreference
             android:defaultValue="@bool/pref_animate_auto_play_default"
             android:key="animate_auto_play"
-            android:summary="@string/pref_animate_auto_play_summary"
-            android:title="@string/pref_animate_auto_play_title"/>
-        <CheckBoxPreference
+            android:summaryOff="@string/pref_animate_auto_play_summary_off"
+            android:summaryOn="@string/pref_animate_auto_play_summary_on"
+            android:title="@string/pref_animate_auto_play_title"
+            android:switchTextOff="@string/pref_switch_text_off"
+            android:switchTextOn="@string/pref_switch_text_on"/>
+        <SwitchPreference
             android:defaultValue="@bool/pref_animate_undo_default"
             android:key="animate_undo"
-            android:summary="@string/pref_animate_undo_summary"
-            android:title="@string/pref_animate_undo_title"/>
+            android:summaryOff="@string/pref_animate_undo_summary_off"
+            android:summaryOn="@string/pref_animate_undo_summary_on"
+            android:title="@string/pref_animate_undo_title"
+            android:switchTextOff="@string/pref_switch_text_off"
+            android:switchTextOn="@string/pref_switch_text_on"/>
     </PreferenceCategory>
-    <PreferenceCategory android:title="@string/pref_animation_speed_category">
+    <PreferenceCategory
+        android:title="@string/pref_animation_speed_category">
         <ListPreference
             android:defaultValue="@string/pref_animation_speed_auto_play_default"
             android:dependency="animate_auto_play"

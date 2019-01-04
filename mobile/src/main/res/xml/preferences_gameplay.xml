@@ -8,10 +8,13 @@
             android:entryValues="@array/pref_auto_play_entryvalues"
             android:key="auto_play"
             android:title="@string/pref_auto_play_title"/>
-        <CheckBoxPreference
+        <SwitchPreference
             android:defaultValue="@bool/pref_auto_flip_default"
             android:key="auto_flip"
-            android:summary="@string/pref_auto_flip_summary"
-            android:title="@string/pref_auto_flip_title"/>
+            android:summaryOff="@string/pref_auto_flip_summary_off"
+            android:summaryOn="@string/pref_auto_flip_summary_on"
+            android:title="@string/pref_auto_flip_title"
+            android:switchTextOff="@string/pref_switch_text_off"
+            android:switchTextOn="@string/pref_switch_text_on"/>
     </PreferenceCategory>
 </PreferenceScreen>
