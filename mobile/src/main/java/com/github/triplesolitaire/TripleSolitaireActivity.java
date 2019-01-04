@@ -365,12 +365,12 @@ public class TripleSolitaireActivity extends Activity implements LoaderCallbacks
 
     @Override
     public void onSuccess(SnapshotsClient.DataOrConflict<Snapshot> snapshotDataOrConflict) {
-        mSnapshot = snapshotDataOrConflict.getData();
         if (!snapshotDataOrConflict.isConflict()) {
             if (BuildConfig.DEBUG)
                 Log.d(TripleSolitaireActivity.TAG, "Snapshot loaded successfully");
             // Data was successfully loaded from the cloud: merge with local data.
             try {
+                mSnapshot = snapshotDataOrConflict.getData();
                 stats = stats.unionWith(new StatsState(mSnapshot.getSnapshotContents().readFully()));
                 mAlreadyLoadedState = true;
                 mPersistStateHandler.post(mPersistStateRunnable);
@@ -388,8 +388,8 @@ public class TripleSolitaireActivity extends Activity implements LoaderCallbacks
         SnapshotContents resolvedSnapshotContents = snapshotConflict
                 .getResolutionSnapshotContents();
         try {
-            final byte[] localData = resolvedSnapshotContents.readFully();
-            final byte[] serverData = openSnapshotResult.getData().getSnapshotContents().readFully();
+            final byte[] localData = snapshotConflict.getConflictingSnapshot().getSnapshotContents().readFully();
+            final byte[] serverData = snapshotConflict.getSnapshot().getSnapshotContents().readFully();
             if (BuildConfig.DEBUG)
                 Log.d(TripleSolitaireActivity.TAG, "onSnapshotConflict");
             // Union the two sets of data together to form a resolved, consistent set of stats
