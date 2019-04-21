@@ -4,5 +4,5 @@
     <dimen name="card_width_dim">58dp</dimen>
     <dimen name="card_height_dim">90dp</dimen>
     <dimen name="card_horz_overlap_dim">11dp</dimen>
-    <dimen name="card_vert_overlap_dim">20dp</dimen>
+    <dimen name="card_vert_overlap_dim">28dp</dimen>
 </resources>
