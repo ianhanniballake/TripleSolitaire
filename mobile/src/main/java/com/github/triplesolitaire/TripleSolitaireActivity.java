@@ -19,7 +19,6 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.RemoteException;
 import android.os.UserManager;
-import android.support.annotation.NonNull;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -38,7 +37,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.SignInButton;
-import com.google.android.gms.drive.Drive;
 import com.google.android.gms.games.AchievementsClient;
 import com.google.android.gms.games.AnnotatedData;
 import com.google.android.gms.games.Games;
@@ -55,6 +53,8 @@ import com.google.android.gms.tasks.Task;
 
 import java.io.IOException;
 import java.util.ArrayList;
+
+import androidx.annotation.NonNull;
 
 /**
  * Main class which controls the UI of the Triple Solitaire game
@@ -164,9 +164,10 @@ public class TripleSolitaireActivity extends Activity implements LoaderCallbacks
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        //noinspection deprecation
         mGoogleSignInClient = GoogleSignIn.getClient(this,
                 new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN)
-                .requestScopes(Drive.SCOPE_APPFOLDER)
+                .requestScopes(com.google.android.gms.drive.Drive.SCOPE_APPFOLDER)
                 .build());
         mAsyncQueryHandler = new AsyncQueryHandler(getContentResolver()) {
         };

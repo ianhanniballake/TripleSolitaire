@@ -16,7 +16,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.provider.BaseColumns;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -25,6 +24,8 @@ import com.github.triplesolitaire.BuildConfig;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+
+import androidx.annotation.NonNull;
 
 /**
  * Provides access to a database of games.

@@ -4,6 +4,8 @@ import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.StringTokenizer;
 
+import androidx.annotation.NonNull;
+
 /**
  * Class encapsulating a single 'move' from any and all sources. See the Move.Type enum for enumeration of all types of
  * Moves
@@ -221,6 +223,7 @@ public class Move {
      * @see java.lang.Object#toString()
      */
     @Override
+    @NonNull
     public String toString() {
         return type.toString() + ':' + fromIndex + '>' + toIndex + ':' + getCascadeAsString();
     }

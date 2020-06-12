@@ -15,6 +15,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import androidx.annotation.NonNull;
+
 /**
  * Represents the player's stats associated with all the games they have played
  */
@@ -334,6 +336,7 @@ public class StatsState {
      * Serializes this StatsState to a JSON string.
      */
     @Override
+    @NonNull
     public String toString() {
         try {
             final JSONObject games = new JSONObject();
