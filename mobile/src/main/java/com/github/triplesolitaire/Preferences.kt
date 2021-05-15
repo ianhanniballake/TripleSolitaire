@@ -1,159 +1,157 @@
-package com.github.triplesolitaire;
+package com.github.triplesolitaire
 
-import android.app.backup.BackupManager;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-import android.os.Bundle;
-import android.preference.ListPreference;
-import android.preference.PreferenceActivity;
-import android.preference.PreferenceFragment;
-import android.view.MenuItem;
-
-import java.util.List;
+import android.app.backup.BackupManager
+import android.content.SharedPreferences
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener
+import android.os.Bundle
+import android.preference.ListPreference
+import android.preference.PreferenceActivity
+import android.preference.PreferenceFragment
+import android.view.MenuItem
 
 /**
  * Activity managing the various application preferences
  */
-public class Preferences extends PreferenceActivity {
+class Preferences : PreferenceActivity() {
     /**
      * Preference Fragment showing preferences relating to game play
      */
-    public static class AnimationPreferenceFragment extends PreferenceFragment implements
-            OnSharedPreferenceChangeListener {
+    class AnimationPreferenceFragment : PreferenceFragment(), OnSharedPreferenceChangeListener {
         /**
          * Reference to the ListPreference corresponding with the auto play animation speed
          */
-        private ListPreference animateSpeedAutoplayListPreference;
+        private lateinit var animateSpeedAutoplayListPreference: ListPreference
+
         /**
          * Reference to the ListPreference corresponding with the undo animation speed
          */
-        private ListPreference animateSpeedUndoListPreference;
+        private lateinit var animateSpeedUndoListPreference: ListPreference
 
-        @Override
-        public void onCreate(final Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.preferences_animation);
-            animateSpeedAutoplayListPreference = (ListPreference) getPreferenceScreen().findPreference(
-                    ANIMATE_SPEED_AUTO_PLAY_PREFERENCE_KEY);
-            animateSpeedAutoplayListPreference.setSummary(animateSpeedAutoplayListPreference.getEntry());
-            animateSpeedUndoListPreference = (ListPreference) getPreferenceScreen().findPreference(
-                    ANIMATE_SPEED_UNDO_PREFERENCE_KEY);
-            animateSpeedUndoListPreference.setSummary(animateSpeedUndoListPreference.getEntry());
+        override fun onCreate(savedInstanceState: Bundle) {
+            super.onCreate(savedInstanceState)
+            addPreferencesFromResource(R.xml.preferences_animation)
+            animateSpeedAutoplayListPreference = preferenceScreen.findPreference(
+                ANIMATE_SPEED_AUTO_PLAY_PREFERENCE_KEY
+            ) as ListPreference
+            animateSpeedAutoplayListPreference.summary =
+                animateSpeedAutoplayListPreference.entry
+            animateSpeedUndoListPreference = preferenceScreen.findPreference(
+                ANIMATE_SPEED_UNDO_PREFERENCE_KEY
+            ) as ListPreference
+            animateSpeedUndoListPreference.summary = animateSpeedUndoListPreference.entry
         }
 
-        @Override
-        public void onPause() {
-            super.onPause();
-            getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
+        override fun onPause() {
+            super.onPause()
+            preferenceScreen.sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
         }
 
-        @Override
-        public void onResume() {
-            super.onResume();
-            getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+        override fun onResume() {
+            super.onResume()
+            preferenceScreen.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
         }
 
-        @Override
-        public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences, final String key) {
-            if (key.equals(ANIMATE_SPEED_AUTO_PLAY_PREFERENCE_KEY))
-                animateSpeedAutoplayListPreference.setSummary(animateSpeedAutoplayListPreference.getEntry());
-            else if (key.equals(ANIMATE_SPEED_UNDO_PREFERENCE_KEY))
-                animateSpeedUndoListPreference.setSummary(animateSpeedUndoListPreference.getEntry());
-            new BackupManager(getActivity()).dataChanged();
+        override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
+            if (key == ANIMATE_SPEED_AUTO_PLAY_PREFERENCE_KEY) {
+                animateSpeedAutoplayListPreference.summary = animateSpeedAutoplayListPreference.entry
+            } else if (key == ANIMATE_SPEED_UNDO_PREFERENCE_KEY) {
+                animateSpeedUndoListPreference.summary = animateSpeedUndoListPreference.entry
+            }
+            BackupManager(activity).dataChanged()
         }
     }
 
     /**
      * Preference Fragment showing preferences relating to game play
      */
-    public static class GameplayPreferenceFragment extends PreferenceFragment implements
-            OnSharedPreferenceChangeListener {
+    class GameplayPreferenceFragment : PreferenceFragment(), OnSharedPreferenceChangeListener {
         /**
          * Reference to the ListPreference corresponding with the auto play mode
          */
-        private ListPreference autoplayListPreference;
+        private lateinit var autoplayListPreference: ListPreference
 
-        @Override
-        public void onCreate(final Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.preferences_gameplay);
-            autoplayListPreference = (ListPreference) getPreferenceScreen().findPreference(AUTO_PLAY_PREFERENCE_KEY);
-            autoplayListPreference.setSummary(autoplayListPreference.getEntry());
+        override fun onCreate(savedInstanceState: Bundle) {
+            super.onCreate(savedInstanceState)
+            addPreferencesFromResource(R.xml.preferences_gameplay)
+            autoplayListPreference =
+                preferenceScreen.findPreference(AUTO_PLAY_PREFERENCE_KEY) as ListPreference
+            autoplayListPreference.summary = autoplayListPreference.entry
         }
 
-        @Override
-        public void onPause() {
-            super.onPause();
-            getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
+        override fun onPause() {
+            super.onPause()
+            preferenceScreen.sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
         }
 
-        @Override
-        public void onResume() {
-            super.onResume();
-            getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+        override fun onResume() {
+            super.onResume()
+            preferenceScreen.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
         }
 
-        @Override
-        public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences, final String key) {
-            if (key.equals(AUTO_PLAY_PREFERENCE_KEY))
-                autoplayListPreference.setSummary(autoplayListPreference.getEntry());
-            new BackupManager(getActivity()).dataChanged();
+        override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
+            if (key == AUTO_PLAY_PREFERENCE_KEY) {
+                autoplayListPreference.summary = autoplayListPreference.entry
+            }
+            BackupManager(activity).dataChanged()
         }
     }
 
-    /**
-     * Animate Auto Play preference name
-     */
-    public static final String ANIMATE_AUTO_PLAY_PREFERENCE_KEY = "animate_auto_play";
-    /**
-     * Animate Undo preference name
-     */
-    public static final String ANIMATE_SPEED_AUTO_PLAY_PREFERENCE_KEY = "animate_speed_auto_play";
-    /**
-     * Animate Undo preference name
-     */
-    public static final String ANIMATE_SPEED_UNDO_PREFERENCE_KEY = "animate_speed_undo";
-    /**
-     * Animate Undo preference name
-     */
-    public static final String ANIMATE_UNDO_PREFERENCE_KEY = "animate_undo";
-    /**
-     * Auto Flip preference name
-     */
-    public static final String AUTO_FLIP_PREFERENCE_KEY = "auto_flip";
-    /**
-     * Auto Play preference name
-     */
-    public static final String AUTO_PLAY_PREFERENCE_KEY = "auto_play";
-
-    @Override
-    public void onBuildHeaders(final List<Header> target) {
-        loadHeadersFromResource(R.xml.preference_headers, target);
+    override fun onBuildHeaders(target: List<Header>) {
+        loadHeadersFromResource(R.xml.preference_headers, target)
     }
 
-    @Override
-    protected boolean isValidFragment(final String fragmentName) {
-        if (fragmentName.equals(GameplayPreferenceFragment.class.getName()))
-            return true;
-        else if (fragmentName.equals(AnimationPreferenceFragment.class.getName()))
-            return true;
-        return false;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(final MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+    override fun isValidFragment(fragmentName: String): Boolean {
+        return when (fragmentName) {
+            GameplayPreferenceFragment::class.java.name -> true
+            AnimationPreferenceFragment::class.java.name -> true
+            else -> false
         }
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        getActionBar().setDisplayHomeAsUpEnabled(true);
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                finish()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        actionBar!!.setDisplayHomeAsUpEnabled(true)
+    }
+
+    companion object {
+        /**
+         * Animate Auto Play preference name
+         */
+        const val ANIMATE_AUTO_PLAY_PREFERENCE_KEY = "animate_auto_play"
+
+        /**
+         * Animate Undo preference name
+         */
+        const val ANIMATE_SPEED_AUTO_PLAY_PREFERENCE_KEY = "animate_speed_auto_play"
+
+        /**
+         * Animate Undo preference name
+         */
+        const val ANIMATE_SPEED_UNDO_PREFERENCE_KEY = "animate_speed_undo"
+
+        /**
+         * Animate Undo preference name
+         */
+        const val ANIMATE_UNDO_PREFERENCE_KEY = "animate_undo"
+
+        /**
+         * Auto Flip preference name
+         */
+        const val AUTO_FLIP_PREFERENCE_KEY = "auto_flip"
+
+        /**
+         * Auto Play preference name
+         */
+        const val AUTO_PLAY_PREFERENCE_KEY = "auto_play"
     }
 }
