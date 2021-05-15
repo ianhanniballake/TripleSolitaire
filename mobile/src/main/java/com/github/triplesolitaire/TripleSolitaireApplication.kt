@@ -1,23 +1,25 @@
-package com.github.triplesolitaire;
+package com.github.triplesolitaire
 
-import android.app.Application;
-import android.os.StrictMode;
+import android.app.Application
+import android.os.StrictMode
+import android.os.StrictMode.ThreadPolicy
 
 /**
  * Creates the Triple Solitaire application, setting strict mode in debug mode
  */
-public class TripleSolitaireApplication extends Application {
+class TripleSolitaireApplication : Application() {
     /**
      * Sets strict mode if we are in debug mode
      *
-     * @see android.app.Application#onCreate()
+     * @see android.app.Application.onCreate
      */
-    @Override
-    public void onCreate() {
-        super.onCreate();
+    override fun onCreate() {
+        super.onCreate()
         if (BuildConfig.DEBUG) {
-            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectDiskReads().detectDiskWrites()
-                    .detectNetwork().penaltyLog().penaltyFlashScreen().build());
+            StrictMode.setThreadPolicy(
+                ThreadPolicy.Builder().detectDiskReads().detectDiskWrites()
+                    .detectNetwork().penaltyLog().penaltyFlashScreen().build()
+            )
         }
     }
 }
