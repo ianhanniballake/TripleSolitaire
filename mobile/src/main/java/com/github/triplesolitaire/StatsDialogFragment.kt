@@ -1,80 +1,75 @@
-package com.github.triplesolitaire;
+package com.github.triplesolitaire
 
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.DialogFragment;
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.TextView;
-
-import java.text.NumberFormat;
+import android.app.AlertDialog
+import android.app.Dialog
+import android.app.DialogFragment
+import android.os.Bundle
+import android.widget.TextView
+import androidx.core.os.bundleOf
+import java.text.NumberFormat
 
 /**
  * Stats Dialog for the application
  */
-public class StatsDialogFragment extends DialogFragment {
-    private static final String STATS_STATE = "STATS_STATE";
-
-    /**
-     * Create a new StatsDialogFragment with the given StatsState
-     *
-     * @param stats Stats to display
-     * @return A valid StatsDialogFragment
-     */
-    public static StatsDialogFragment createInstance(final StatsState stats) {
-        final StatsDialogFragment statsDialogFragment = new StatsDialogFragment();
-        final Bundle args = new Bundle();
-        args.putString(STATS_STATE, stats.toString());
-        statsDialogFragment.setArguments(args);
-        return statsDialogFragment;
-    }
-
-    @Override
-    public Dialog onCreateDialog(final Bundle savedInstanceState) {
-        final StatsState stats = new StatsState(getArguments().getString(STATS_STATE));
-        final int gamesPlayed = stats.getGamesPlayed();
-        final int gamesWon = stats.getGamesWon(false);
-        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        final LayoutInflater inflater = getActivity().getLayoutInflater();
-        final View layout = inflater.inflate(R.layout.stats_dialog, null);
-        final TextView gamesPlayedView = layout.findViewById(R.id.games_played);
-        gamesPlayedView.setText(Integer.toString(gamesPlayed));
-        final TextView gamesWonView = layout.findViewById(R.id.games_won);
-        gamesWonView.setText(Integer.toString(gamesWon));
-        final TextView winPercentageView = layout.findViewById(R.id.win_percentage);
-        if (gamesPlayed == 0)
-            winPercentageView.setText(R.string.stats_na);
-        else {
-            final NumberFormat percentFormat = NumberFormat.getPercentInstance();
-            percentFormat.setMaximumFractionDigits(1);
-            winPercentageView.setText(percentFormat.format((double) gamesWon / gamesPlayed));
+class StatsDialogFragment : DialogFragment() {
+    override fun onCreateDialog(savedInstanceState: Bundle): Dialog {
+        val stats = StatsState(arguments.getString(STATS_STATE))
+        val gamesPlayed = stats.gamesPlayed
+        val gamesWon = stats.getGamesWon(false)
+        val builder = AlertDialog.Builder(activity)
+        val inflater = activity.layoutInflater
+        val layout = inflater.inflate(R.layout.stats_dialog, null)
+        val gamesPlayedView = layout.findViewById<TextView>(R.id.games_played)
+        gamesPlayedView.text = gamesPlayed.toString()
+        val gamesWonView = layout.findViewById<TextView>(R.id.games_won)
+        gamesWonView.text = gamesWon.toString()
+        val winPercentageView = layout.findViewById<TextView>(R.id.win_percentage)
+        winPercentageView.text = if (gamesPlayed == 0) {
+            getText(R.string.stats_na)
+        } else {
+            val percentFormat = NumberFormat.getPercentInstance()
+            percentFormat.maximumFractionDigits = 1
+            percentFormat.format(gamesWon.toDouble() / gamesPlayed)
         }
-        final TextView averageDurationView = layout.findViewById(R.id.average_duration);
-        if (gamesWon == 0)
-            averageDurationView.setText(getText(R.string.stats_na));
-        else {
-            final double averageDuration = stats.getAverageDuration();
-            final int minutes = (int) (averageDuration / 60);
-            final int seconds = (int) (averageDuration % 60);
-            final StringBuilder sb = new StringBuilder();
-            sb.append(minutes);
-            sb.append(':');
-            if (seconds < 10)
-                sb.append(0);
-            sb.append(seconds);
-            averageDurationView.setText(sb);
+        val averageDurationView = layout.findViewById<TextView>(R.id.average_duration)
+        averageDurationView.text = if (gamesWon == 0) {
+            getText(R.string.stats_na)
+        } else {
+            val averageDuration = stats.averageDuration
+            val minutes = (averageDuration / 60).toInt()
+            val seconds = (averageDuration % 60).toInt()
+            val sb = StringBuilder()
+            sb.append(minutes)
+            sb.append(':')
+            if (seconds < 10) sb.append(0)
+            sb.append(seconds)
+            sb
         }
-        final NumberFormat integerFormat = NumberFormat.getIntegerInstance();
-        final TextView averageMovesView = layout.findViewById(R.id.average_moves);
-        if (gamesWon == 0)
-            averageMovesView.setText(getText(R.string.stats_na));
-        else {
-            final double averageMoves = stats.getAverageMoves();
-            averageMovesView.setText(integerFormat.format(averageMoves));
+        val integerFormat = NumberFormat.getIntegerInstance()
+        val averageMovesView = layout.findViewById<TextView>(R.id.average_moves)
+        averageMovesView.text = if (gamesWon == 0) {
+            getText(R.string.stats_na)
+        } else {
+            val averageMoves = stats.averageMoves
+            integerFormat.format(averageMoves)
         }
         builder.setTitle(R.string.stats).setView(layout)
-                .setNegativeButton(getText(R.string.close), null);
-        return builder.create();
+            .setNegativeButton(getText(R.string.close), null)
+        return builder.create()
+    }
+
+    companion object {
+        private const val STATS_STATE = "STATS_STATE"
+
+        /**
+         * Create a new StatsDialogFragment with the given StatsState
+         *
+         * @param stats Stats to display
+         * @return A valid StatsDialogFragment
+         */
+        @JvmStatic
+        fun createInstance(stats: StatsState) = StatsDialogFragment().apply {
+            arguments = bundleOf(STATS_STATE to stats.toString())
+        }
     }
 }
