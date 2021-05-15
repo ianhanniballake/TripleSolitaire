@@ -1,33 +1,27 @@
-package com.github.triplesolitaire;
+package com.github.triplesolitaire
 
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.widget.ImageView;
+import android.annotation.SuppressLint
+import android.content.Context
+import android.widget.ImageView
 
 /**
  * Image View specifically for Cards. Auto sets the width and height to the appropriate values
  */
 @SuppressLint("ViewConstructor")
-public class Card extends ImageView {
-    /**
-     * Constructs a new Card with the given background image
-     *
-     * @param context context used to create the ImageView
-     * @param resid   image to set as the background
-     */
-    public Card(final Context context, final int resid) {
-        super(context);
-        setBackgroundResource(resid);
+class Card(context: Context, resId: Int) : ImageView(context) {
+    init {
+        setBackgroundResource(resId)
     }
 
     /**
      * Sets the width and height to the appropriate values for a single card
      *
-     * @see android.widget.ImageView#onMeasure(int, int)
+     * @see android.widget.ImageView.onMeasure
      */
-    @Override
-    protected void onMeasure(final int widthMeasureSpec, final int heightMeasureSpec) {
-        setMeasuredDimension(getResources().getDimensionPixelSize(R.dimen.card_width_dim), getResources()
-                .getDimensionPixelSize(R.dimen.card_height_dim));
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        setMeasuredDimension(
+            resources.getDimensionPixelSize(R.dimen.card_width_dim),
+            resources.getDimensionPixelSize(R.dimen.card_height_dim)
+        )
     }
 }
