@@ -20,6 +20,8 @@ import java.util.LinkedList;
 import java.util.Random;
 import java.util.Stack;
 
+import kotlin.collections.ArrayDeque;
+
 /**
  * Class to manage the game state associated with a Triple Solitaire game
  */
@@ -198,7 +200,7 @@ public class GameState {
      * @return Whether the lane should accept the drop
      */
     public boolean acceptCascadeDrop(final int laneIndex, final String bottomNewCard) {
-        final String cascadeCard = lane[laneIndex - 1].getCascade().getLast();
+        final String cascadeCard = lane[laneIndex - 1].getCascade().last();
         final String cascadeSuit = GameState.getSuit(cascadeCard);
         final int cascadeNum = GameState.getNumber(cascadeCard);
         final String bottomNewCardSuit = GameState.getSuit(bottomNewCard);
@@ -286,7 +288,7 @@ public class GameState {
     public boolean attemptAutoMoveFromCascadeToFoundation(final int laneIndex) {
         if (lane[laneIndex - 1].getCascade().isEmpty())
             return false;
-        final String card = lane[laneIndex - 1].getCascade().getLast();
+        final String card = lane[laneIndex - 1].getCascade().last();
         for (int foundationIndex = -1; foundationIndex >= -12; foundationIndex--)
             if (acceptFoundationDrop(foundationIndex, card)) {
                 move(new Move(Type.AUTO_PLAY, foundationIndex, laneIndex, card));
@@ -354,7 +356,7 @@ public class GameState {
      * @return A semicolon separated list of the cards in the requested cascade
      */
     public String buildCascadeString(final int laneIndex, final int numCardsToInclude) {
-        final LinkedList<String> cascade = lane[laneIndex - 1].getCascade();
+        final ArrayDeque<String> cascade = lane[laneIndex - 1].getCascade();
         final StringBuilder cascadeData = new StringBuilder(cascade.get(cascade.size() - numCardsToInclude));
         for (int cascadeIndex = cascade.size() - numCardsToInclude + 1; cascadeIndex < cascade.size(); cascadeIndex++) {
             cascadeData.append(";");
@@ -508,7 +510,7 @@ public class GameState {
                 activity.updateStockUI();
                 break;
             case FLIP: // Flipping over a face down card in a lane
-                final String toFlip = lane[move.getToIndex() - 1].getStack().pop();
+                final String toFlip = lane[move.getToIndex() - 1].getStack().removeLast();
                 lane[move.getToIndex() - 1].getCascade().add(toFlip);
                 addMoveToUndo(move);
                 activity.getLane(move.getToIndex() - 1).flipOverTopStack(toFlip);
@@ -672,7 +674,7 @@ public class GameState {
         for (int laneIndex = 0; laneIndex < 13; laneIndex++) {
             lane[laneIndex] = new LaneData();
             for (int i = 0; i < laneIndex; i++)
-                lane[laneIndex].getStack().push(fullDeck.get(currentIndex++));
+                lane[laneIndex].getStack().addLast(fullDeck.get(currentIndex++));
             lane[laneIndex].getCascade().add(fullDeck.get(currentIndex++));
             final Lane laneLayout = activity.getLane(laneIndex);
             laneLayout.setStackSize(lane[laneIndex].getStack().size());
