@@ -19,10 +19,10 @@ import kotlin.math.min
 /**
  * Represents the player's stats associated with all the games they have played
  */
-class StatsState private constructor(
+class StatsState constructor(
     private val gameStats: SparseArray<GameStats> = SparseArray()
 ) {
-    private data class GameStats(
+    data class GameStats(
         val synced: Boolean = true,
         val duration: Int = 0,
         val moves: Int = 0,
