@@ -42,6 +42,10 @@ android {
             signingConfig signingConfigs.release
         }
     }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
 }
 
 apply plugin: 'com.google.gms.google-services'

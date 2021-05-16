@@ -1,71 +1,55 @@
-package com.github.triplesolitaire;
+package com.github.triplesolitaire
 
-import android.content.ContentProviderOperation;
-import android.content.ContentValues;
-import android.database.Cursor;
-import android.text.format.DateUtils;
-import android.util.Log;
-import android.util.SparseArray;
-
-import com.github.triplesolitaire.provider.GameContract;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-
-import androidx.annotation.NonNull;
+import android.content.ContentProviderOperation
+import android.content.ContentValues
+import android.database.Cursor
+import android.text.format.DateUtils
+import android.util.Log
+import android.util.SparseArray
+import androidx.core.util.forEach
+import androidx.core.util.plus
+import androidx.core.util.set
+import androidx.core.util.valueIterator
+import com.github.triplesolitaire.provider.GameContract
+import org.json.JSONException
+import org.json.JSONObject
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * Represents the player's stats associated with all the games they have played
  */
-public class StatsState {
-    private static class GameStats {
-        int duration = 0;
-        boolean loss = true;
-        int moves = 0;
-        boolean synced = true;
-
-        public GameStats(final boolean synced) {
-            this.synced = synced;
-        }
-
-        public GameStats(final int duration, final int moves, final boolean synced) {
-            loss = false;
-            this.duration = duration;
-            this.moves = moves;
-            this.synced = synced;
-        }
-
-        public GameStats(final JSONObject jsonObject) throws JSONException {
-            if (!jsonObject.has("loss") && jsonObject.getInt("duration") != 0) {
-                loss = false;
-                duration = jsonObject.getInt("duration");
-                moves = jsonObject.getInt("moves");
+class StatsState private constructor(
+    private val gameStats: SparseArray<GameStats> = SparseArray()
+) {
+    private data class GameStats(
+        val synced: Boolean = true,
+        val duration: Int = 0,
+        val moves: Int = 0,
+        val loss: Boolean = false,
+    ) {
+        @Throws(JSONException::class)
+        fun toJSON(): JSONObject {
+            val json = JSONObject()
+            if (loss) {
+                json.put("loss", true)
+            } else {
+                json.put("duration", duration)
+                json.put("moves", moves)
             }
-        }
-
-        public JSONObject toJSON() throws JSONException {
-            final JSONObject json = new JSONObject();
-            if (loss)
-                json.put("loss", true);
-            else {
-                json.put("duration", duration);
-                json.put("moves", moves);
-            }
-            return json;
+            return json
         }
     }
 
-    // serialization format version
-    private static final String SERIAL_VERSION = "1.0";
-    private final SparseArray<GameStats> gameStats = new SparseArray<>();
-
-    /**
-     * Constructs an empty StatsState (i.e., no games played)
-     */
-    public StatsState() {
+    private fun GameStats(
+        jsonObject: JSONObject
+    ) = if (!jsonObject.has("loss") && jsonObject.getInt("duration") != 0) {
+        GameStats(
+            duration = jsonObject.getInt("duration"),
+            moves = jsonObject.getInt("moves")
+        )
+    } else {
+        GameStats()
     }
 
     /**
@@ -73,32 +57,30 @@ public class StatsState {
      *
      * @param data Serialized data to parse
      */
-    public StatsState(final byte[] data) {
-        this(new String(data));
-    }
+    constructor(data: ByteArray) : this(String(data))
 
     /**
      * Constructs a StatsState object from Cursor data.
      *
      * @param data Cursor data to parse
      */
-    public StatsState(final Cursor data) {
+    constructor(data: Cursor?) : this() {
         if (data == null) {
-            return;
+            return
         }
-        final int startTimeColumnIndex = data.getColumnIndex(GameContract.Games.COLUMN_NAME_START_TIME);
-        final int durationColumnIndex = data.getColumnIndex(GameContract.Games.COLUMN_NAME_DURATION);
-        final int movesColumnIndex = data.getColumnIndex(GameContract.Games.COLUMN_NAME_MOVES);
-        final int syncedColumnIndex = data.getColumnIndex(GameContract.Games.COLUMN_NAME_SYNCED);
+        val startTimeColumnIndex = data.getColumnIndex(GameContract.Games.COLUMN_NAME_START_TIME)
+        val durationColumnIndex = data.getColumnIndex(GameContract.Games.COLUMN_NAME_DURATION)
+        val movesColumnIndex = data.getColumnIndex(GameContract.Games.COLUMN_NAME_MOVES)
+        val syncedColumnIndex = data.getColumnIndex(GameContract.Games.COLUMN_NAME_SYNCED)
         while (data.moveToNext()) {
-            final int startTime = data.getInt(startTimeColumnIndex);
-            final boolean synced = data.getInt(syncedColumnIndex) != 0;
-            if (data.isNull(durationColumnIndex) || data.getInt(durationColumnIndex) == 0)
-                gameStats.put(startTime, new GameStats(synced));
-            else {
-                final int duration = data.getInt(durationColumnIndex);
-                final int moves = data.getInt(movesColumnIndex);
-                gameStats.put(startTime, new GameStats(duration, moves, synced));
+            val startTime = data.getInt(startTimeColumnIndex)
+            val synced = data.getInt(syncedColumnIndex) != 0
+            if (data.isNull(durationColumnIndex) || data.getInt(durationColumnIndex) == 0) {
+                gameStats[startTime] = GameStats(synced)
+            } else {
+                val duration = data.getInt(durationColumnIndex)
+                val moves = data.getInt(movesColumnIndex)
+                gameStats[startTime] = GameStats(synced, duration, moves)
             }
         }
     }
@@ -108,78 +90,61 @@ public class StatsState {
      *
      * @param json JSON data to parse
      */
-    public StatsState(final String json) {
-        if (json == null || json.trim().equals(""))
-            return; // default progress
+    constructor(json: String?) : this() {
+        if (json.isNullOrBlank()) return  // default progress
         try {
-            final JSONObject obj = new JSONObject(json);
-            final String format = obj.getString("version");
-            if (!format.equals(SERIAL_VERSION))
-                throw new RuntimeException("Unexpected stats format " + format);
-            final JSONObject levels = obj.getJSONObject("games");
-            final Iterator<?> iter = levels.keys();
-            while (iter.hasNext()) {
-                final String startTime = (String) iter.next();
-                final GameStats gameStat = new GameStats(levels.getJSONObject(startTime));
-                gameStats.put(Integer.valueOf(startTime), gameStat);
+            val obj = JSONObject(json)
+            val format = obj.getString("version")
+            if (format != SERIAL_VERSION) throw RuntimeException("Unexpected stats format $format")
+            val levels = obj.getJSONObject("games")
+            levels.keys().forEach { startTime ->
+                val gameStat = GameStats(levels.getJSONObject(startTime))
+                gameStats[startTime.toInt()] = gameStat
             }
-        } catch (final JSONException e) {
-            Log.e(StatsState.class.getSimpleName(), "Error parsing JSON", e);
-            throw new RuntimeException("Save data has a syntax error: " + json, e);
-        } catch (final NumberFormatException e) {
-            Log.e(StatsState.class.getSimpleName(), "Invalid number while parsing JSON", e);
-            throw new RuntimeException("Save data has an invalid number in it: " + json, e);
+        } catch (e: JSONException) {
+            Log.e(StatsState::class.java.simpleName, "Error parsing JSON", e)
+            throw RuntimeException("Save data has a syntax error: $json", e)
+        } catch (e: NumberFormatException) {
+            Log.e(StatsState::class.java.simpleName, "Invalid number while parsing JSON", e)
+            throw RuntimeException("Save data has an invalid number in it: $json", e)
         }
     }
 
     /**
-     * Returns a clone of this StatsState object.
-     */
-    @Override
-    public StatsState clone() {
-        final StatsState result = new StatsState();
-        final int size = gameStats.size();
-        for (int index = 0; index < size; index++) {
-            final int key = gameStats.keyAt(index);
-            result.gameStats.put(key, gameStats.get(key));
-        }
-        return result;
-    }
-
-    /**
-     * Get the average game duration of games won. This should only be called when the user has won at least one game
+     * Get the average game duration of games won. This should only be called when the
+     * user has won at least one game
      *
      * @return Average game duration in seconds
      */
-    public double getAverageDuration() {
-        double durationSum = 0;
-        final int size = gameStats.size();
-        for (int index = 0; index < size; index++)
-            durationSum += gameStats.get(gameStats.keyAt(index)).duration;
-        return durationSum / getGamesWon(false);
-    }
+    val averageDuration: Double
+        get() {
+            val durationSum = gameStats.valueIterator().asSequence().map {
+                it.duration.toDouble()
+            }.sum()
+            return durationSum / getGamesWon(false)
+        }
 
     /**
-     * Gets the average game moves of games won. This should only be called when the user has won at least one game
+     * Gets the average game moves of games won. This should only be called when the
+     * user has won at least one game
      *
      * @return Average game moves
      */
-    public double getAverageMoves() {
-        double moveSum = 0;
-        final int size = gameStats.size();
-        for (int index = 0; index < size; index++)
-            moveSum += gameStats.get(gameStats.keyAt(index)).moves;
-        return moveSum / getGamesWon(false);
-    }
+    val averageMoves: Double
+        get() {
+            val moveSum = gameStats.valueIterator().asSequence().map {
+                it.moves.toDouble()
+            }.sum()
+            return moveSum / getGamesWon(false)
+        }
 
     /**
      * Gets the total number of games played
      *
      * @return The number of games played
      */
-    public int getGamesPlayed() {
-        return gameStats.size();
-    }
+    val gamesPlayed: Int
+        get() = gameStats.size()
 
     /**
      * Gets the total number of games won
@@ -187,95 +152,85 @@ public class StatsState {
      * @param onlyUnsynced If only unsynced games should be considered
      * @return The number of games won
      */
-    public int getGamesWon(final boolean onlyUnsynced) {
-        int gamesWon = 0;
-        for (int index = 0; index < gameStats.size(); index++) {
-            final GameStats stats = gameStats.get(gameStats.keyAt(index));
-            if (stats.loss || (onlyUnsynced && stats.synced))
-                continue;
-            gamesWon++;
-        }
-        return gamesWon;
-    }
+    fun getGamesWon(
+        onlyUnsynced: Boolean
+    ) = gameStats.valueIterator().asSequence().filterNot { stats ->
+        stats.loss
+    }.filterNot { stats ->
+        onlyUnsynced && stats.synced
+    }.count()
 
     /**
      * Gets the number of unsynced games
      * @return The number of unsynced games
      */
-    public int getGamesUnsynced() {
-        int gamesUnsynced = 0;
-        for (int index = 0; index < gameStats.size(); index++) {
-            final GameStats stats = gameStats.get(gameStats.keyAt(index));
-            if (!stats.synced) {
-                gamesUnsynced++;
+    val gamesUnsynced: Int
+        get() {
+            return gameStats.valueIterator().asSequence().count { stats ->
+                !stats.synced
             }
         }
-        return gamesUnsynced;
-    }
 
     /**
      * Gets the total time played across all games
      *
      * @return The time played across all games in milliseconds
      */
-    public long getTotalPlayedTimeMillis() {
-        long playedTimeMillis = 0;
-        for (int index = 0; index < gameStats.size(); index++) {
-            final GameStats stats = gameStats.get(gameStats.keyAt(index));
-            playedTimeMillis += stats.duration * DateUtils.SECOND_IN_MILLIS;
+    val totalPlayedTimeMillis: Long
+        get() {
+            return gameStats.valueIterator().asSequence().map { it.duration }.sumOf { duration ->
+                duration * DateUtils.SECOND_IN_MILLIS
+            }
         }
-        return playedTimeMillis;
-    }
-
 
     /**
-     * Gets a list of ContentProviderOperations that save all of the current game stats to the local ContentProvider.
-     * Note that this does not look for already existing records, but assumes the ContentProvider can ignore duplicates
+     * Gets a list of ContentProviderOperations that save all of the current game stats
+     * to the local ContentProvider.
+     *
+     * Note that this does not look for already existing records, but assumes the
+     * ContentProvider can ignore duplicates
      *
      * @return List of operations needed to save these stats to the local ContentProvider
      */
-    public ArrayList<ContentProviderOperation> getLocalSaveOperations() {
-        final ArrayList<ContentProviderOperation> operations = new ArrayList<>();
-        final int size = gameStats.size();
-        for (int index = 0; index < size; index++) {
-            final int startTime = gameStats.keyAt(index);
-            final GameStats stats = gameStats.get(startTime);
-            final ContentValues values = new ContentValues();
-            values.put(GameContract.Games.COLUMN_NAME_START_TIME, startTime);
-            if (stats.loss) {
-                values.putNull(GameContract.Games.COLUMN_NAME_DURATION);
-                values.putNull(GameContract.Games.COLUMN_NAME_MOVES);
-            } else {
-                values.put(GameContract.Games.COLUMN_NAME_DURATION, stats.duration);
-                values.put(GameContract.Games.COLUMN_NAME_MOVES, stats.moves);
+    val localSaveOperations: ArrayList<ContentProviderOperation>
+        get() {
+            val operations = ArrayList<ContentProviderOperation>()
+            gameStats.forEach { startTime, stats ->
+                val values = ContentValues()
+                values.put(GameContract.Games.COLUMN_NAME_START_TIME, startTime)
+                if (stats.loss) {
+                    values.putNull(GameContract.Games.COLUMN_NAME_DURATION)
+                    values.putNull(GameContract.Games.COLUMN_NAME_MOVES)
+                } else {
+                    values.put(GameContract.Games.COLUMN_NAME_DURATION, stats.duration)
+                    values.put(GameContract.Games.COLUMN_NAME_MOVES, stats.moves)
+                }
+                values.put(GameContract.Games.COLUMN_NAME_SYNCED, stats.synced)
+                operations.add(
+                    ContentProviderOperation.newInsert(GameContract.Games.CONTENT_URI)
+                        .withValues(values)
+                        .build()
+                )
             }
-            values.put(GameContract.Games.COLUMN_NAME_SYNCED, stats.synced);
-            operations.add(ContentProviderOperation.newInsert(GameContract.Games.CONTENT_URI).withValues(values)
-                    .build());
+            return operations
         }
-        return operations;
-    }
 
     /**
      * Get longest win streak (i.e., multiple games won in a row
      *
      * @return The maximum number of games won in a row
      */
-    public int getLongestWinStreak() {
-        int currentStreak = 0;
-        int longestWinStreak = 0;
-        final int size = gameStats.size();
-        for (int index = 0; index < size; index++) {
-            final GameStats stats = gameStats.get(gameStats.keyAt(index));
-            if (stats.loss) {
-                longestWinStreak = Math.max(longestWinStreak, currentStreak);
-                currentStreak = 0;
-            } else
-                currentStreak++;
+    val longestWinStreak: Int
+        get() {
+            return gameStats.valueIterator().asSequence().fold(0 to 0) {
+                    (currentStreak, longestWinStreak), stats ->
+                if (stats.loss) {
+                    0 to max(currentStreak, longestWinStreak)
+                } else {
+                    currentStreak + 1 to max(currentStreak + 1, longestWinStreak)
+                }
+            }.second
         }
-        longestWinStreak = Math.max(longestWinStreak, currentStreak);
-        return longestWinStreak;
-    }
 
     /**
      * Gets the minimum number of moves in any won game
@@ -283,21 +238,22 @@ public class StatsState {
      * @param onlyUnsynced If only unsynced games should be considered
      * @return The minimum number of moves used to win a game
      */
-    public int getMinimumMoves(final boolean onlyUnsynced) {
-        int numConsidered = 0;
-        int minimumMoves = Integer.MAX_VALUE;
-        final int size = gameStats.size();
-        for (int index = 0; index < size; index++) {
-            final GameStats stats = gameStats.get(gameStats.keyAt(index));
-            if (stats.loss || (onlyUnsynced && stats.synced))
-                continue;
-            minimumMoves = Math.min(minimumMoves, stats.moves);
-            numConsidered++;
+    fun getMinimumMoves(onlyUnsynced: Boolean): Int {
+        var numConsidered = 0
+        val minimumMoves = gameStats.valueIterator().asSequence().filterNot { stats ->
+            stats.loss || onlyUnsynced && stats.synced
+        }.fold(Int.MAX_VALUE) { minimum, stats ->
+            numConsidered++
+            min(minimum, stats.moves)
         }
-        if (BuildConfig.DEBUG)
-            Log.d(StatsState.class.getSimpleName(), "Get Minimum Moves" + (onlyUnsynced ? " (Unsynced)" : "")
-                    + ": considered " + numConsidered);
-        return minimumMoves;
+        if (BuildConfig.DEBUG) {
+            Log.d(
+                StatsState::class.java.simpleName,
+                "Get Minimum Moves" + (if (onlyUnsynced) " (Unsynced)" else "")
+                        + ": considered " + numConsidered
+            )
+        }
+        return minimumMoves
     }
 
     /**
@@ -306,21 +262,22 @@ public class StatsState {
      * @param onlyUnsynced If only unsynced games should be considered
      * @return The shortest time (in seconds) in any won game
      */
-    public int getShortestTime(final boolean onlyUnsynced) {
-        int numConsidered = 0;
-        int shortestDuration = Integer.MAX_VALUE;
-        final int size = gameStats.size();
-        for (int index = 0; index < size; index++) {
-            final GameStats stats = gameStats.get(gameStats.keyAt(index));
-            if (stats.loss || (onlyUnsynced && stats.synced))
-                continue;
-            shortestDuration = Math.min(shortestDuration, stats.duration);
-            numConsidered++;
+    fun getShortestTime(onlyUnsynced: Boolean): Int {
+        var numConsidered = 0
+        val shortestDuration = gameStats.valueIterator().asSequence().filterNot { stats ->
+            stats.loss || onlyUnsynced && stats.synced
+        }.fold(Int.MAX_VALUE) { minimum, stats ->
+            numConsidered++
+            min(minimum, stats.duration)
         }
-        if (BuildConfig.DEBUG)
-            Log.d(StatsState.class.getSimpleName(), "Get Shorted Time" + (onlyUnsynced ? " (Unsynced)" : "")
-                    + ": considered " + numConsidered);
-        return shortestDuration;
+        if (BuildConfig.DEBUG) {
+            Log.d(
+                StatsState::class.java.simpleName,
+                "Get Shorted Time" + (if (onlyUnsynced) " (Unsynced)" else "")
+                        + ": considered " + numConsidered
+            )
+        }
+        return shortestDuration
     }
 
     /**
@@ -328,49 +285,40 @@ public class StatsState {
      *
      * @return A byte array representing this StatsState
      */
-    public byte[] toBytes() {
-        return toString().getBytes();
+    fun toBytes(): ByteArray {
+        return toString().toByteArray()
     }
 
     /**
      * Serializes this StatsState to a JSON string.
      */
-    @Override
-    @NonNull
-    public String toString() {
-        try {
-            final JSONObject games = new JSONObject();
-            final int size = gameStats.size();
-            for (int index = 0; index < size; index++) {
-                final int startTime = gameStats.keyAt(index);
-                games.put(Integer.toString(startTime), gameStats.get(startTime).toJSON());
+    override fun toString(): String {
+        return try {
+            val games = JSONObject()
+            gameStats.forEach { startTime, stats ->
+                games.put(startTime.toString(), stats.toJSON())
             }
-            final JSONObject obj = new JSONObject();
-            obj.put("version", SERIAL_VERSION);
-            obj.put("games", games);
-            return obj.toString();
-        } catch (final JSONException e) {
-            Log.e(StatsState.class.getSimpleName(), "Error converting save data to JSON", e);
-            throw new RuntimeException("Error converting save data to JSON.", e);
+            JSONObject().apply {
+                put("version", SERIAL_VERSION)
+                put("games", games)
+            }.toString()
+        } catch (e: JSONException) {
+            Log.e(StatsState::class.java.simpleName, "Error converting save data to JSON", e)
+            throw RuntimeException("Error converting save data to JSON.", e)
         }
     }
 
     /**
-     * Computes the union of this StatsState with the given StatsState. The other stats always overwrite the current
-     * stats
+     * Computes the union of this StatsState with the given StatsState.
+     * The other stats always overwrite the current stats
      *
      * @param other The other operand with which to compute the union.
      * @return The result of the union.
      */
-    public StatsState unionWith(final StatsState other) {
-        final StatsState result = clone();
-        final int size = other.gameStats.size();
-        for (int index = 0; index < size; index++) {
-            final int key = other.gameStats.keyAt(index);
-            // Other overwrites local stats. In almost all cases, they'll be the same as key conflicts will be near
-            // impossible
-            result.gameStats.put(key, other.gameStats.get(key));
-        }
-        return result;
+    fun unionWith(other: StatsState) = StatsState(gameStats + other.gameStats)
+
+    companion object {
+        // serialization format version
+        private const val SERIAL_VERSION = "1.0"
     }
 }
