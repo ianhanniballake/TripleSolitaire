@@ -248,7 +248,7 @@ class GameActivity : Activity() {
      */
     private val gameTime: CharSequence
         get() {
-            val timeInSeconds = gameState.getTimeInSeconds()
+            val timeInSeconds = gameState.timeInSeconds
             val minutes = timeInSeconds / 60
             val seconds = timeInSeconds % 60
             val sb = StringBuilder()
@@ -281,7 +281,7 @@ class GameActivity : Activity() {
      * @return Current move count
      */
     private val moveCount: Int
-        get() = gameState.getMoveCount()
+        get() = gameState.moveCount
 
     /**
      * Gets the screen location for the top card in the waste
@@ -298,7 +298,7 @@ class GameActivity : Activity() {
         }
 
     override fun onBackPressed() {
-        val gameStarted = gameState.getTimeInSeconds() > 0
+        val gameStarted = gameState.timeInSeconds > 0
         if (!gameStarted && !gameState.gameInProgress) {
             super.onBackPressed()
             return
@@ -450,7 +450,7 @@ class GameActivity : Activity() {
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         super.onPrepareOptionsMenu(menu)
         menu.findItem(R.id.undo).isEnabled = gameState.canUndo()
-        val gameStarted = gameState.getTimeInSeconds() > 0
+        val gameStarted = gameState.timeInSeconds > 0
         val gameInProgress = gameState.gameInProgress
         menu.findItem(R.id.pause).isEnabled = gameStarted || gameInProgress
         return true
