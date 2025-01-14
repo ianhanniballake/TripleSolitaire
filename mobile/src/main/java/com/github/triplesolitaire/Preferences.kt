@@ -27,7 +27,7 @@ class Preferences : PreferenceActivity() {
          */
         private lateinit var animateSpeedUndoListPreference: ListPreference
 
-        override fun onCreate(savedInstanceState: Bundle) {
+        override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
             addPreferencesFromResource(R.xml.preferences_animation)
             animateSpeedAutoplayListPreference = preferenceScreen.findPreference(
@@ -70,7 +70,7 @@ class Preferences : PreferenceActivity() {
          */
         private lateinit var autoplayListPreference: ListPreference
 
-        override fun onCreate(savedInstanceState: Bundle) {
+        override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
             addPreferencesFromResource(R.xml.preferences_gameplay)
             autoplayListPreference =

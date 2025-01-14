@@ -112,7 +112,7 @@ class TripleSolitaireActivity : Activity(), LoaderManager.LoaderCallbacks<Cursor
         }
     }
 
-    override fun onActivityResult(request: Int, response: Int, data: Intent) {
+    override fun onActivityResult(request: Int, response: Int, data: Intent?) {
         super.onActivityResult(request, response, data)
         if (request == REQUEST_SIGN_IN) {
             if (BuildConfig.DEBUG) {
@@ -132,7 +132,7 @@ class TripleSolitaireActivity : Activity(), LoaderManager.LoaderCallbacks<Cursor
                 dialog?.show()
             }
         }
-        if (request == REQUEST_GAME && response == RESULT_OK) {
+        if (request == REQUEST_GAME && response == RESULT_OK && data != null) {
             val winDialogFragment = createInstance(data)
             winDialogFragment.show(fragmentManager, "win")
         }
@@ -144,7 +144,7 @@ class TripleSolitaireActivity : Activity(), LoaderManager.LoaderCallbacks<Cursor
      *
      * @see android.app.Activity.onCreate
      */
-    override fun onCreate(savedInstanceState: Bundle) {
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main)
         googleSignInClient = GoogleSignIn.getClient(
@@ -189,7 +189,7 @@ class TripleSolitaireActivity : Activity(), LoaderManager.LoaderCallbacks<Cursor
         loaderManager.initLoader(0, null, this)
     }
 
-    override fun onCreateLoader(id: Int, args: Bundle): Loader<Cursor?> {
+    override fun onCreateLoader(id: Int, args: Bundle?): Loader<Cursor?> {
         return CursorLoader(this, GameContract.Games.CONTENT_URI, null, null, null, null)
     }
 

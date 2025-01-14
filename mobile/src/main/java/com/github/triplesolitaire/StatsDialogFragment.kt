@@ -12,7 +12,7 @@ import java.text.NumberFormat
  * Stats Dialog for the application
  */
 class StatsDialogFragment : DialogFragment() {
-    override fun onCreateDialog(savedInstanceState: Bundle): Dialog {
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val stats = StatsState(arguments.getString(STATS_STATE))
         val gamesPlayed = stats.gamesPlayed
         val gamesWon = stats.getGamesWon(false)

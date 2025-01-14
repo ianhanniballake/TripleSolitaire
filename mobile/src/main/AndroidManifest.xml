@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-    package="com.github.triplesolitaire"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:installLocation="auto">
 
@@ -31,6 +29,7 @@
 
         <activity
             android:name="com.github.triplesolitaire.TripleSolitaireActivity"
+            android:exported="true"
             android:screenOrientation="sensorLandscape"
             android:theme="@style/Theme.TripleSolitaire.Main">
             <intent-filter>
@@ -51,6 +50,7 @@
         </activity>
         <activity
             android:name="com.github.triplesolitaire.GameActivity"
+            android:exported="false"
             android:parentActivityName="com.github.triplesolitaire.TripleSolitaireActivity"
             android:screenOrientation="sensorLandscape"
             android:theme="@style/Theme.TripleSolitaire.Game">

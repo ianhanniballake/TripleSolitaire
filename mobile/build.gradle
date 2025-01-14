@@ -16,11 +16,12 @@ def versionPatch = 0
 def versionBuild = 0
 
 android {
-    compileSdkVersion 28
+    namespace 'com.github.triplesolitaire'
+    compileSdk 31
 
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 28
+        targetSdk 31
         versionCode versionMajor * 10000000 + versionMinor * 1000000 + versionPatch * 1000 + versionBuild
         versionName "${versionMajor}.${versionMinor}.${versionPatch}"
     }
